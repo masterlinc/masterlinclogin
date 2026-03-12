@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统，而非提示词</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+        }
+        
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3), 0 0 40px rgba(0, 255, 255, 0.1);
+        }
+        
+        .neon-glow:hover {
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.2);
+        }
+        
+        .underline-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #404040;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+        
+        .underline-input:focus {
+            border-bottom-color: #00FFFF;
+        }
+        
+        .underline-input::placeholder {
+            color: #525252;
+        }
+        
+        .pain-bullet::before {
+            content: "—";
+            color: #00FFFF;
+            margin-right: 1rem;
+        }
+        
+        .step-number {
+            color: #00FFFF;
+            font-weight: 800;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto px-6 py-20 md:py-32">
+        
+        <!-- 1. Eyebrow 眉题 -->
+        <div class="mb-8">
+            <p class="text-xs md:text-sm tracking-[0.3em] uppercase text-neutral-500 font-medium">
+                致被日常琐事榨干的实业高管
+            </p>
+        </div>
+        
+        <!-- 2. Clear Promise Headline 核心承诺标题 -->
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight mb-8">
+            没有<br/>
+            <span class="text-neutral-400">精神内耗</span><br/>
+            的情况下，<br/>
+            实现<span class="text-cyan-400">10倍产出</span>
+        </h1>
+        
+        <!-- 3. Subheadline 副标题 -->
+        <p class="text-lg md:text-xl text-neutral-400 max-w-2xl leading-relaxed mb-20">
+            把 8 小时的扯皮压缩成 15 分钟的 AI 自动执行。
+            不是收集更多提示词，而是建立一个永不疲倦的数字员工系统。
+        </p>
+        
+        <!-- 4. Pain Bullet Spray 痛点扫射 -->
+        <div class="mb-20">
+            <p class="text-sm tracking-[0.2em] uppercase text-neutral-600 mb-8 font-medium">
+                你现在正在经历的
+            </p>
+            <div class="space-y-4 text-lg md:text-xl">
+                <div class="pain-bullet flex items-start">
+                    <span class="text-neutral-300">每天早上被 200 封邮件淹没，回复完已经是中午</span>
+                </div>
+                <div class="pain-bullet flex items-start">
+                    <span class="text-neutral-300">团队会议占满日程，但 90% 的内容与你无关</span>
+                </div>
+                <div class="pain-bullet flex items-start">
+                    <span class="text-neutral-300">花 3 小时写一份报告，AI 30 秒就能完成</span>
+                </div>
+                <div class="pain-bullet flex items-start">
+                    <span class="text-neutral-300">收藏了 500 个提示词，却从未真正用过</span>
+                </div>
+                <div class="pain-bullet flex items-start">
+                    <span class="text-neutral-300">你越来越忙，但公司增长却越来越慢</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 5. Perspective Shift 观点重塑 -->
+        <div class="mb-20 py-12 border-t border-b border-neutral-900">
+            <p class="text-2xl md:text-3xl font-light leading-relaxed text-white">
+                你错了。
+            </p>
+            <p class="text-lg md:text-xl text-neutral-400 leading-relaxed mt-4 max-w-3xl">
+                收集提示词只是精神自慰。你需要的是<span class="text-white font-medium">系统</span>——
+                一个在你睡觉时仍在运转、在你度假时仍在成交、在你思考战略时仍在执行的
+                <span class="text-white font-medium">自动化机器</span>。
+            </p>
+        </div>
+        
+        <!-- 6. Unique Mechanism 独特机制 -->
+        <div class="mb-20">
+            <p class="text-sm tracking-[0.2em] uppercase text-neutral-600 mb-10 font-medium">
+                三步构建你的自动化帝国
+            </p>
+            <div class="space-y-8">
+                <div class="flex items-start gap-6">
+                    <span class="step-number text-3xl md:text-4xl">01</span>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-2">审计</h3>
+                        <p class="text-neutral-400">识别你每周浪费的 20+ 小时重复性工作</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6">
+                    <span class="step-number text-3xl md:text-4xl">02</span>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-2">自动化</h3>
+                        <p class="text-neutral-400">用 AI 工作流替代人工，零代码，即插即用</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-6">
+                    <span class="step-number text-3xl md:text-4xl">03</span>
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-semibold mb-2">放大</h3>
+                        <p class="text-neutral-400">把省下的时间投入真正创造价值的决策</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 7. Call To Action 最终CTA -->
+        <div class="mb-20">
+            <p class="text-sm tracking-[0.2em] uppercase text-neutral-600 mb-8 font-medium">
+                获取你的专属自动化审计报告
+            </p>
+            <form class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-end max-w-xl" onsubmit="event.preventDefault(); alert('感谢订阅！我们会尽快联系你。');">
+                <div class="flex-1 w-full">
+                    <input 
+                        type="email" 
+                        placeholder="输入你的邮箱" 
+                        class="underline-input w-full py-3 text-lg text-white"
+                        required
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    class="w-full sm:w-auto px-8 py-3 bg-cyan-400 text-black font-bold text-lg tracking-wide neon-glow transition-all duration-300 hover:bg-cyan-300"
+                >
+                    开始解放
+                </button>
+            </form>
+            <p class="text-xs text-neutral-600 mt-4">
+                无垃圾邮件。随时退订。你的时间很宝贵，我们不会浪费它。
+            </p>
+        </div>
+        
+        <!-- 8. Footer Soul Question 灵魂拷问 -->
+        <footer class="pt-12 border-t border-neutral-900">
+            <p class="text-xl md:text-2xl text-neutral-500 font-light italic leading-relaxed">
+                "今天，你又把生命浪费在了哪件<br class="hidden md:block"/>
+                本来可以交给系统自动运行的破事上？"
+            </p>
+            <div class="mt-12 flex items-center justify-between">
+                <p class="text-xs text-neutral-700 tracking-wider">
+                    © 2024 SYSTEM OVER PROMPTS
+                </p>
+                <p class="text-xs text-neutral-700 tracking-wider">
+                    系统，而非提示词
+                </p>
+            </div>
+        </footer>
+        
+    </main>
+</body>
+</html>
