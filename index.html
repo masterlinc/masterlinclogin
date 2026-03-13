@@ -23,20 +23,75 @@
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), 0 0 60px rgba(0, 255, 255, 0.2);
         }
         
+        .form-container {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.03) 0%, rgba(0, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(0, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+        
+        .form-input-wrapper {
+            position: relative;
+        }
+        
+        .form-input-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #00FFFF, #00CCCC);
+            transition: width 0.4s ease;
+        }
+        
+        .form-input-wrapper:focus-within::after {
+            width: 100%;
+        }
+        
         .underline-input {
             background: transparent;
             border: none;
-            border-bottom: 1px solid #404040;
+            border-bottom: 1px solid #333333;
             outline: none;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .underline-input:focus {
-            border-bottom-color: #00FFFF;
+            border-bottom-color: transparent;
         }
         
         .underline-input::placeholder {
             color: #525252;
+            transition: color 0.3s ease;
+        }
+        
+        .underline-input:focus::placeholder {
+            color: #666666;
+        }
+        
+        .form-button {
+            background: linear-gradient(135deg, #00FFFF 0%, #00CCCC 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .form-button:hover::before {
+            left: 100%;
+        }
+        
+        .form-button:hover {
+            background: linear-gradient(135deg, #33FFFF 0%, #00FFFF 100%);
         }
         
         .pain-bullet::before {
@@ -143,14 +198,32 @@
         </div>
         
         <!-- 7. Call To Action 最终CTA -->
-        <div class="mb-20">
-            <p class="text-sm tracking-[0.2em] uppercase text-neutral-600 mb-8 font-medium">
-                获取你的专属自动化审计报告
+        <div class="mb-20 form-container p-8 md:p-10">
+            <p class="text-xl md:text-2xl font-semibold mb-2 text-white">
+                想从「执行者」进化为「系统架构师」？
             </p>
-            <script async src="https://subscribe-forms.beehiiv.com/embed.js"></script>
-            <iframe src="https://subscribe-forms.beehiiv.com/e5215b10-5e97-4711-adc4-19de2d7f5a1c" class="beehiiv-embed" data-test-id="beehiiv-embed" frameborder="0" scrolling="no" style="width: 560px; height: 315px; margin: 0; border-radius: 0px 0px 0px 0px !important; background-color: transparent; box-shadow: 0 0 #0000; max-width: 100%;"></iframe>
-            <p class="text-xs text-neutral-600 mt-4">
-                无垃圾邮件。随时退订。你的时间很宝贵，我们不会浪费它。
+            <p class="text-lg text-neutral-400 mb-8">
+                获取《NotebookLM 高管极简部署指南》
+            </p>
+            <form action="https://buttondown.com/api/emails/embed-subscribe/linc" method="post" class="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-end max-w-xl">
+                <div class="flex-1 w-full form-input-wrapper">
+                    <input 
+                        type="email" 
+                        name="email"
+                        placeholder="your@email.com" 
+                        class="underline-input w-full py-3 text-lg text-white"
+                        required
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    class="w-full sm:w-auto px-8 py-3 text-black font-bold text-lg tracking-wide neon-glow transition-all duration-300 form-button"
+                >
+                    立即获取指南
+                </button>
+            </form>
+            <p class="text-xs text-neutral-600 mt-6">
+                Powered by Buttondown. 无垃圾邮件，随时退订。
             </p>
         </div>
         
