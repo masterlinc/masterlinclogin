@@ -1,5 +1,6 @@
 /* ============================================================
-   在路上的 AI 管理博士 — Dan Koe 风格暗色极简
+   在路上的 AI 管理博士 — Dan Koe 风格暗色极简 v2
+   字体即主角 · 极简高对比 · 强调色点睛 · 粗粝真实
    ============================================================ */
 
 :root {
@@ -9,6 +10,8 @@
   --white: #ffffff;
   --gray: #8a8a8a;
   --gray-light: #b5b5b5;
+  --accent: #ffb454;
+  --accent-soft: rgba(255, 180, 84, 0.12);
 }
 
 * {
@@ -17,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 90px;
 }
 
 body {
@@ -42,7 +46,8 @@ img {
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 180, 84, 0.35);
+  color: var(--white);
 }
 
 .wrap {
@@ -53,10 +58,17 @@ img {
 /* ---------- 导航 ---------- */
 
 .nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 40px;
+  padding: 22px 40px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(31, 31, 31, 0.7);
 }
 
 .monogram {
@@ -65,10 +77,16 @@ img {
   letter-spacing: 0.02em;
 }
 
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
 .nav-link {
   font-size: 14px;
   color: var(--gray-light);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid transparent;
   padding-bottom: 2px;
   transition: color 0.2s ease, border-color 0.2s ease;
 }
@@ -76,6 +94,17 @@ img {
 .nav-link:hover {
   color: var(--white);
   border-color: var(--white);
+}
+
+.nav-link-cta {
+  color: var(--accent);
+  border-color: rgba(255, 180, 84, 0.35);
+  font-weight: 600;
+}
+
+.nav-link-cta:hover {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ---------- 通用区块标题 ---------- */
@@ -111,7 +140,7 @@ section {
 /* ---------- Hero ---------- */
 
 .hero {
-  padding: 130px 0 90px;
+  padding: 140px 0 90px;
   text-align: center;
 }
 
@@ -124,7 +153,7 @@ section {
 }
 
 .hero-sub {
-  width: min(560px, 90%);
+  width: min(600px, 90%);
   margin: 26px auto 0;
   font-size: 17px;
   line-height: 1.75;
@@ -138,14 +167,100 @@ section {
   margin-top: 38px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--white);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
-  padding-bottom: 3px;
-  transition: border-color 0.2s ease;
+  color: var(--accent);
+  border: 1px solid rgba(255, 180, 84, 0.45);
+  padding: 13px 26px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
 }
 
 .hero-cta:hover {
-  border-color: var(--white);
+  background: rgba(255, 180, 84, 0.2);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.hero-note {
+  margin-top: 20px;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: #555;
+}
+
+/* ---------- 信任锚点 ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 40px;
+  padding: 40px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+
+.stat-num {
+  font-size: clamp(30px, 4vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  color: var(--gray);
+}
+
+/* ---------- 痛点 ---------- */
+
+.pain-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-top: 64px;
+  text-align: left;
+}
+
+.pain-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 26px 28px;
+  transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.pain-item:hover {
+  border-color: #3a3a3a;
+  transform: translateY(-2px);
+}
+
+.pain-item h3 {
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.pain-item h3::before {
+  content: "—";
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.pain-item p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--gray);
 }
 
 /* ---------- 产品卡片 ---------- */
@@ -179,7 +294,7 @@ section {
   justify-content: center;
   aspect-ratio: 16 / 9;
   background:
-    radial-gradient(ellipse 80% 90% at 50% 110%, rgba(255, 255, 255, 0.09), transparent 70%),
+    radial-gradient(ellipse 80% 90% at 50% 110%, rgba(255, 180, 84, 0.14), transparent 70%),
     var(--card);
   border-bottom: 1px solid var(--border);
 }
@@ -188,7 +303,7 @@ section {
   font-size: 44px;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--white);
 }
 
 .card-body {
@@ -214,7 +329,7 @@ section {
 
 .card h3 em {
   font-style: normal;
-  color: var(--gray-light);
+  color: var(--accent);
 }
 
 .card p {
@@ -244,6 +359,52 @@ section {
   margin: 0 0 14px;
   font-size: 13px;
   color: var(--gray-light);
+}
+
+/* ---------- 方法论 ---------- */
+
+.method-card {
+  margin-top: 64px;
+  width: min(720px, 100%);
+  margin-inline: auto;
+  text-align: left;
+}
+
+.method-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 34px 0 8px;
+}
+
+.method-step {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.method-head h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.method-card > p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--gray);
+}
+
+.method-note {
+  margin-top: 40px;
+  font-size: 13px;
+  color: #666;
+  border-top: 1px solid var(--border);
+  padding-top: 22px;
 }
 
 /* ---------- 现场笔记 ---------- */
@@ -307,11 +468,12 @@ section {
   border-radius: 50%;
   border: 1px solid var(--border);
   background:
-    radial-gradient(circle at 50% 120%, rgba(255, 255, 255, 0.12), transparent 65%),
+    radial-gradient(circle at 50% 120%, rgba(255, 180, 84, 0.16), transparent 65%),
     var(--card);
   font-size: 56px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  color: var(--accent);
 }
 
 .about-copy h3 {
@@ -377,7 +539,7 @@ footer {
   font-size: 14px;
   line-height: 1.7;
   color: var(--gray);
-  max-width: 300px;
+  max-width: 340px;
 }
 
 .footer-right {
@@ -417,6 +579,17 @@ footer {
     margin-inline: auto;
   }
 
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px 18px;
+  }
+
+  .pain-grid {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin-inline: auto;
+  }
+
   .about-inner {
     grid-template-columns: 1fr;
     gap: 36px;
@@ -426,6 +599,7 @@ footer {
 
   .about-links {
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .footer-inner {
@@ -437,6 +611,27 @@ footer {
   }
 
   .nav {
-    padding: 22px 24px;
+    padding: 20px 24px;
+  }
+
+  .nav-links {
+    gap: 16px;
+  }
+
+  .nav-link:not(.nav-link-cta) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
   }
 }
