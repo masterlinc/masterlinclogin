@@ -535,6 +535,120 @@ img { display: block; width: 100%; }
   font-size: 10px;
 }
 
+/* ---------- 文章详情页（letters/） ---------- */
+
+.post {
+  padding: 96px 0 120px;
+}
+
+.post-head {
+  max-width: 760px;
+  margin: 0 auto 56px;
+  text-align: left;
+}
+
+.post-head h1 {
+  margin: 0;
+  font-size: clamp(40px, 5.5vw, 64px);
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+}
+
+.post-meta {
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.post-body {
+  max-width: 700px;
+  margin: 0 auto;
+  font-size: 18px;
+  line-height: 1.9;
+  color: #c3c3c0;
+}
+
+.post-body > p {
+  margin: 0 0 22px;
+}
+
+.post-body strong {
+  color: var(--white);
+  font-weight: 650;
+}
+
+.post-body ul,
+.post-body ol {
+  margin: 0 0 24px;
+  padding-left: 1.4em;
+}
+
+.post-body li {
+  margin-bottom: 10px;
+}
+
+.post-body blockquote {
+  margin: 40px 0;
+  padding: 8px 0 8px 24px;
+  border-left: 2px solid var(--white);
+  color: var(--white);
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+
+.post-tags {
+  margin-top: 44px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  color: var(--muted) !important;
+  font-size: 13px !important;
+  letter-spacing: 0.04em;
+}
+
+.post-foot {
+  max-width: 700px;
+  margin: 64px auto 0;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.post-back {
+  display: inline-flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--white);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.post-back:hover { color: var(--muted); border-color: var(--muted); }
+
+.post-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 32px;
+  margin-top: 26px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.post-pager a {
+  border-bottom: 1px solid currentColor;
+  font-weight: 600;
+}
+
+.post-pager a:hover { color: var(--white); }
+
+@media (max-width: 640px) {
+  .post { padding: 64px 0 90px; }
+  .post-body { font-size: 17px; }
+}
+
+/* ---------- 页脚 ---------- */
+
 .footer {
   display: grid;
   grid-template-columns: 1fr auto auto auto;
