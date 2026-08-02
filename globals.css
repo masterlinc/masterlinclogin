@@ -532,32 +532,55 @@ section {
 
 .contact-inner {
   display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 56px;
+  grid-template-columns: 340px 1fr;
+  gap: 64px;
   align-items: center;
-  width: min(760px, 100%);
+  width: min(780px, 100%);
   margin: 64px auto 0;
   text-align: left;
 }
 
 .contact-qr {
   text-align: center;
+  position: relative;
+  padding-bottom: 26px;
 }
 
-.contact-qr img {
-  width: 100%;
-  max-width: 300px;
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: var(--card);
+.qr-card {
+  position: relative;
+  width: 300px;
   margin-inline: auto;
+  padding: 16px;
+  background: linear-gradient(160deg, #ffffff, #f5f2ec);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 24px 60px rgba(255, 180, 84, 0.08),
+    0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.qr-card::before {
+  content: "";
+  position: absolute;
+  inset: -28px;
+  background: radial-gradient(circle at 50% 40%, rgba(255, 180, 84, 0.14), transparent 65%);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.qr-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  display: block;
+  background: #fff;
 }
 
 .contact-qr-note {
-  margin-top: 14px;
+  margin-top: 44px;
   font-size: 13px;
   letter-spacing: 0.2em;
-  color: var(--accent);
+  color: var(--gray);
 }
 
 .contact-copy h3 {
