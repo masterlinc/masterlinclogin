@@ -508,6 +508,84 @@ section {
   border-color: var(--white);
 }
 
+/* ---------- 免费咨询 ---------- */
+
+.contact {
+  padding-bottom: 60px;
+}
+
+.contact-inner {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 56px;
+  align-items: center;
+  width: min(760px, 100%);
+  margin: 64px auto 0;
+  text-align: left;
+}
+
+.contact-qr {
+  text-align: center;
+}
+
+.contact-qr img {
+  width: 100%;
+  max-width: 300px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  margin-inline: auto;
+}
+
+.contact-qr-note {
+  margin-top: 14px;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.contact-copy h3 {
+  margin: 0 0 18px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.contact-copy ul {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-copy li {
+  position: relative;
+  padding-left: 22px;
+  margin-bottom: 10px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--gray-light);
+}
+
+.contact-copy li::before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.contact-copy > p {
+  margin: 0 0 26px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--gray);
+}
+
+.contact-copy .hero-cta {
+  margin-top: 0;
+  font-size: 14px;
+  padding: 11px 22px;
+}
+
 /* ---------- 底部 CTA ---------- */
 
 .final {
@@ -608,6 +686,21 @@ footer {
 
   .footer-right {
     text-align: left;
+  }
+
+  .contact-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .contact-copy li {
+    text-align: left;
+  }
+
+  .contact-copy .hero-cta {
+    margin-top: 4px;
   }
 
   .nav {
