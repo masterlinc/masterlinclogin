@@ -530,20 +530,28 @@ section {
   padding-bottom: 60px;
 }
 
-.contact-inner {
+.contact-inner,
+.contact-duo {
   display: grid;
-  grid-template-columns: 340px 1fr;
-  gap: 64px;
+  grid-template-columns: 1fr;
+  gap: 48px;
   align-items: center;
   width: min(780px, 100%);
   margin: 64px auto 0;
   text-align: left;
 }
 
+.contact-duo {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  width: min(720px, 100%);
+  margin-top: 56px;
+}
+
 .contact-qr {
   text-align: center;
   position: relative;
-  padding-bottom: 26px;
+  padding-bottom: 0;
 }
 
 .qr-card {
@@ -576,22 +584,36 @@ section {
   background: #fff;
 }
 
+.contact-qr-title {
+  margin-top: 26px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--white);
+}
+
 .contact-qr-note {
-  margin-top: 44px;
+  margin-top: 8px;
   font-size: 13px;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.12em;
   color: var(--gray);
 }
 
-.contact-copy h3 {
-  margin: 0 0 18px;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+.contact-copy {
+  width: min(560px, 100%);
+  margin: 56px auto 0;
+  text-align: left;
+}
+
+.contact-copy > p {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
 }
 
 .contact-copy ul {
-  margin: 0 0 22px;
+  margin: 0 0 28px;
   padding: 0;
   list-style: none;
 }
@@ -600,7 +622,7 @@ section {
   position: relative;
   padding-left: 22px;
   margin-bottom: 10px;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.7;
   color: var(--gray-light);
 }
@@ -610,13 +632,6 @@ section {
   position: absolute;
   left: 0;
   color: var(--accent);
-}
-
-.contact-copy > p {
-  margin: 0 0 26px;
-  font-size: 14px;
-  line-height: 1.8;
-  color: var(--gray);
 }
 
 .contact-copy .hero-cta {
@@ -732,6 +747,12 @@ footer {
     gap: 36px;
     justify-items: center;
     text-align: center;
+  }
+
+  .contact-duo {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    justify-items: center;
   }
 
   .contact-copy li {
