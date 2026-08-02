@@ -162,8 +162,35 @@ section {
 /* ---------- Hero ---------- */
 
 .hero {
+  position: relative;
   padding: 150px 0 100px;
   text-align: center;
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.hero-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.45) 45%, rgba(0,0,0,0.88) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
 }
 
 .hero h1 {
@@ -375,6 +402,20 @@ section {
 
 /* ---------- 方法论（编号竖排） ---------- */
 
+.method-figure {
+  margin: 56px auto 0;
+  width: min(820px, 100%);
+}
+
+.method-figure img,
+.letters-figure img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  filter: saturate(0.9) contrast(1.05);
+}
+
 .method-card {
   margin-top: 72px;
   width: min(720px, 100%);
@@ -422,6 +463,11 @@ section {
 
 /* ---------- 现场笔记（细分隔线列表） ---------- */
 
+.letters-figure {
+  margin: 56px auto 0;
+  width: min(820px, 100%);
+}
+
 .letters {
   margin-top: 72px;
   display: grid;
@@ -464,26 +510,21 @@ section {
 
 .about-inner {
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: 64px;
   align-items: center;
-  width: min(820px, 100%);
+  width: min(860px, 100%);
   margin: 72px auto 0;
   text-align: left;
 }
 
-.avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  height: 200px;
+.avatar-figure img {
+  width: 100%;
   border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   border: 1px solid var(--line);
-  background: radial-gradient(circle at 50% 120%, rgba(255, 180, 84, 0.14), transparent 65%), var(--black);
-  font-size: 54px;
-  font-weight: 900;
-  color: var(--accent);
+  filter: saturate(0.85) contrast(1.05);
 }
 
 .about-copy h3 {
