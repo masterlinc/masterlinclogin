@@ -62,10 +62,19 @@ img { display: block; width: 100%; }
 }
 
 .wordmark {
+  display: inline-flex;
+  align-items: center;
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.23em;
   line-height: 1;
+}
+
+.wordmark-logo {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .nav-links {
