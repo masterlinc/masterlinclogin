@@ -11,7 +11,7 @@
   <meta name="theme-color" content="#050505" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="canonical" href="https://www.masterlinc.com/" />
-  <link rel="stylesheet" href="/globals.css?v=20260802-7" />
+  <link rel="stylesheet" href="/globals.css?v=20260802-8" />
 
   <meta property="og:title" content="MASTER LINC｜少做重复，多做判断" />
   <meta property="og:description" content="把 AI 放进真实管理现场，而不是停在提示词里。当前开放免费咨询。" />
@@ -230,7 +230,25 @@
     <a class="wordmark" href="#top" aria-label="返回顶部"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
     <p>AI MANAGEMENT, IN PRACTICE</p>
     <a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a>
-    <span>© 2026 MASTER LINC</span>
+    <span class="footer-right">© 2026 MASTER LINC · <span class="view-count" title="本机访问计数">—</span></span>
   </footer>
+
+  <!-- 访问计数（本机 localStorage） -->
+  <script>
+  (function () {
+    try {
+      var KEY = "ml_view_count";
+      var n = parseInt(localStorage.getItem(KEY) || "0", 10);
+      if (!n || isNaN(n)) n = 0;
+      n += 1;
+      localStorage.setItem(KEY, String(n));
+      var el = document.querySelector(".view-count");
+      if (el) el.textContent = n + " 次访问";
+    } catch (e) { /* 隐私模式下忽略 */ }
+  })();
+  </script>
+
+  <!-- Vercel Web Analytics（在 Vercel 面板开启后自动统计真实全站访问；未开启时静默 404 不影响页面） -->
+  <script defer src="/_vercel/insights/script.js" onerror="this.remove()"></script>
 </body>
 </html>
