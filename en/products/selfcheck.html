@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manager AI Self-Check · Find the first thing AI should do for you in 10 min · MASTER LINC</title>
+  <meta name="description" content="No files needed, no prompt engineering. Spend 10 minutes describing your three most time-consuming tasks, and get a judgment on which one AI should tackle first — plus a five-step action flow." />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#050505" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://www.masterlinc.com/en/products/selfcheck.html" />
+  <link rel="alternate" hreflang="zh-CN" href="https://www.masterlinc.com/products/selfcheck.html" />
+  <link rel="alternate" hreflang="en" href="https://www.masterlinc.com/en/products/selfcheck.html" />
+  <link rel="stylesheet" href="/globals.css?v=20260802-9" />
+
+  <meta property="og:title" content="Manager AI Self-Check · MASTER LINC" />
+  <meta property="og:description" content="Find the first thing AI should do for you in 10 minutes." />
+  <meta property="og:url" content="https://www.masterlinc.com/en/products/selfcheck.html" />
+  <meta property="og:site_name" content="MASTER LINC" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://www.masterlinc.com/og-master-linc.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    /* ===== Self-check tool styles (isolated) ===== */
+    .check-shell { max-width: 720px; margin: 0 auto; padding: 48px 20px 88px; }
+    .check-head { margin-bottom: 36px; }
+    .check-kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #a8a8a5; margin-bottom: 12px; }
+    .check-title { font-size: 30px; line-height: 1.25; font-weight: 750; margin-bottom: 12px; }
+    .check-sub { color: #a8a8a5; font-size: 15px; line-height: 1.6; }
+    .check-sub strong { color: #f4f3ef; font-weight: 650; }
+
+    .step-card { border: 1px solid #2a2a28; border-radius: 16px; padding: 26px 24px; margin-bottom: 18px; background: #0b0b0b; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #f4f3ef; color: #050505; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+    .step-q { font-size: 17px; font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+    .step-hint { font-size: 13px; color: #a8a8a5; margin-bottom: 14px; }
+    .check-input { width: 100%; background: #050505; border: 1px solid #2a2a28; border-radius: 10px; color: #f4f3ef; padding: 14px 16px; font-size: 15px; line-height: 1.6; resize: vertical; min-height: 78px; }
+    .check-input:focus { outline: none; border-color: #f4f3ef; }
+    .check-input::placeholder { color: #555; }
+
+    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt { border: 1px solid #2a2a28; border-radius: 10px; padding: 14px; cursor: pointer; text-align: left; font-size: 14px; line-height: 1.5; color: #d9d9d6; background: transparent; transition: border-color 150ms ease, background 150ms ease; }
+    .opt:hover { border-color: #555; }
+    .opt.selected { border-color: #f4f3ef; background: #141414; color: #f4f3ef; }
+    @media (max-width: 560px) { .opt-grid { grid-template-columns: 1fr; } }
+
+    .btn-row { display: flex; gap: 12px; align-items: center; margin-top: 22px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; background: #f4f3ef; color: #050505; border: none; border-radius: 10px; padding: 13px 22px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease; }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-ghost { background: transparent; border: 1px solid #2a2a28; color: #d9d9d6; }
+    .btn-ghost:hover { border-color: #555; opacity: 1; }
+
+    .result-wrap { display: none; }
+    .result-wrap.visible { display: block; }
+    .result-box { border: 1px solid #2a2a28; border-radius: 16px; padding: 28px 26px; margin-top: 26px; }
+    .result-badge { display: inline-block; background: #f4f3ef; color: #050505; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 5px 12px; border-radius: 999px; margin-bottom: 16px; }
+    .result-title { font-size: 22px; font-weight: 750; line-height: 1.35; margin-bottom: 10px; }
+    .result-sel { color: #a8a8a5; font-size: 14px; margin-bottom: 22px; }
+    .flow { display: flex; flex-direction: column; gap: 0; margin: 22px 0; }
+    .flow-step { display: flex; gap: 14px; align-items: flex-start; }
+    .flow-idx { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #3a3a38; color: #a8a8a5; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .flow-body { padding-bottom: 20px; border-left: 1px solid #2a2a28; padding-left: 20px; margin-left: 13px; }
+    .flow-body h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .flow-body p { font-size: 14px; color: #a8a8a5; line-height: 1.6; }
+    .flow-step:last-child .flow-body { border-left: none; padding-bottom: 0; }
+
+    .verdict { background: #101010; border-radius: 12px; padding: 18px 20px; margin: 20px 0; border-left: 3px solid #f4f3ef; }
+    .verdict-label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #a8a8a5; margin-bottom: 8px; }
+    .verdict-text { font-size: 15px; line-height: 1.7; }
+
+    .hook { margin-top: 30px; padding: 24px; border: 1px dashed #3a3a38; border-radius: 14px; }
+    .hook h3 { font-size: 17px; font-weight: 750; margin-bottom: 10px; }
+    .hook p { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 16px; }
+    .hook a { color: #f4f3ef; text-decoration: underline; text-underline-offset: 3px; }
+
+    .progress { height: 3px; background: #1a1a1a; border-radius: 99px; margin: 0 0 26px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 33%; background: #f4f3ef; border-radius: 99px; transition: width 300ms ease; }
+
+    .print-only { display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block; }
+      .check-shell { padding: 0; }
+      body { background: #fff; color: #000; }
+      .flow-body h4 { color: #000; }
+      .flow-body p { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link no-print" href="#main">Skip to content</a>
+
+  <nav class="nav no-print" aria-label="Main navigation">
+    <a class="wordmark" href="/en/#top" aria-label="MASTER LINC home"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <div class="nav-links">
+      <a href="/en/#start">Start here</a>
+      <a href="/en/#products">Products</a>
+      <a href="/en/#letters">Field notes</a>
+      <a href="/en/#about">About</a>
+      <a class="nav-cta" href="mailto:lincyang@foxmail.com?subject=Free%20AI%20management%20fit%20assessment">Free consult</a>
+      <a class="lang-switch" href="/products/selfcheck.html" lang="zh-CN">中文</a>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="check-shell">
+      <div class="check-head">
+        <p class="check-kicker">Manager AI Self-Check · 10 min</p>
+        <h1 class="check-title">No files needed, no prompt engineering.<br />Find the first thing AI should do for you.</h1>
+        <p class="check-sub">Describe your <strong>3 most time-consuming tasks</strong> from the past week. The system walks through input → judgment → output → review → rework to locate which one deserves AI first, and what the first step looks like.</p>
+      </div>
+
+      <div class="progress no-print"><div class="progress-fill" id="progressFill"></div></div>
+
+      <!-- Step 1 -->
+      <section class="step-card" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-q">In the past week, which 3 things consumed most of your time?</div>
+        <div class="step-hint">Only things you personally keep doing — not what others do for you. Examples: answering messages, chasing task progress, writing reports, cross-team alignment, meeting notes, reviewing proposals…</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="Messages & coordination">Replying to messages / fishing for info in groups</button>
+          <button class="opt" data-sel="Meetings & notes">Meetings / writing meeting notes</button>
+          <button class="opt" data-sel="Reports & updates">Weekly reports / update materials</button>
+          <button class="opt" data-sel="Chasing progress">Chasing task progress, repeated follow-ups</button>
+          <button class="opt" data-sel="Reviewing proposals">Reviewing proposals, editing documents</button>
+          <button class="opt" data-sel="Other">Other (describe below)</button>
+        </div>
+        <textarea class="check-input" id="task1" placeholder="Task 1: one sentence, the more concrete the better (who initiates, how often, what annoys you most)"></textarea>
+        <div class="btn-row no-print">
+          <button class="btn" id="to2" disabled>Next →</button>
+        </div>
+      </section>
+
+      <!-- Step 2 -->
+      <section class="step-card" id="step2" style="display:none;">
+        <div class="step-num">2</div>
+        <div class="step-q">Which part of this task bothers you most?</div>
+        <div class="step-hint">Pick the closest one. It decides whether AI can help, and whether it should be delegated at all.</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="Repetitive transfer">Repetitive transfer: copying, organizing, form-filling, converting</button>
+          <button class="opt" data-sel="Rule-based judgment">Rule-based judgment: filtering, classifying, summarizing by set standards</button>
+          <button class="opt" data-sel="Experience judgment">Experience judgment: needs judgment, direction, expertise</button>
+          <button class="opt" data-sel="Coordination">Coordination: needs people, cross-team push, follow-ups</button>
+          <button class="opt" data-sel="Not sure">Not sure / haven't thought about it</button>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="back1">← Back</button>
+          <button class="btn" id="to3" disabled>Next →</button>
+        </div>
+      </section>
+
+      <!-- Step 3 -->
+      <section class="step-card" id="step3" style="display:none;">
+        <div class="step-num">3</div>
+        <div class="step-q">If you handed this to AI, what would you worry about?</div>
+        <div class="step-hint">No right or wrong. It decides where to draw the risk boundary.</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="Data security">Data security: names, amounts, internal decisions involved</button>
+          <button class="opt" data-sel="Quality concerns">Quality: AI might make mistakes, miss something critical</button>
+          <button class="opt" data-sel="Accountability">Accountability: who is responsible if it goes wrong, who reviews</button>
+          <button class="opt" data-sel="Don't know how">Don't know how: where to start, too much hassle</button>
+          <button class="opt" data-sel="Not very worried">Actually not very worried</button>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="back2">← Back</button>
+          <button class="btn" id="submit">Generate result →</button>
+        </div>
+      </section>
+
+      <!-- Result -->
+      <div class="result-wrap" id="result">
+        <div class="result-box">
+          <span class="result-badge">Your result</span>
+          <h2 class="result-title" id="resultTitle">The first thing to change: </h2>
+          <p class="result-sel" id="resultSel"></p>
+
+          <div class="verdict" id="verdictBox">
+            <div class="verdict-label">Judgment</div>
+            <div class="verdict-text" id="verdictText"></div>
+          </div>
+
+          <div class="flow" id="flowBox"></div>
+
+          <div class="hook no-print">
+            <h3>The self-check is only step one</h3>
+            <p>The tool points the direction. Real value is getting this "first AI-worthy task" running: where input comes from, who reviews, which step reworks most, and how to verify in 7 days.</p>
+            <a href="mailto:lincyang@foxmail.com?subject=Manager%20AI%20Self-Check%3A%20book%20a%2030-min%20diagnosis">Book a 30-min diagnosis (free first talk) →</a>
+          </div>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="restart">Restart</button>
+          <button class="btn" id="print">Print / Save result</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer shell no-print">
+    <a class="wordmark" href="/en/#top" aria-label="Back to top"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <p>AI MANAGEMENT, IN PRACTICE</p>
+    <a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a>
+    <span>© 2026 MASTER LINC</span>
+  </footer>
+
+  <script>
+  (function () {
+    var state = { sel1: '', sel2: '', sel3: '', task1: '' };
+
+    function qs(sel) { return document.querySelector(sel); }
+
+    function bindOpts(containerId, key, nextBtn) {
+      var container = qs(containerId);
+      container.querySelectorAll('.opt').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          container.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          state[key] = btn.getAttribute('data-sel') || btn.innerText.trim();
+          if (nextBtn) qs(nextBtn).disabled = false;
+        });
+      });
+    }
+
+    bindOpts('#step1', 'sel1', '#to2');
+    bindOpts('#step2', 'sel2', '#to3');
+    bindOpts('#step3', 'sel3', '#submit');
+
+    function updateProgress(pct) {
+      qs('#progressFill').style.width = pct + '%';
+    }
+
+    qs('#task1').addEventListener('input', function () {
+      state.task1 = this.value.trim();
+      if (state.task1.length > 0 && state.sel1) qs('#to2').disabled = false;
+    });
+
+    qs('#to2').addEventListener('click', function () {
+      qs('#step1').style.display = 'none';
+      qs('#step2').style.display = 'block';
+      updateProgress(66);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#back1').addEventListener('click', function () {
+      qs('#step2').style.display = 'none';
+      qs('#step1').style.display = 'block';
+      updateProgress(33);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#to3').addEventListener('click', function () {
+      qs('#step2').style.display = 'none';
+      qs('#step3').style.display = 'block';
+      updateProgress(100);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#back2').addEventListener('click', function () {
+      qs('#step3').style.display = 'none';
+      qs('#step2').style.display = 'block';
+      updateProgress(66);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Judgment engine
+    function classify() {
+      var s1 = state.sel1, s2 = state.sel2, s3 = state.sel3, t1 = state.task1;
+
+      var title, verdict, flows, selText;
+
+      if (s2 === 'Repetitive transfer') {
+        title = 'This "repetitive transfer" task is the best first candidate for AI';
+        verdict = 'It is high-repetition, low-judgment, verifiable — the highest-efficiency, lowest-risk AI scenario. Get one running first, then decide whether to scale.';
+        flows = [
+          { h: 'Input', p: 'Clarify where the raw material comes from: who initiates, what format, how often.' },
+          { h: 'Steps', p: 'Break it into repeatable fixed steps: organizing, dedup, form-filling, converting… one action at a time.' },
+          { h: 'Output', p: 'Define the final deliverable: a table, a summary, a file — fixed format, verifiable.' },
+          { h: 'Review', p: 'Assign one owner and a check point: after AI produces, who samples it and for how long.' },
+          { h: 'After 7 days', p: 'Record before/after time and error count. Goal: this step drops from N minutes to 3, without major errors.' }
+        ];
+        selText = 'You picked: ' + s1 + ' · Most annoying: ' + s2 + ' · Worry: ' + s3;
+      } else if (s2 === 'Rule-based judgment') {
+        title = 'AI can do the first-pass screening; you keep the final call';
+        verdict = 'It has clear criteria, so AI can draft by rules — but "decision and accountability" stay with people. Boundary: let AI propose candidates; you make the final call.';
+        flows = [
+          { h: 'Input', p: 'Package the judging criteria (standards, thresholds, past cases) into context AI can read.' },
+          { h: 'Steps', p: 'Let AI screen item by item: pass / fail / uncertain — in three buckets.' },
+          { h: 'Output', p: 'AI returns a "screened result with reasons" so you can re-check quickly.' },
+          { h: 'Review', p: 'You only review "uncertain" and high-impact items; batch-approve the rest.' },
+          { h: 'After 7 days', p: 'Track AI first-pass accuracy. If >90%, expand scope; if it often errs, add rules.' }
+        ];
+        selText = 'You picked: ' + s1 + ' · Most annoying: ' + s2 + ' · Worry: ' + s3;
+      } else if (s2 === 'Experience judgment') {
+        title = 'AI is your advisor; you make the decision';
+        verdict = 'It depends on your experience and judgment — do not delegate the decision directly. Right use: let AI organize information, list trade-offs and blind spots; keep the decision with you.';
+        flows = [
+          { h: 'Input', p: 'Feed AI the background, constraints, relevant data and past decisions as material.' },
+          { h: 'Steps', p: 'Ask AI to list options, trade-offs, risks and blind spots — not to give a conclusion directly.' },
+          { h: 'Output', p: 'Get a "decision support brief": 3 options + costs + questions only you can answer.' },
+          { h: 'Review', p: 'All judgment is yours. AI only arranges information and asks complete questions.' },
+          { h: 'After 7 days', p: 'Review a recent decision: did the AI brief help you see blind spots? Where did it not help?' }
+        ];
+        selText = 'You picked: ' + s1 + ' · Most annoying: ' + s2 + ' · Worry: ' + s3;
+      } else if (s2 === 'Coordination') {
+        title = 'AI can prepare it, but not show up for you';
+        verdict = 'The issue is usually not "not enough information" but "no one can state responsibility and progress clearly." AI can organize updates, draft messages, and track milestones — pushing real people is on you.';
+        flows = [
+          { h: 'Input', p: 'Put stakeholders, current progress, blockers and deadlines into one "progress card".' },
+          { h: 'Steps', p: 'Let AI draft updates, meeting notes and to-do lists to cut your back-and-forth writing.' },
+          { h: 'Output', p: 'Get a sendable update + a "who owns what, by when, where it is stuck" list.' },
+          { h: 'Review', p: 'You verify accuracy and send it yourself; judgment involving people and responsibility stays with you.' },
+          { h: 'After 7 days', p: 'See which step blocks most: information not synced, or no one with authority to decide?' }
+        ];
+        selText = 'You picked: ' + s1 + ' · Most annoying: ' + s2 + ' · Worry: ' + s3;
+      } else {
+        title = 'Start with the smallest repetitive thing — acting beats thinking';
+        verdict = 'Not sure is normal. Pick one small, repetitive, low-sensitivity task and spend 30 minutes letting AI run it. Let a real result replace imagination.';
+        flows = [
+          { h: 'Input', p: 'Pick one "doable today" task: organize a list, convert a format, draft a version.' },
+          { h: 'Steps', p: 'Give it minimal context and let it output one version — no need to nail it first try.' },
+          { h: 'Output', p: 'Compare AI output with your usual way: faster? fewer errors? needs edits?' },
+          { h: 'Review', p: 'You personally check the critical parts. First goal is experience, not replacement.' },
+          { h: 'After 7 days', p: 'If you are satisfied once, formalize it into a repeatable workflow.' }
+        ];
+        selText = 'You picked: ' + s1 + ' · Most annoying: ' + s2 + ' · Worry: ' + s3;
+      }
+
+      if (s3 === 'Data security') {
+        verdict += ' Note: when names, amounts or internal decisions are involved, de-identify first or use a minimal sample; keep data in an environment you control.';
+      }
+      if (s3 === 'Accountability') {
+        verdict += ' Note: AI assists only; responsibility and review stay with you or a named person on your team.';
+      }
+
+      return { title: title, verdict: verdict, flows: flows, selText: selText, task: t1 };
+    }
+
+    function renderResult(r) {
+      qs('#resultTitle').textContent = r.title;
+      qs('#resultSel').textContent = r.selText + (r.task ? ' · "' + r.task + '"' : '');
+      qs('#verdictText').textContent = r.verdict;
+
+      var flowBox = qs('#flowBox');
+      flowBox.innerHTML = '';
+      r.flows.forEach(function (f, i) {
+        var step = document.createElement('div');
+        step.className = 'flow-step';
+        step.innerHTML = '<div class="flow-idx">' + (i + 1) + '</div><div class="flow-body"><h4>' + f.h + '</h4><p>' + f.p + '</p></div>';
+        flowBox.appendChild(step);
+      });
+    }
+
+    qs('#submit').addEventListener('click', function () {
+      var r = classify();
+      renderResult(r);
+      qs('#step3').style.display = 'none';
+      qs('#result').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    qs('#restart').addEventListener('click', function () {
+      state = { sel1: '', sel2: '', sel3: '', task1: '' };
+      document.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('selected'); });
+      qs('#task1').value = '';
+      qs('#to2').disabled = true; qs('#to3').disabled = true; qs('#submit').disabled = true;
+      qs('#result').classList.remove('visible');
+      qs('#step1').style.display = 'block';
+      qs('#step2').style.display = 'none';
+      qs('#step3').style.display = 'none';
+      updateProgress(33);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    qs('#print').addEventListener('click', function () { window.print(); });
+  })();
+  </script>
+</body>
+</html>
