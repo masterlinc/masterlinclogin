@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>管理者 AI 自检 · 10 分钟找出第一件最该 AI 改的工作 · MASTER LINC</title>
+  <meta name="description" content="不交资料、不学提示词。花 10 分钟口述你一周最耗时的三件事，AI 帮你判断哪一件最值得用 AI 改造，并给出五步流程图。" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#050505" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://www.masterlinc.com/products/selfcheck.html" />
+  <link rel="stylesheet" href="/globals.css?v=20260802-9" />
+
+  <meta property="og:title" content="管理者 AI 自检 · MASTER LINC" />
+  <meta property="og:description" content="10 分钟找出你第一件最该 AI 改的工作。" />
+  <meta property="og:url" content="https://www.masterlinc.com/products/selfcheck.html" />
+  <meta property="og:site_name" content="MASTER LINC" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://www.masterlinc.com/og-master-linc.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    /* ===== 自检工具专用样式（独立于站点，避免污染全局） ===== */
+    .check-shell { max-width: 720px; margin: 0 auto; padding: 48px 20px 88px; }
+    .check-head { margin-bottom: 36px; }
+    .check-kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #a8a8a5; margin-bottom: 12px; }
+    .check-title { font-size: 30px; line-height: 1.25; font-weight: 750; margin-bottom: 12px; }
+    .check-sub { color: #a8a8a5; font-size: 15px; line-height: 1.6; }
+    .check-sub strong { color: #f4f3ef; font-weight: 650; }
+
+    .step-card { border: 1px solid #2a2a28; border-radius: 16px; padding: 26px 24px; margin-bottom: 18px; background: #0b0b0b; }
+    .step-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #f4f3ef; color: #050505; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+    .step-q { font-size: 17px; font-weight: 700; margin-bottom: 14px; line-height: 1.5; }
+    .step-hint { font-size: 13px; color: #a8a8a5; margin-bottom: 14px; }
+    .check-input { width: 100%; background: #050505; border: 1px solid #2a2a28; border-radius: 10px; color: #f4f3ef; padding: 14px 16px; font-size: 15px; line-height: 1.6; resize: vertical; min-height: 78px; }
+    .check-input:focus { outline: none; border-color: #f4f3ef; }
+    .check-input::placeholder { color: #555; }
+
+    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .opt { border: 1px solid #2a2a28; border-radius: 10px; padding: 14px; cursor: pointer; text-align: left; font-size: 14px; line-height: 1.5; color: #d9d9d6; background: transparent; transition: border-color 150ms ease, background 150ms ease; }
+    .opt:hover { border-color: #555; }
+    .opt.selected { border-color: #f4f3ef; background: #141414; color: #f4f3ef; }
+    @media (max-width: 560px) { .opt-grid { grid-template-columns: 1fr; } }
+
+    .btn-row { display: flex; gap: 12px; align-items: center; margin-top: 22px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; background: #f4f3ef; color: #050505; border: none; border-radius: 10px; padding: 13px 22px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease; }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-ghost { background: transparent; border: 1px solid #2a2a28; color: #d9d9d6; }
+    .btn-ghost:hover { border-color: #555; opacity: 1; }
+
+    .result-wrap { display: none; }
+    .result-wrap.visible { display: block; }
+    .result-box { border: 1px solid #2a2a28; border-radius: 16px; padding: 28px 26px; margin-top: 26px; }
+    .result-badge { display: inline-block; background: #f4f3ef; color: #050505; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 5px 12px; border-radius: 999px; margin-bottom: 16px; }
+    .result-title { font-size: 22px; font-weight: 750; line-height: 1.35; margin-bottom: 10px; }
+    .result-sel { color: #a8a8a5; font-size: 14px; margin-bottom: 22px; }
+    .flow { display: flex; flex-direction: column; gap: 0; margin: 22px 0; }
+    .flow-step { display: flex; gap: 14px; align-items: flex-start; }
+    .flow-idx { flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid #3a3a38; color: #a8a8a5; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; margin-top: 2px; }
+    .flow-body { padding-bottom: 20px; border-left: 1px solid #2a2a28; padding-left: 20px; margin-left: 13px; }
+    .flow-body h4 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .flow-body p { font-size: 14px; color: #a8a8a5; line-height: 1.6; }
+    .flow-step:last-child .flow-body { border-left: none; padding-bottom: 0; }
+
+    .verdict { background: #101010; border-radius: 12px; padding: 18px 20px; margin: 20px 0; border-left: 3px solid #f4f3ef; }
+    .verdict-label { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #a8a8a5; margin-bottom: 8px; }
+    .verdict-text { font-size: 15px; line-height: 1.7; }
+
+    .hook { margin-top: 30px; padding: 24px; border: 1px dashed #3a3a38; border-radius: 14px; }
+    .hook h3 { font-size: 17px; font-weight: 750; margin-bottom: 10px; }
+    .hook p { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 16px; }
+    .hook a { color: #f4f3ef; text-decoration: underline; text-underline-offset: 3px; }
+
+    .progress { height: 3px; background: #1a1a1a; border-radius: 99px; margin: 0 0 26px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 33%; background: #f4f3ef; border-radius: 99px; transition: width 300ms ease; }
+
+    .print-only { display: none; }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block; }
+      .check-shell { padding: 0; }
+      body { background: #fff; color: #000; }
+      .flow-body h4 { color: #000; }
+      .flow-body p { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link no-print" href="#main">跳到正文</a>
+
+  <nav class="nav no-print" aria-label="主导航">
+    <a class="wordmark" href="/#top" aria-label="MASTER LINC 首页"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <div class="nav-links">
+      <a href="/#start">从这里开始</a>
+      <a href="/#letters">现场笔记</a>
+      <a href="/#about">关于</a>
+      <a class="nav-cta" href="mailto:lincyang@foxmail.com?subject=%E5%85%8D%E8%B4%B9AI%E7%AE%A1%E7%90%86%E9%80%82%E9%85%8D%E5%88%A4%E6%96%AD">免费咨询</a>
+      <a class="lang-switch" href="/en/products/selfcheck.html" lang="en">EN</a>
+    </div>
+  </nav>
+
+  <main id="main">
+    <div class="check-shell">
+      <div class="check-head">
+        <p class="check-kicker">管理者 AI 自检 · 10 分钟</p>
+        <h1 class="check-title">不用交资料，不学提示词。<br />找出你第一件最该 AI 改的工作。</h1>
+        <p class="check-sub">口述你一周最耗时的 <strong>3 件事</strong>，系统按「输入 → 判断 → 输出 → 审核 → 返工」五步帮你定位：哪一件最值得用 AI 改造，改造第一步怎么走。</p>
+      </div>
+
+      <div class="progress no-print"><div class="progress-fill" id="progressFill"></div></div>
+
+      <!-- 步骤 1 -->
+      <section class="step-card" id="step1">
+        <div class="step-num">1</div>
+        <div class="step-q">最近一周，哪 3 件事最消耗你的时间？</div>
+        <div class="step-hint">只写你亲自反复做的事，不用管别人做的。例如：回微信消息、跟项目进度、写周报、跨部门对齐、做会议纪要、审方案……</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="消息与协调">回复消息、群里捞信息</button>
+          <button class="opt" data-sel="会议与纪要">开会、整理会议纪要</button>
+          <button class="opt" data-sel="汇报与周报">写周报 / 汇报材料</button>
+          <button class="opt" data-sel="跟进度">跟任务进度、反复催</button>
+          <button class="opt" data-sel="审方案">审方案、改文档</button>
+          <button class="opt" data-sel="其他">其他（在下面补充）</button>
+        </div>
+        <textarea class="check-input" id="task1" placeholder="第 1 件：一句话描述，越具体越好（谁发起、多久一次、最烦在哪）"></textarea>
+        <div class="btn-row no-print">
+          <button class="btn" id="to2" disabled>下一步 →</button>
+        </div>
+      </section>
+
+      <!-- 步骤 2 -->
+      <section class="step-card" id="step2" style="display:none;">
+        <div class="step-num">2</div>
+        <div class="step-q">这件事，最让你头疼的是哪一部分？</div>
+        <div class="step-hint">选最接近的。它会决定 AI 能不能帮上忙、该不该外包。</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="重复搬运">重复搬运：复制、整理、填表、转格式</button>
+          <button class="opt" data-sel="规则判断">规则判断：按既定标准筛选、分类、汇总</button>
+          <button class="opt" data-sel="经验判断">经验判断：需要靠经验拿主意、定方向</button>
+          <button class="opt" data-sel="沟通协调">沟通协调：要人配合、跨部门推、催</button>
+          <button class="opt" data-sel="不确认">不好说 / 我没想过</button>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="back1">← 上一步</button>
+          <button class="btn" id="to3" disabled>下一步 →</button>
+        </div>
+      </section>
+
+      <!-- 步骤 3 -->
+      <section class="step-card" id="step3" style="display:none;">
+        <div class="step-num">3</div>
+        <div class="step-q">如果交给 AI，你担心什么？</div>
+        <div class="step-hint">没有对错。它决定风险边界怎么画。</div>
+        <div class="opt-grid">
+          <button class="opt" data-sel="数据安全">数据安全：涉及人名、金额、内部决策</button>
+          <button class="opt" data-sel="质量不可靠">质量不可靠：怕 AI 出错、漏关键</button>
+          <button class="opt" data-sel="责任归属">责任归属：出了错谁负责、谁审核</button>
+          <button class="opt" data-sel="不会用">不会用：不知道从哪开始、嫌麻烦</button>
+          <button class="opt" data-sel="不太担心">其实不太担心</button>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="back2">← 上一步</button>
+          <button class="btn" id="submit">生成自检结果 →</button>
+        </div>
+      </section>
+
+      <!-- 结果 -->
+      <div class="result-wrap" id="result">
+        <div class="result-box">
+          <span class="result-badge">自检结果</span>
+          <h2 class="result-title" id="resultTitle">你最该先改的，可能是：</h2>
+          <p class="result-sel" id="resultSel"></p>
+
+          <div class="verdict" id="verdictBox">
+            <div class="verdict-label">判断</div>
+            <div class="verdict-text" id="verdictText"></div>
+          </div>
+
+          <div class="flow" id="flowBox"></div>
+
+          <div class="hook no-print">
+            <h3>自检只是第一步</h3>
+            <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
+            <a href="mailto:lincyang@foxmail.com?subject=%E7%AE%A1%E7%90%86%E8%80%85AI%E8%87%AA%E6%A3%80%EF%BC%9A%E6%83%B3%E7%BA%A630%E5%88%86%E9%92%9F%E8%AF%8A%E6%96%AD">约一次 30 分钟诊断（免费先聊）→</a>
+          </div>
+        </div>
+        <div class="btn-row no-print">
+          <button class="btn-ghost btn" id="restart">重新自检</button>
+          <button class="btn" id="print">打印 / 保存结果</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer shell no-print">
+    <a class="wordmark" href="/#top" aria-label="返回顶部"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <p>AI MANAGEMENT, IN PRACTICE</p>
+    <a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a>
+    <span>© 2026 MASTER LINC</span>
+  </footer>
+
+  <script>
+  (function () {
+    var state = { sel1: '', sel2: '', sel3: '', task1: '' };
+
+    function qs(sel) { return document.querySelector(sel); }
+
+    function bindOpts(containerId, key, nextBtn) {
+      var container = qs(containerId);
+      container.querySelectorAll('.opt').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          container.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          state[key] = btn.getAttribute('data-sel') || btn.innerText.trim();
+          if (nextBtn) qs(nextBtn).disabled = false;
+        });
+      });
+    }
+
+    bindOpts('#step1', 'sel1', '#to2');
+    bindOpts('#step2', 'sel2', '#to3');
+    bindOpts('#step3', 'sel3', '#submit');
+
+    function updateProgress(pct) {
+      qs('#progressFill').style.width = pct + '%';
+    }
+
+    qs('#task1').addEventListener('input', function () {
+      state.task1 = this.value.trim();
+      if (state.task1.length > 0 && state.sel1) qs('#to2').disabled = false;
+    });
+
+    qs('#to2').addEventListener('click', function () {
+      qs('#step1').style.display = 'none';
+      qs('#step2').style.display = 'block';
+      updateProgress(66);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#back1').addEventListener('click', function () {
+      qs('#step2').style.display = 'none';
+      qs('#step1').style.display = 'block';
+      updateProgress(33);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#to3').addEventListener('click', function () {
+      qs('#step2').style.display = 'none';
+      qs('#step3').style.display = 'block';
+      updateProgress(100);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    qs('#back2').addEventListener('click', function () {
+      qs('#step3').style.display = 'none';
+      qs('#step2').style.display = 'block';
+      updateProgress(66);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 判断引擎
+    function classify() {
+      var s1 = state.sel1, s2 = state.sel2, s3 = state.sel3, t1 = state.task1;
+
+      var type, title, verdict, flows, selText;
+
+      if (s2 === '重复搬运') {
+        type = 'A';
+        title = '这件「重复搬运」的工作，最适合先交给 AI';
+        verdict = '它属于高重复、低判断、可验证的流程，是 AI 效率最高、风险最低的场景。先跑通一个，再决定要不要放大。';
+        flows = [
+          { h: '输入', p: '明确这项工作的原始材料从哪来：谁发起、什么格式、多久一次。' },
+          { h: '步骤', p: '拆成可重复的固定步骤：整理、去重、填表、转格式……一步一个动作。' },
+          { h: '输出', p: '定义最终交付物：一张表、一份汇总、一个文件，格式固定可验证。' },
+          { h: '审核', p: '定一个负责人和核对点：AI 产出后，由谁、花几分钟抽查。' },
+          { h: '7 天后', p: '记录前后耗时和出错次数。目标：这一步从 N 分钟降到 3 分钟，且不出大错。' }
+        ];
+        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
+      } else if (s2 === '规则判断') {
+        type = 'B';
+        title = '这件「规则判断」的工作，AI 可以帮你做初筛，人做终审';
+        verdict = '它有明确标准，可以交给 AI 按规则生成草稿，但「决定和担责」必须留给人。边界：先让 AI 给出候选，你做最后拍板。';
+        flows = [
+          { h: '输入', p: '把判断依据（标准、阈值、历史案例）整理成 AI 能读的上下文。' },
+          { h: '步骤', p: '让 AI 按规则逐条筛：符合 / 不符合 / 存疑，三类分开。' },
+          { h: '输出', p: 'AI 产出「带依据的初筛结果」，每条附理由，方便你快速复核。' },
+          { h: '审核', p: '你只审「存疑」和「高影响」的条目，其余批量放行。' },
+          { h: '7 天后', p: '统计 AI 初筛的准确率。若 >90%，可扩大范围；若常错，补规则。' }
+        ];
+        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
+      } else if (s2 === '经验判断') {
+        type = 'C';
+        title = '这件「经验判断」的工作，AI 当参谋，你做决定';
+        verdict = '它依赖你的经验和判断力，不该直接交给 AI 做决定。正确用法：让 AI 把信息整理好、列出利弊和盲点，决策权留在你手里。';
+        flows = [
+          { h: '输入', p: '把背景、约束、相关数据和历史决策整理给 AI 当素材。' },
+          { h: '步骤', p: '让 AI 列出选项、利弊、风险和你可能忽略的盲点，不要让它直接给结论。' },
+          { h: '输出', p: '得到一份「决策辅助简报」：3 个选项 + 各自代价 + 需要你确认的问题。' },
+          { h: '审核', p: '所有判断由你拍板。AI 只负责把信息摆整齐、把问题问全。' },
+          { h: '7 天后', p: '复盘你最近一个决策：AI 简报有没有帮你看见盲点？哪部分它帮不上？' }
+        ];
+        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
+      } else if (s2 === '沟通协调') {
+        type = 'D';
+        title = '这件「沟通协调」的工作，AI 能帮你准备，不能替你出面';
+        verdict = '它的问题通常不是「信息不够」，而是「责任和进度没人说得清」。AI 可以帮你整理进展、起草沟通、追踪节点，但推动人情的部分必须你自己上。';
+        flows = [
+          { h: '输入', p: '把相关方、当前进度、卡点和截止时间整理成一张「推进卡」。' },
+          { h: '步骤', p: '让 AI 起草进展同步、会议纪要、待办清单，减少你来回写消息的时间。' },
+          { h: '输出', p: '得到可发的同步消息 + 一份「谁负责、什么时候、卡在哪」的清单。' },
+          { h: '审核', p: '你确认信息准确后亲自发出；涉及人情和责任的判断不外包。' },
+          { h: '7 天后', p: '看哪一步最常卡：是信息没同步，还是没人有权拍板？' }
+        ];
+        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
+      } else {
+        type = 'E';
+        title = '先从「最小的一件重复事」开始验证，比想清楚更重要';
+        verdict = '还没想清楚是正常的。建议先挑一件最重复、最不涉及机密的小事，花 30 分钟让 AI 跑一遍，用真实结果代替想象。';
+        flows = [
+          { h: '输入', p: '挑一件「今天就能做」的小事：整理一份清单、转一段格式、生成一版草稿。' },
+          { h: '步骤', p: '给它最小上下文，让它输出一版结果，不要追求一次到位。' },
+          { h: '输出', p: '对比 AI 产出和你原来的做法：快不快、错不错、要不要改。' },
+          { h: '审核', p: '你亲自核对关键部分。第一次的目标是「体验」，不是「替换」。' },
+          { h: '7 天后', p: '如果你对一次结果满意，再把它固化成固定工作流。' }
+        ];
+        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
+      }
+
+      // 风险边界补充
+      if (s3 === '数据安全') {
+        verdict += ' 注意：涉及人名、金额、内部决策时，先脱敏或只用最小样本，资料留在你控制的环境里。';
+      }
+      if (s3 === '责任归属') {
+        verdict += ' 注意：AI 只做辅助，责任和审核必须由你或团队指定的人承担。';
+      }
+
+      return { title: title, verdict: verdict, flows: flows, selText: selText, task: t1 };
+    }
+
+    function renderResult(r) {
+      qs('#resultTitle').textContent = r.title;
+      qs('#resultSel').textContent = r.selText + (r.task ? ' · 「' + r.task + '」' : '');
+      qs('#verdictText').textContent = r.verdict;
+
+      var flowBox = qs('#flowBox');
+      flowBox.innerHTML = '';
+      r.flows.forEach(function (f, i) {
+        var step = document.createElement('div');
+        step.className = 'flow-step';
+        step.innerHTML = '<div class="flow-idx">' + (i + 1) + '</div><div class="flow-body"><h4>' + f.h + '</h4><p>' + f.p + '</p></div>';
+        flowBox.appendChild(step);
+      });
+    }
+
+    qs('#submit').addEventListener('click', function () {
+      var r = classify();
+      renderResult(r);
+      qs('#step3').style.display = 'none';
+      qs('#result').classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    qs('#restart').addEventListener('click', function () {
+      state = { sel1: '', sel2: '', sel3: '', task1: '' };
+      document.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('selected'); });
+      qs('#task1').value = '';
+      qs('#to2').disabled = true; qs('#to3').disabled = true; qs('#submit').disabled = true;
+      qs('#result').classList.remove('visible');
+      qs('#step1').style.display = 'block';
+      qs('#step2').style.display = 'none';
+      qs('#step3').style.display = 'none';
+      updateProgress(33);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    qs('#print').addEventListener('click', function () { window.print(); });
+  })();
+  </script>
+</body>
+</html>
