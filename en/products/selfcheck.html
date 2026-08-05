@@ -74,6 +74,22 @@
     .hook p { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 16px; }
     .hook a { color: #f4f3ef; text-decoration: underline; text-underline-offset: 3px; }
 
+    /* Pro kit */
+    .paybox { margin-top: 22px; border: 1px solid #3a3a38; border-radius: 16px; padding: 24px; background: linear-gradient(180deg, #101010 0%, #0b0b0b 100%); }
+    .paybox-tag { display: inline-block; background: #f4f3ef; color: #050505; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 999px; margin-bottom: 14px; }
+    .paybox h3 { font-size: 18px; font-weight: 750; margin-bottom: 8px; }
+    .paybox .pay-sub { font-size: 14px; color: #a8a8a5; margin-bottom: 14px; }
+    .paybox ul { list-style: none; padding: 0; margin: 0 0 16px; }
+    .paybox li { font-size: 14px; color: #d9d9d6; padding: 6px 0 6px 24px; position: relative; line-height: 1.6; }
+    .paybox li::before { content: '✓'; position: absolute; left: 0; color: #f4f3ef; font-weight: 700; }
+    .pay-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .pay-price { font-size: 26px; font-weight: 800; }
+    .pay-price small { font-size: 13px; font-weight: 400; color: #a8a8a5; }
+    .pay-btn { display: inline-flex; align-items: center; gap: 8px; background: #f4f3ef; color: #050505; border-radius: 10px; padding: 13px 24px; font-size: 15px; font-weight: 700; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease; }
+    .pay-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .pay-note { font-size: 12px; color: #666; margin-top: 12px; }
+    @media (max-width: 560px) { .pay-row { flex-direction: column; align-items: flex-start; } }
+
     .progress { height: 3px; background: #1a1a1a; border-radius: 99px; margin: 0 0 26px; overflow: hidden; }
     .progress-fill { height: 100%; width: 33%; background: #f4f3ef; border-radius: 99px; transition: width 300ms ease; }
 
@@ -186,6 +202,22 @@
             <h3>The self-check is only step one</h3>
             <p>The tool points the direction. Real value is getting this "first AI-worthy task" running: where input comes from, who reviews, which step reworks most, and how to verify in 7 days.</p>
             <a href="mailto:lincyang@foxmail.com?subject=Manager%20AI%20Self-Check%3A%20book%20a%2030-min%20diagnosis">Book a 30-min diagnosis (free first talk) →</a>
+          </div>
+
+          <div class="paybox no-print">
+            <span class="paybox-tag">Pro · ¥29</span>
+            <h3>Full kit: get this one "first AI task" actually running</h3>
+            <p class="pay-sub">The free tool points the direction; the Pro kit gives you deliverables you can use today.</p>
+            <ul>
+              <li><strong>Method handbook PDF</strong>: AI meeting-note four columns + process-audit five steps + 3 real cases</li>
+              <li><strong>Meeting closure template</strong>: copy-paste for Feishu / Obsidian, stop "discussion becoming decision"</li>
+              <li><strong>Post-meeting checklist</strong>: 5-minute review, every item has an owner and a deadline</li>
+            </ul>
+            <div class="pay-row">
+              <span class="pay-price">¥29 <small>one-time · auto-delivery</small></span>
+              <a class="pay-btn" id="payBtn" href="MBDPUB_URL" target="_blank" rel="noopener">Get the full kit →</a>
+            </div>
+            <p class="pay-note">Download link is delivered automatically after payment. Diagnose first, buy tools later.</p>
           </div>
         </div>
         <div class="btn-row no-print">
