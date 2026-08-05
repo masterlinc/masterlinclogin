@@ -460,10 +460,23 @@
     qs('#print').addEventListener('click', function () { window.print(); });
 
     // ===== 免费资料 · 线索捕获 =====
-    // 接收端：FormSubmit.co（零注册零成本；首次提交会给收件邮箱发激活确认邮件，点击后即开始接收）
-    // 备选：注册 Formspree 免费账号后，把 LEAD_ENDPOINT 换成 https://formspree.io/f/你的ID
-    var LEAD_ENDPOINT = 'https://formsubmit.co/ajax/lincyang@foxmail.com';
-    var LEAD_SUBJECT = '自检页 · 免费资料领取';
+    // 接收端：飞书多维表格（Vercel Serverless /api/lead 服务端写入，后台可导出）
+    // 安全：页面只与同域 /api/lead 通信，不接触任何飞书 token/secret
+    var LEAD_ENDPOINT = '/api/lead';
+
+    // 来源渠道：优先 URL 参数（utm_source / source），其次 referrer，最后默认「直接访问」
+    function detectSource() {
+      try {
+        var m = (window.location.search || '').match(/[?&](?:utm_source|source)=([^&]+)/);
+        if (m && m[1]) return decodeURIComponent(m[1]).slice(0, 100);
+        var ref = document.referrer;
+        if (ref) {
+          var host = ref.replace(/^https?:\/\//, '').split('/')[0];
+          if (host) return host.slice(0, 100);
+        }
+      } catch (e) { /* ignore */ }
+      return '直接访问';
+    }
 
     var leadForm = qs('#leadForm');
     if (leadForm) {
@@ -505,14 +518,13 @@
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
             email: email,
-            problem: problem,
-            _subject: LEAD_SUBJECT,
-            _honey: ''
+            question: problem,
+            source: detectSource()
           })
         }).then(function (res) {
           return res.json();
         }).then(function (data) {
-          if (data && data.success === 'true') {
+          if (data && data.ok === true) {
             qs('#leadSuccessEmail').textContent = email;
             leadForm.hidden = true;
             qs('#leadSuccess').hidden = false;
