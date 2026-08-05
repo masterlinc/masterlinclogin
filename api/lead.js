@@ -115,12 +115,14 @@ module.exports = async function handler(req, res) {
 
   try {
     // 字段需与多维表格「线索」表的字段名完全一致
+    // 注意：Text 字段（type 1）必须传字符串格式，不能传 {text: ...} 对象，否则飞书返回 TextFieldConvFail(1254060)
+    // DateTime 字段（type 5）传毫秒时间戳数字
     const fields = {
       '邮箱': email,
       '最想解决的问题': question || '',
-      '来源渠道': { text: source || '直接访问' },
+      '来源渠道': source || '直接访问',
       '提交时间': Date.now(),
-      '数据使用同意': { text: '是' },
+      '数据使用同意': '是',
     };
     await writeRecord(fields);
     res.status(200).json({ ok: true });
