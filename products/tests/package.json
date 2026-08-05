@@ -1,0 +1,9 @@
+{
+  "name": "transition-os-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Transition OS Web MVP 自动化测试（凌验 QA 出品）",
+  "scripts": {
+    "test": "node transition-os.spec.js"
+  }
+}

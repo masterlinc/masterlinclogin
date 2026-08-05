@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Node.js（tests 依赖，不应提交）
+node_modules/

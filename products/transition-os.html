@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>转型操作系统 · Transition OS · 每天 15-30 分钟，用碎片时间积累长期资产</title>
+  <meta name="description" content="给边工作边转型的你：红黄绿日判断今日状态 → 系统推荐今日唯一动作 → 资产/证据自动沉淀 → 90 天母线不换 → 每周只呈现事实的复盘。" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#050505" />
+  <style>
+    /* ===== Transition OS 独立样式（自包含，不依赖站点全局） ===== */
+    :root {
+      --bg: #050505;
+      --card: #0b0b0b;
+      --card2: #101010;
+      --line: #2a2a28;
+      --line-soft: rgba(244, 243, 239, 0.18);
+      --text: #f4f3ef;
+      --sub: #a8a8a5;
+      --dim: #6f6f6c;
+      --red: #e5484d;
+      --red-bg: rgba(229,72,77,0.12);
+      --yellow: #f2b13c;
+      --yellow-bg: rgba(242,177,60,0.12);
+      --green: #46a758;
+      --green-bg: rgba(70,167,88,0.12);
+      --accent: #f4f3ef;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button { font-family: inherit; font-size: inherit; color: inherit; background: none; border: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    input, textarea, select { font-family: inherit; font-size: 16px; color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 13px 14px; width: 100%; outline: none; }
+    input:focus, textarea:focus, select:focus { border-color: var(--text); }
+    input::placeholder, textarea::placeholder { color: #6f6f6c; }
+    :focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+    .visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a8a8a5' fill='none' stroke-width='1.6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+    .hide { display: none !important; }
+
+    .app { max-width: 720px; margin: 0 auto; padding: 0 16px 110px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; padding: 22px 2px 18px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      width: 40px; height: 40px; border-radius: 12px; background: var(--text); color: var(--bg);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 800; letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .brand-name { font-size: 17px; font-weight: 750; line-height: 1.2; }
+    .brand-sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-top: 2px; }
+    .top-date { text-align: right; font-size: 14px; color: var(--sub); line-height: 1.5; font-variant-numeric: tabular-nums; }
+
+    .view { display: none; animation: fadeIn 200ms ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .kicker { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sub); margin-bottom: 10px; }
+    .page-title { font-size: 26px; line-height: 1.25; font-weight: 750; margin-bottom: 8px; letter-spacing: -0.01em; }
+    .page-sub { color: var(--sub); font-size: 14px; line-height: 1.6; margin-bottom: 22px; }
+    .page-sub strong { color: var(--text); font-weight: 650; }
+
+    .card { border: 1px solid var(--line); border-radius: 16px; padding: 24px 22px; margin-bottom: 16px; background: var(--card); }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .card-sub { font-size: 14px; color: var(--sub); line-height: 1.6; }
+
+    .notice { border: 1px solid var(--line); border-left: 3px solid var(--yellow); border-radius: 12px; background: var(--yellow-bg); padding: 13px 16px; font-size: 14px; line-height: 1.6; color: #f0d9a8; margin-bottom: 16px; display: flex; gap: 10px; align-items: flex-start; }
+    .notice a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+    .notice .notice-x { margin-left: auto; color: var(--sub); font-size: 16px; flex-shrink: 0; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--accent); color: var(--bg); border: none; border-radius: 12px;
+      padding: 13px 22px; font-size: 16px; font-weight: 700; cursor: pointer;
+      transition: opacity 150ms ease, transform 150ms ease; min-height: 52px; width: 100%;
+    }
+    .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--sub); }
+    .btn-ghost:hover { border-color: #555; opacity: 1; }
+    .btn-sm { min-height: 44px; padding: 8px 14px; font-size: 14px; width: auto; border-radius: 8px; }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+    .btn-row .btn { flex: 1; min-width: 120px; }
+
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .chip { display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 999px; padding: 10px 16px; font-size: 14px; min-height: 44px; color: var(--sub); background: transparent; transition: border-color 150ms ease, color 150ms ease, background 150ms ease; }
+    .chip.active { border-color: var(--text); color: var(--text); background: #141414; }
+
+    .mode-card { border-radius: 16px; padding: 22px; margin-bottom: 16px; border: 1px solid; }
+    .mode-red { border-color: rgba(229,72,77,0.5); background: var(--red-bg); }
+    .mode-yellow { border-color: rgba(242,177,60,0.5); background: var(--yellow-bg); }
+    .mode-green { border-color: rgba(70,167,88,0.5); background: var(--green-bg); }
+    .mode-top { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .mode-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+    .mode-red .mode-dot { background: var(--red); } .mode-yellow .mode-dot { background: var(--yellow); } .mode-green .mode-dot { background: var(--green); }
+    .mode-name { font-size: 18px; font-weight: 750; }
+    .mode-time { font-size: 14px; color: var(--sub); margin-left: auto; white-space: nowrap; }
+    .mode-rule { font-size: 14px; line-height: 1.7; opacity: 0.92; }
+
+    .q-list { display: flex; flex-direction: column; gap: 12px; }
+    .q-item { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--card2); }
+    .q-text { font-size: 16px; font-weight: 650; line-height: 1.5; margin-bottom: 12px; }
+    .q-hint { font-size: 14px; color: var(--dim); margin-top: 8px; line-height: 1.5; }
+    .q-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .q-opt { border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; font-size: 14px; color: var(--sub); background: transparent; transition: border-color 150ms ease, background 150ms ease, color 150ms ease; min-height: 48px; }
+    .q-opt.active { border-color: var(--text); background: #141414; color: var(--text); font-weight: 650; }
+
+    .preview { border: 1px dashed #3a3a38; border-radius: 14px; padding: 16px; margin-top: 16px; font-size: 14px; color: var(--sub); }
+    .preview b { color: var(--text); }
+
+    .action-card { border: 1px solid var(--line); border-radius: 16px; padding: 22px; background: var(--card); margin-bottom: 16px; }
+    .action-tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tag { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 650; letter-spacing: 0.06em; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--sub); }
+    .tag-cat-content { color: #7fb5f0; border-color: rgba(127,181,240,0.35); }
+    .tag-cat-service { color: #e0a86a; border-color: rgba(224,168,106,0.35); }
+    .tag-cat-evidence { color: #c68fe2; border-color: rgba(198,143,226,0.35); }
+    .tag-cat-product { color: #6fd3c7; border-color: rgba(111,211,199,0.35); }
+    .tag-cat-review { color: #a8a8a5; border-color: rgba(168,168,165,0.35); }
+    .action-title { font-size: 18px; font-weight: 750; line-height: 1.4; margin-bottom: 8px; }
+    .action-out { font-size: 14px; color: var(--sub); line-height: 1.7; background: var(--card2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
+    .action-out b { color: var(--text); font-weight: 650; }
+    .action-meta { display: flex; gap: 14px; font-size: 14px; color: var(--dim); margin-bottom: 12px; }
+    .done-badge { display: inline-flex; align-items: center; gap: 6px; color: var(--green); font-size: 14px; font-weight: 700; }
+
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+    .stat-card { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--card); }
+    .stat-num { font-size: 30px; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .stat-label { font-size: 14px; color: var(--sub); margin-top: 4px; }
+    .stat-num.red { color: var(--red); } .stat-num.yellow { color: var(--yellow); } .stat-num.green { color: var(--green); }
+    @media (max-width: 480px) { .stat-grid { grid-template-columns: 1fr 1fr; } }
+
+    .funnel { display: flex; flex-direction: column; gap: 10px; }
+    .funnel-row { display: grid; grid-template-columns: 44px 1fr 30px; align-items: center; gap: 10px; }
+    .funnel-name { font-size: 14px; color: var(--sub); }
+    .funnel-track { height: 20px; background: var(--card2); border-radius: 6px; overflow: hidden; border: 1px solid var(--line-soft); }
+    .funnel-fill { height: 100%; background: var(--text); border-radius: 6px; transition: width 300ms ease; }
+    .funnel-num { font-size: 14px; font-weight: 700; text-align: right; color: var(--text); font-variant-numeric: tabular-nums; }
+    .funnel-note { font-size: 14px; color: var(--dim); margin-top: 12px; line-height: 1.6; }
+
+    .rec-list { display: flex; flex-direction: column; gap: 12px; }
+    .rec-item { border: 1px solid var(--line); border-radius: 14px; padding: 16px; background: var(--card); }
+    .rec-head { display: flex; align-items: flex-start; gap: 10px; }
+    .rec-type { flex-shrink: 0; font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 6px; background: #141414; border: 1px solid var(--line); color: var(--sub); margin-top: 2px; }
+    .rec-body { flex: 1; min-width: 0; }
+    .rec-title { font-size: 16px; font-weight: 650; line-height: 1.5; }
+    .rec-content { font-size: 14px; color: var(--sub); line-height: 1.6; margin-top: 4px; word-break: break-word; }
+    .rec-foot { display: flex; gap: 10px; align-items: center; font-size: 14px; color: var(--dim); margin-top: 8px; }
+    .rec-del { margin-left: auto; color: var(--dim); font-size: 14px; min-height: 44px; min-width: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 8px 10px; border-radius: 8px; flex-shrink: 0; }
+    .rec-del:hover { color: var(--red); }
+
+    .mainline-card { border: 1px solid var(--line); border-radius: 16px; padding: 26px 22px; background: var(--card); margin-bottom: 16px; text-align: center; }
+    .mainline-name { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .mainline-dates { font-size: 14px; color: var(--dim); margin-bottom: 18px; }
+    .mainline-days { font-size: 54px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .mainline-days small { font-size: 16px; font-weight: 600; color: var(--sub); }
+    .mainline-progress-wrap { margin: 18px 0 6px; }
+    .mainline-progress { height: 8px; background: var(--card2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line-soft); }
+    .mainline-progress-fill { height: 100%; background: var(--text); border-radius: 99px; transition: width 300ms ease; }
+    .mainline-progress-label { font-size: 14px; color: var(--dim); margin-top: 8px; }
+
+    .check-item { border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; background: var(--card2); }
+    .check-item-title { font-size: 14px; font-weight: 650; line-height: 1.5; }
+    .check-item-sub { font-size: 14px; color: var(--dim); margin-top: 3px; }
+    .check-opts { display: flex; gap: 8px; margin-top: 10px; }
+    .check-opt { flex: 1; border: 1px solid var(--line); border-radius: 8px; padding: 9px 6px; text-align: center; font-size: 14px; color: var(--sub); min-height: 44px; }
+    .check-opt.active { border-color: var(--text); color: var(--text); background: #141414; font-weight: 650; }
+    .result-box { border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-top: 16px; text-align: center; }
+    .result-box.ok { border-color: rgba(70,167,88,0.5); background: var(--green-bg); }
+    .result-box.warn { border-color: rgba(242,177,60,0.5); background: var(--yellow-bg); }
+    .result-big { font-size: 34px; font-weight: 800; }
+    .result-text { font-size: 14px; color: var(--sub); margin-top: 6px; line-height: 1.6; }
+
+    .mode-dist { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .mode-dist-item { border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; background: var(--card2); }
+    .mode-dist-num { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .mode-dist-label { font-size: 14px; color: var(--sub); margin-top: 2px; }
+
+    .empty { text-align: center; padding: 42px 20px; color: var(--dim); font-size: 14px; line-height: 1.8; }
+    .empty .empty-ico { font-size: 34px; margin-bottom: 10px; opacity: 0.6; }
+    .link { color: var(--text); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+    .muted { color: var(--dim); }
+    .divider { border: none; border-top: 1px solid var(--line-soft); margin: 18px 0; }
+
+    .seg { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 18px; }
+    .seg button { flex: 1; padding: 12px 0; font-size: 14px; color: var(--sub); background: var(--card); }
+    .seg button.active { background: var(--text); color: var(--bg); font-weight: 700; }
+
+    /* 弹层 */
+    .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.66); display: flex; align-items: flex-end; justify-content: center; z-index: 100; animation: fadeIn 150ms ease; }
+    @media (min-width: 560px) { .modal-mask { align-items: center; } }
+    .modal { width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 22px; }
+    @media (min-width: 560px) { .modal { border-radius: 20px; } }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-title { font-size: 17px; font-weight: 750; }
+    .modal-x { color: var(--sub); font-size: 20px; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 8px; }
+    .field { margin-bottom: 14px; }
+    .field-label { font-size: 14px; color: var(--sub); margin-bottom: 6px; display: block; }
+    .field-hint { font-size: 14px; color: var(--dim); margin-top: 5px; line-height: 1.5; }
+    .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .type-toggle button { border: 1px solid var(--line); border-radius: 10px; padding: 11px; text-align: center; font-size: 14px; min-height: 44px; color: var(--sub); background: var(--card2); }
+    .type-toggle button.active { border-color: var(--text); background: #141414; color: var(--text); font-weight: 700; }
+    .subtype-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .subtype-grid button { border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px; text-align: center; font-size: 14px; min-height: 44px; color: var(--sub); background: var(--card2); }
+    .subtype-grid button.active { border-color: var(--text); background: #141414; color: var(--text); font-weight: 650; }
+
+    /* 底部 Tab */
+    .tabbar {
+      position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+      background: rgba(5,5,5,0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--line-soft);
+    }
+    .tabbar-inner { max-width: 720px; margin: 0 auto; display: flex; }
+    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 0 10px; color: var(--dim); min-height: 60px; }
+    .tab-ico { font-size: 18px; line-height: 1; }
+    .tab-label { font-size: 12px; }
+    .tab.active { color: var(--text); }
+    .tab.active .tab-ico { transform: translateY(-1px); }
+    .safe-bottom { height: env(safe-area-inset-bottom, 0px); }
+
+    .about-line { font-size: 14px; color: var(--sub); line-height: 1.8; }
+    .toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; font-weight: 650; padding: 10px 18px; border-radius: 999px; z-index: 200; opacity: 0; transition: opacity 200ms ease; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◤</span>
+        <div>
+          <div class="brand-name">转型操作系统</div>
+          <div class="brand-sub">Transition OS</div>
+        </div>
+      </div>
+      <div class="top-date" id="topDate"></div>
+    </header>
+
+    <main>
+      <h1 class="visually-hidden">转型操作系统 Transition OS — 每天 15-30 分钟，用碎片时间积累长期资产</h1>
+      <section class="view" id="view-today"></section>
+      <section class="view" id="view-records"></section>
+      <section class="view" id="view-mainline"></section>
+      <section class="view" id="view-review"></section>
+      <section class="view" id="view-settings"></section>
+    </main>
+  </div>
+
+  <nav class="tabbar" aria-label="主导航">
+    <div class="tabbar-inner">
+      <button class="tab" data-route="today"><span class="tab-ico">☀</span><span class="tab-label">今日</span></button>
+      <button class="tab" data-route="records"><span class="tab-ico">▤</span><span class="tab-label">记录</span></button>
+      <button class="tab" data-route="mainline"><span class="tab-ico">➤</span><span class="tab-label">母线</span></button>
+      <button class="tab" data-route="review"><span class="tab-ico">▦</span><span class="tab-label">复盘</span></button>
+      <button class="tab" data-route="settings"><span class="tab-ico">⚙</span><span class="tab-label">设置</span></button>
+    </div>
+    <div class="safe-bottom"></div>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ================= 数据层（localStorage 单一 JSON 根） ================= */
+  var LS_KEY = 'transition-os:v1';
+  var todayStr = (function () {
+    var d = new Date();
+    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+  })();
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function uid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'id-' + Date.now() + '-' + Math.random().toString(36).slice(2, 10);
+  }
+  function nowISO() { return new Date().toISOString(); }
+  function parseDate(s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+  function fmt(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function addDays(s, n) { var d = parseDate(s); d.setDate(d.getDate() + n); return fmt(d); }
+  function diffDays(a, b) { return Math.round((parseDate(b) - parseDate(a)) / 86400000); }
+  var WEEK_CN = ['日', '一', '二', '三', '四', '五', '六'];
+  function prettyDate(s) { var d = parseDate(s); return (d.getMonth() + 1) + '月' + d.getDate() + '日 周' + WEEK_CN[d.getDay()]; }
+  function mondayOf(s) { var d = parseDate(s); d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return fmt(d); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+
+  function emptyDB() {
+    return {
+      user: { id: uid(), name: 'masterlinc', stage: 'validate', createdAt: nowISO() },
+      mainline: null,
+      dailySessions: [],
+      assets: [],
+      evidences: [],
+      weeklyReviews: [],
+      meta: { lastExportAt: null, backupDismissDate: null, createdAt: nowISO() }
+    };
+  }
+  function load() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (raw) { var d = JSON.parse(raw); if (d && d.user) return normalize(d); }
+    } catch (e) {}
+    var d = emptyDB();
+    save(d);
+    return d;
+  }
+  function normalize(d) {
+    if (!d.meta) d.meta = { lastExportAt: null, backupDismissDate: null, createdAt: nowISO() };
+    if (!d.user) d.user = emptyDB().user;
+    if (!Array.isArray(d.dailySessions)) d.dailySessions = [];
+    if (!Array.isArray(d.assets)) d.assets = [];
+    if (!Array.isArray(d.evidences)) d.evidences = [];
+    if (!Array.isArray(d.weeklyReviews)) d.weeklyReviews = [];
+    return d;
+  }
+  function save(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch (e) { toast('存储失败：空间不足或浏览器限制'); } }
+
+  var db = load();
+  function persist() { save(db); }
+
+  function lastSessionDate() {
+    var best = null;
+    db.dailySessions.forEach(function (s) { if (!best || s.date > best) best = s.date; });
+    return best;
+  }
+  function sessionOf(dateStr) {
+    return db.dailySessions.filter(function (s) { return s.date === dateStr; })[0] || null;
+  }
+
+  /* ================= 规则引擎：红黄绿日 ================= */
+  var MODE_META = {
+    red:    { name: '红日', time: '3 分钟', dot: 'red',    rule: '只做一个 3 分钟的小动作，做完就收。约束：不研究、不润色、不补欠账。今天你的任务是恢复系统，不是推进项目。' },
+    yellow: { name: '黄日', time: '15 分钟', dot: 'yellow', rule: '只做一个 15 分钟的动作，别贪多。约束：会议多、精力散，先护住一段完整时间，做完即记录。' },
+    green:  { name: '绿日', time: '60 分钟', dot: 'green',  rule: '今天状态好，把最多时间投给高杠杆动作（产品/内容/服务交付）。约束：仍然只推进一件事，做完沉淀。' }
+  };
+  function decideMode(a) {
+    if (a.sleepUnder6h || a.hardDeadline || a.lastGapOver3d) return 'red';
+    if (a.meetingsOver4) return 'yellow';
+    return 'green';
+  }
+  function autoGap() {
+    var last = lastSessionDate();
+    if (!last) return true; // 从未记录，视为中断过久
+    return diffDays(last, todayStr) > 3;
+  }
+
+  /* ================= 动作库（22 个，覆盖五类） ================= */
+  var STAGE_CN = { explore: '探索', validate: '验证', productize: '产品化', scale: '规模化' };
+  var CAT_CN = { content: '内容', service: '服务', evidence: '证据', product: '产品', review: '复盘' };
+  var ACTIONS = [
+    // —— 内容类 ——
+    { id: 'a-case-card', cat: 'content', priority: 2, minutes: 20, modes: ['yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '把 1 个真实问题写成 300 字案例卡',
+      out: '问题 / 动作 / 结果 / 可复用点，四段各 1-2 句，≥300 字' },
+    { id: 'a-publish-note', cat: 'content', priority: 1, minutes: 30, modes: ['yellow', 'green'], stages: ['explore', 'validate', 'scale'],
+      title: '发布 1 条内容（小红书 / 公众号）',
+      out: '1 篇已发布的内容（可粘贴链接或截图存证）' },
+    { id: 'a-scene-note', cat: 'content', priority: 2, minutes: 25, modes: ['green'], stages: ['explore'],
+      title: '写 1 篇「管理者 × AI」现场笔记（500 字）',
+      out: '1 篇现场笔记：一个真实场景 + 你做了什么 + 结果如何' },
+    { id: 'a-method-rewrite', cat: 'content', priority: 1, minutes: 10, modes: ['yellow', 'green'], stages: ['explore'],
+      title: '把 1 条方法论翻译成自己的话',
+      out: '1 条 Dan Koe / Naval 原则 → 100 字自己的话 + 1 个你见过的例子' },
+    { id: 'a-dictation', cat: 'content', priority: 1, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '用 60 秒语音说出今天的灵感，转成文字',
+      out: '1 段语音转文字草稿（≥100 字），存进资产库' },
+    // —— 服务类 ——
+    { id: 'a-outreach', cat: 'service', priority: 3, minutes: 10, modes: ['yellow', 'green'], stages: ['validate', 'productize', 'scale'],
+      title: '给 1 位真实管理者发出邀约 / 回访',
+      out: '1 条已发出的消息（微信 / 私信，记录对方回复或未回）' },
+    { id: 'a-diagnosis', cat: 'service', priority: 3, minutes: 30, modes: ['yellow', 'green'], stages: ['validate', 'productize'],
+      title: '完成 1 次免费诊断 / 体检交付',
+      out: '1 次 30 分钟对话 + 交付 1 个明确判断（可截图记录）' },
+    { id: 'a-followup', cat: 'service', priority: 2, minutes: 5, modes: ['yellow', 'green'], stages: ['validate', 'scale'],
+      title: '跟进 1 位潜在客户 / 观察者',
+      out: '1 条回复或 1 个问题已发出，记录对方反应' },
+    { id: 'a-referral', cat: 'service', priority: 2, minutes: 5, modes: ['yellow', 'green'], stages: ['validate', 'productize'],
+      title: '请 1 位朋友介绍 1 位管理者',
+      out: '1 条介绍请求已发出，记录对方的回应' },
+    // —— 证据类 ——
+    { id: 'a-pain-capture', cat: 'evidence', priority: 3, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '捕捉 1 个用户原话 / 痛点',
+      out: '1 条原话 + 场景：谁、什么时候、说了什么（逐字记录）' },
+    { id: 'a-rejection', cat: 'evidence', priority: 3, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['validate', 'productize'],
+      title: '记录 1 次拒绝',
+      out: '谁拒绝了你什么、为什么（1-3 句，不修饰）' },
+    { id: 'a-payment-signal', cat: 'evidence', priority: 3, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['validate', 'productize', 'scale'],
+      title: '记录 1 个付费 / 购买信号',
+      out: '1 条信号：询价、问价、或明确付费意愿的原话' },
+    { id: 'a-validate-q', cat: 'evidence', priority: 3, minutes: 10, modes: ['yellow', 'green'], stages: ['validate'],
+      title: '给 1 位真实用户发 1 个验证问题',
+      out: '1 个开放问题已发出，并收到 1 条回复（记录回复原话）' },
+    { id: 'a-feedback-mining', cat: 'evidence', priority: 2, minutes: 5, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '整理已有反馈，找出重复痛点',
+      out: '找出重复出现 ≥2 次的 1 个痛点，写成 1 句话' },
+    // —— 产品类 ——
+    { id: 'a-template', cat: 'product', priority: 3, minutes: 30, modes: ['green'], stages: ['productize', 'scale'],
+      title: '把 1 次实践沉淀成模板 / 流程',
+      out: '1 份可复用的模板或流程文档（≥5 步）' },
+    { id: 'a-product-page', cat: 'product', priority: 3, minutes: 30, modes: ['green'], stages: ['productize'],
+      title: '把 1 个案例卡升级成 1 页产品介绍',
+      out: '1 页介绍：痛点 → 服务 → 价格 → 怎么买' },
+    { id: 'a-flow-map', cat: 'product', priority: 2, minutes: 15, modes: ['green'], stages: ['productize'],
+      title: '画 1 张服务流程图（A→B 最小路径）',
+      out: '1 张图：输入 → 步骤 → 输出 → 审核点' },
+    { id: 'a-checklist', cat: 'product', priority: 2, minutes: 15, modes: ['green'], stages: ['productize', 'scale'],
+      title: '打磨 1 个交付清单 / 检查清单',
+      out: '1 份清单（≥5 项，可直接用于下次交付）' },
+    // —— 复盘类 ——
+    { id: 'a-mainline-check', cat: 'review', priority: 3, minutes: 10, modes: ['yellow'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '做 1 次 7 天母线检查',
+      out: '本周产出逐条打标（在母线 / 跑偏 / 无关），算出一致性比例' },
+    { id: 'a-system-update', cat: 'review', priority: 1, minutes: 5, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '更新系统状态：看 5 分钟本周数据',
+      out: '写下 1 句中性总结（只陈述事实，不评判好坏）' },
+    { id: 'a-week-rereview', cat: 'review', priority: 2, minutes: 10, modes: ['yellow'], stages: ['all'],
+      title: '复盘本周的 1 个动作',
+      out: '做了什么 / 产出什么 / 卡在哪，三段各 1 句' },
+    { id: 'a-funnel-check', cat: 'review', priority: 2, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['validate', 'productize'],
+      title: '检查证据漏斗走到哪一步',
+      out: '看一遍五段计数，写下当前所在段位 + 下一步要补的一段' }
+  ];
+  // 'all' 兼容
+  ACTIONS.forEach(function (a) {
+    if (a.stages.indexOf('all') >= 0) a.stages = ['explore', 'validate', 'productize', 'scale'];
+  });
+
+  function actionById(id) {
+    return ACTIONS.filter(function (a) { return a.id === id; })[0] || null;
+  }
+  function lastDoneDays(actionId) {
+    var best = null;
+    db.dailySessions.forEach(function (s) { if (s.actionId === actionId && (!best || s.date > best)) best = s.date; });
+    return best ? diffDays(best, todayStr) : null;
+  }
+  function recommendList(mode, stage, excludeFirst) {
+    var pool = ACTIONS.filter(function (a) { return a.modes.indexOf(mode) >= 0 && a.stages.indexOf(stage) >= 0; });
+    var recentIds = {};
+    for (var i = 1; i <= 3; i++) {
+      var ds = addDays(todayStr, -i);
+      db.dailySessions.forEach(function (s) { if (s.date === ds && s.actionId) recentIds[s.actionId] = true; });
+    }
+    var candidates = pool.filter(function (a) { return !recentIds[a.id]; });
+    if (!candidates.length) candidates = pool;
+    candidates.sort(function (x, y) {
+      var sx = score(x), sy = score(y);
+      return sy - sx;
+    });
+    if (excludeFirst) {
+      var rest = candidates.filter(function (a) { return a.id !== excludeFirst; });
+      if (rest.length) return rest.concat(candidates.slice(0, 1));
+      return candidates;
+    }
+    return candidates;
+  }
+  function score(a) {
+    var done = lastDoneDays(a.id);
+    var recency = (done === null) ? 2 : Math.min(done, 14) / 7;
+    return a.priority * 2 + recency;
+  }
+
+  /* ================= 通用 UI ================= */
+  function $id(id) { return document.getElementById(id); }
+  var toastTimer = null;
+  function toast(msg) {
+    var el = $id('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2200);
+  }
+  function openModal(html) {
+    var mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.id = 'modalMask';
+    mask.innerHTML = '<div class="modal" role="dialog" aria-modal="true" aria-label="对话框"><div class="modal-head"><div class="modal-title"></div><button class="modal-x" data-action="modal-close" aria-label="关闭">✕</button></div><div class="modal-body"></div></div>';
+    mask.querySelector('.modal-title').textContent = '';
+    mask.querySelector('.modal-body').innerHTML = html;
+    mask.addEventListener('click', function (e) { if (e.target === mask) closeModal(); });
+    document.body.appendChild(mask);
+    return mask;
+  }
+  function closeModal() {
+    var m = $id('modalMask');
+    if (m) m.remove();
+  }
+  function modalTitle(t) {
+    var m = $id('modalMask');
+    if (m) { m.querySelector('.modal-title').textContent = t; m.querySelector('.modal').setAttribute('aria-label', t); }
+  }
+
+  var ASSET_TYPES = [
+    { v: 'article',  n: '文章' }, { v: 'template', n: '模板' }, { v: 'workflow', n: '流程' },
+    { v: 'case',     n: '案例' }, { v: 'product',  n: '产品' }
+  ];
+  var EVIDENCE_TYPES = [
+    { v: 'pain',      n: '痛点原话' }, { v: 'feedback', n: '反馈' },
+    { v: 'payment',   n: '付费' },     { v: 'rejection', n: '拒绝' }
+  ];
+  var FUNNEL = [
+    { key: 'person',  name: '先人',   hint: '接触过的真实人数（每条证据 = 一次真实接触）' },
+    { key: 'pain',    name: '痛点',   hint: '记录到痛点原话' },
+    { key: 'service', name: '服务',   hint: '收到反馈 / 被拒绝（有人回应）' },
+    { key: 'payment', name: '付费',   hint: '出现付费信号' },
+    { key: 'product', name: '产品化', hint: '沉淀出产品形态' }
+  ];
+
+  /* ================= 今日页 ================= */
+  var qForm = { sleepUnder6h: false, meetingsOver4: false, lastGapOver3d: null, hardDeadline: false };
+  var editingToday = false; // 「修改判断」编辑态：为 true 时渲染晨间 4 问表单，提交走更新分支
+
+  function renderToday() {
+    var v = $id('view-today');
+    var html = '';
+    html += '<p class="kicker">今日 · Daily</p>';
+    html += '<h2 class="page-title">' + prettyDate(todayStr) + '</h2>';
+    html += '<p class="page-sub">先判断今天是什么日子，再做今天唯一一件事。</p>';
+
+    // 备份提醒
+    if (needBackupTip()) {
+      html += '<div class="notice" role="note">⚠ 你已连续 7 天未导出备份。数据只存在本浏览器里，<a data-action="goto-settings">去导出一次</a>（10 秒）<button class="notice-x" data-action="dismiss-backup" aria-label="关闭提醒">✕</button></div>';
+    }
+    if (!db.mainline) {
+      html += '<div class="notice" role="note">尚未设定 90 天母线。<a data-action="goto-mainline">现在设定 →</a></div>';
+    }
+
+    var s = sessionOf(todayStr);
+    if (s && !editingToday) {
+      html += renderTodayWithSession(s);
+    } else {
+      html += renderTodayCheckin();
+    }
+    v.innerHTML = html;
+  }
+
+  function needBackupTip() {
+    if (!db.meta.lastExportAt) return false; // 从未导出过，不打扰
+    if (db.meta.backupDismissDate === todayStr) return false;
+    return diffDays(db.meta.lastExportAt.slice(0, 10), todayStr) >= 7;
+  }
+
+  function renderTodayCheckin() {
+    var h = '';
+    if (qForm.lastGapOver3d === null) qForm.lastGapOver3d = autoGap();
+    var a = qForm;
+    var mode = decideMode(a);
+    var mm = MODE_META[mode];
+
+    h += '<div class="card">';
+    h += '<div class="card-title">晨间 4 问（1 分钟）</div>';
+    h += '<p class="card-sub" style="margin-bottom:14px;">回答 4 个客观问题，系统判断今天投入多少精力。</p>';
+    h += '<div class="q-list">';
+    h += qItem('sleepUnder6h', '昨晚睡眠 < 6 小时？', a.sleepUnder6h, '红灯信号：没睡够，今天不宜硬撑。');
+    h += qItem('meetingsOver4', '今天会议 > 4 个？', a.meetingsOver4, '会议多会打碎时间块，黄灯信号。');
+    h += qItem('lastGapOver3d', '上次执行日志 > 3 天未写？', a.lastGapOver3d, '系统已自动判断，你可手动改。红灯信号：中断过久，先恢复。');
+    h += qItem('hardDeadline', '今天有硬性截止的工作交付？', a.hardDeadline, '红灯信号：今天必须交东西，别抢自己的精力。');
+    h += '</div>';
+    h += '<div class="preview">即时预览：<b>' + mm.name + '</b> · ' + mm.time + ' — ' + mm.rule.split('。')[0] + '。</div>';
+    h += '<div class="btn-row"><button class="btn" data-action="confirm-checkin">' + (editingToday ? '保存修改' : '确认进入今日 →') + '</button>';
+    if (editingToday) h += '<button class="btn-ghost" data-action="cancel-edit-today">取消修改</button>';
+    h += '</div>';
+    h += '</div>';
+    return h;
+  }
+
+  function qItem(key, text, val, hint) {
+    return '<div class="q-item"><div class="q-text">' + text + '</div>' +
+      '<div class="q-options">' +
+      '<button class="q-opt' + (val === true ? ' active' : '') + '" data-action="q-set" data-key="' + key + '" data-val="true">是</button>' +
+      '<button class="q-opt' + (val === false ? ' active' : '') + '" data-action="q-set" data-key="' + key + '" data-val="false">否</button>' +
+      '</div>' +
+      (hint ? '<div class="q-hint">' + hint + '</div>' : '') +
+      '</div>';
+  }
+
+  function renderTodayWithSession(s) {
+    var h = '';
+    var mm = MODE_META[s.mode];
+    var completed = (s.output || (s.assetIds && s.assetIds.length) || (s.evidenceIds && s.evidenceIds.length));
+
+    h += '<div class="mode-card mode-' + s.mode + '">';
+    h += '<div class="mode-top"><span class="mode-dot"></span><span class="mode-name">' + mm.name + '</span>';
+    h += '<span class="mode-time">' + mm.time + '</span></div>';
+    h += '<div class="mode-rule">' + mm.rule + '</div>';
+    h += '<div class="btn-row">';
+    h += '<button class="btn-ghost btn btn-sm" data-action="edit-today">修改判断</button>';
+    h += '<button class="btn-ghost btn btn-sm" data-action="override-mode" data-mode="red">手动降为红</button>';
+    h += '<button class="btn-ghost btn btn-sm" data-action="override-mode" data-mode="green">手动升为绿</button>';
+    h += '</div>';
+    h += '</div>';
+
+    // 动作卡
+    var a = s.actionId ? actionById(s.actionId) : null;
+    var rec = recommendList(s.mode, db.user.stage, s.actionId);
+    h += '<div class="action-card">';
+    h += '<p class="kicker">今日唯一动作</p>';
+    if (a) {
+      h += actionCardBody(a, s.mode);
+      if (completed) {
+        h += '<div class="done-badge" style="margin-top:12px;">✓ 今日已完成 · 产出已沉淀</div>';
+        h += '<div class="btn-row"><button class="btn-ghost btn btn-sm" data-action="view-today-output">查看今日产出</button>';
+        h += '<button class="btn-ghost btn btn-sm" data-action="open-record" data-session="1">再记一条</button></div>';
+      } else {
+        h += '<div class="btn-row"><button class="btn" data-action="complete-action">完成这个动作</button>';
+        h += '<button class="btn-ghost" data-action="switch-action">换一个</button></div>';
+      }
+    } else if (rec.length) {
+      h += actionCardBody(rec[0], s.mode);
+      h += '<div class="btn-row"><button class="btn" data-action="complete-action">完成这个动作</button>';
+      h += '<button class="btn-ghost" data-action="switch-action">换一个</button></div>';
+    } else {
+      h += '<p class="muted">当前模式没有可用动作，去记录页手动记录一条产出。</p>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function actionCardBody(a, mode) {
+    var catCn = CAT_CN[a.cat] || '';
+    var stageHint = '';
+    if (a.minutes > parseInt(MODE_META[mode].time, 10)) stageHint = ' · 超出当日预算，可只做到「最小产出」即收';
+    return '<div class="action-tag-row"><span class="tag tag-cat-' + a.cat + '">' + catCn + '</span><span class="tag">约 ' + a.minutes + ' 分钟</span></div>' +
+      '<div class="action-title">' + esc(a.title) + '</div>' +
+      '<div class="action-out"><b>最小产出定义：</b>' + esc(a.out) + '</div>' +
+      '<div class="action-meta"><span>建议模式：' + a.modes.map(function (m) { return MODE_META[m].name; }).join(' / ') + '</span>' + stageHint + '</div>';
+  }
+
+  function confirmCheckin() {
+    var mode = decideMode(qForm);
+    var existing = sessionOf(todayStr);
+    if (existing && editingToday) {
+      // 修改判断：更新当日 session，而非 push 新 session
+      var modeChanged = existing.mode !== mode;
+      existing.mode = mode;
+      existing.manualOverride = false;
+      existing.checkAnswers = {
+        sleepUnder6h: !!qForm.sleepUnder6h,
+        meetingsOver4: !!qForm.meetingsOver4,
+        lastGapOver3d: !!qForm.lastGapOver3d,
+        hardDeadline: !!qForm.hardDeadline
+      };
+      existing.durationMinutes = parseInt(MODE_META[mode].time, 10);
+      if (modeChanged) existing.actionId = null; // 模式变了，重新推荐动作
+      editingToday = false;
+      persist();
+      toast('判断已更新为' + MODE_META[mode].name);
+      render();
+      return;
+    }
+    var rec = recommendList(mode, db.user.stage);
+    var s = {
+      id: uid(),
+      date: todayStr,
+      mode: mode,
+      manualOverride: false,
+      checkAnswers: {
+        sleepUnder6h: !!qForm.sleepUnder6h,
+        meetingsOver4: !!qForm.meetingsOver4,
+        lastGapOver3d: !!qForm.lastGapOver3d,
+        hardDeadline: !!qForm.hardDeadline
+      },
+      actionId: rec.length ? rec[0].id : null,
+      customAction: null,
+      output: '',
+      assetIds: [],
+      evidenceIds: [],
+      durationMinutes: parseInt(MODE_META[mode].time, 10),
+      createdAt: nowISO()
+    };
+    db.dailySessions.push(s);
+    persist();
+    toast(MODE_META[mode].name + '已确认 · 已推荐今日动作');
+    render();
+  }
+
+  function editToday() {
+    var s = sessionOf(todayStr);
+    if (!s) return;
+    editingToday = true;
+    qForm = { sleepUnder6h: !!s.checkAnswers.sleepUnder6h, meetingsOver4: !!s.checkAnswers.meetingsOver4, lastGapOver3d: !!s.checkAnswers.lastGapOver3d, hardDeadline: !!s.checkAnswers.hardDeadline };
+    render();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEditToday() {
+    editingToday = false;
+    render();
+  }
+
+  function overrideMode(mode) {
+    var s = sessionOf(todayStr);
+    if (!s) return;
+    s.mode = mode;
+    s.manualOverride = true;
+    s.durationMinutes = parseInt(MODE_META[mode].time, 10);
+    persist();
+    toast('已手动调整为' + MODE_META[mode].name);
+    render();
+  }
+
+  function switchAction() {
+    var s = sessionOf(todayStr);
+    if (!s) return;
+    var rec = recommendList(s.mode, db.user.stage, s.actionId);
+    if (rec.length) { s.actionId = rec[0].id; s.output = ''; s.assetIds = []; s.evidenceIds = []; persist(); }
+    render();
+  }
+
+  // 产出记录弹层
+  var recordModalState = { kind: 'asset', subtype: 'article', sessionId: null, defaultTitle: '', defaultCat: 'content' };
+
+  function openRecordModal(sessionId, actionCat) {
+    var s = sessionId ? sessionOf(todayStr) : null;
+    if (sessionId && !s) { toast('当前没有可关联的今日会话'); return; }
+    var cat = actionCat || (s && s.actionId ? actionById(s.actionId).cat : 'content');
+    var kind = (cat === 'evidence') ? 'evidence' : 'asset';
+    var subtype = defaultSubtype(cat);
+    recordModalState = { kind: kind, subtype: subtype, sessionId: sessionId ? s.id : null, defaultTitle: s && s.actionId ? actionById(s.actionId).title : '', defaultCat: cat };
+    var html = '';
+    html += '<div class="field"><label class="field-label" for="recContent">产出内容（一段话即可）</label>';
+    html += '<textarea id="recContent" rows="4" placeholder="今天做了什么？产出是什么？一句话说清楚。"></textarea></div>';
+    html += '<div class="field"><label class="field-label">归类</label>';
+    html += '<div class="type-toggle">';
+    html += '<button data-action="rec-kind" data-kind="asset" class="' + (kind === 'asset' ? 'active' : '') + '">资产类（可复用）</button>';
+    html += '<button data-action="rec-kind" data-kind="evidence" class="' + (kind === 'evidence' ? 'active' : '') + '">证据类（真实反馈）</button>';
+    html += '</div>';
+    html += '<div class="subtype-grid" id="recSubtypes">' + subtypeButtons(kind, subtype) + '</div></div>';
+    html += '<div class="field" id="recExtra">' + extraField(kind, subtype) + '</div>';
+    html += '<div class="btn-row"><button class="btn" data-action="rec-save">保存到库</button><button class="btn-ghost" data-action="modal-close">取消</button></div>';
+    openModal(html);
+    modalTitle(s ? '记录今日产出' : '新增记录');
+  }
+
+  function defaultSubtype(cat) {
+    if (cat === 'content') return 'article';
+    if (cat === 'service') return 'feedback';
+    if (cat === 'evidence') return 'pain';
+    if (cat === 'product') return 'template';
+    return 'case';
+  }
+  function subtypeButtons(kind, active) {
+    var arr = kind === 'asset' ? ASSET_TYPES : EVIDENCE_TYPES;
+    return arr.map(function (t) {
+      return '<button data-action="rec-subtype" data-sub="' + t.v + '" class="' + (t.v === active ? 'active' : '') + '">' + t.n + '</button>';
+    }).join('');
+  }
+  function extraField(kind, subtype) {
+    if (kind === 'asset') {
+      return '<label class="field-label" for="recTitle">标题</label><input id="recTitle" placeholder="' + esc(recordModalState.defaultTitle) + '" value="">';
+    }
+    if (kind === 'evidence') {
+      var src = (recordModalState.defaultCat === 'service') ? '今日服务动作' : '';
+      return '<label class="field-label" for="recSource">来源（谁、在什么场景说的）</label><input id="recSource" placeholder="如：朋友 1v1 对话 / 公众号评论 / 同事" value="' + esc(src) + '">';
+    }
+    return '';
+  }
+
+  function recSave() {
+    var content = $id('recContent') ? $id('recContent').value.trim() : '';
+    if (!content) { toast('请填写产出内容'); return; }
+    var kind = recordModalState.kind;
+    var subtype = recordModalState.subtype;
+    var title = kind === 'asset' && $id('recTitle') ? ($id('recTitle').value.trim() || content.slice(0, 30)) : '';
+    var source = kind === 'evidence' && $id('recSource') ? $id('recSource').value.trim() : '';
+    var s = recordModalState.sessionId ? sessionOf(todayStr) : null;
+
+    if (kind === 'asset') {
+      var asset = {
+        id: uid(), type: subtype, title: title || content.slice(0, 30), content: content,
+        tags: [], sessionId: s ? s.id : null, createdAt: nowISO()
+      };
+      db.assets.push(asset);
+      if (s) { s.output = s.output ? s.output + '\n' + content : content; s.assetIds.push(asset.id); }
+    } else {
+      var ev = {
+        id: uid(), type: subtype, content: content, source: source || '', funnelStage: funnelOf(subtype),
+        sessionId: s ? s.id : null, createdAt: nowISO()
+      };
+      db.evidences.push(ev);
+      if (s) { s.output = s.output ? s.output + '\n' + content : content; s.evidenceIds.push(ev.id); }
+    }
+    persist();
+    closeModal();
+    toast('已沉淀 → ' + (kind === 'asset' ? '资产库' : '证据库'));
+    render();
+  }
+  function funnelOf(t) {
+    if (t === 'pain') return 'pain';
+    if (t === 'payment') return 'payment';
+    return 'service'; // feedback / rejection → service
+  }
+
+  /* ================= 记录页（资产 + 证据 + 漏斗） ================= */
+  var recFilter = { tab: 'asset', assetType: 'all', evidenceType: 'all', q: '' };
+
+  function renderRecords() {
+    var v = $id('view-records');
+    var h = '';
+    h += '<p class="kicker">资产 · 证据</p>';
+    h += '<h2 class="page-title">你积累了什么</h2>';
+    h += '<p class="page-sub">每一条产出，要么是<strong>可复用资产</strong>，要么是<strong>真实市场证据</strong>。分开管理，互相可见。</p>';
+    h += '<div class="btn-row" style="margin-top:0;"><button class="btn" data-action="open-record" data-session="0">＋ 新增记录</button></div>';
+    h += '<div style="height:14px;"></div>';
+    h += '<div class="seg">';
+    h += '<button data-action="rec-tab" data-tab="asset" class="' + (recFilter.tab === 'asset' ? 'active' : '') + '">资产库 (' + db.assets.length + ')</button>';
+    h += '<button data-action="rec-tab" data-tab="evidence" class="' + (recFilter.tab === 'evidence' ? 'active' : '') + '">证据库 (' + db.evidences.length + ')</button>';
+    h += '</div>';
+
+    if (recFilter.tab === 'asset') {
+      h += renderAssets();
+    } else {
+      h += renderEvidence();
+    }
+    v.innerHTML = h;
+  }
+
+  function renderAssets() {
+    var h = '';
+    h += '<div class="chip-row">';
+    h += '<button class="chip' + (recFilter.assetType === 'all' ? ' active' : '') + '" data-action="asset-filter" data-type="all">全部</button>';
+    ASSET_TYPES.forEach(function (t) {
+      h += '<button class="chip' + (recFilter.assetType === t.v ? ' active' : '') + '" data-action="asset-filter" data-type="' + t.v + '">' + t.n + '</button>';
+    });
+    h += '</div>';
+    h += '<div class="field"><input id="assetSearch" placeholder="搜索资产…" value="' + esc(recFilter.q) + '"></div>';
+    h += '<div style="height:8px;"></div>';
+    var list = db.assets.filter(function (a) {
+      if (recFilter.assetType !== 'all' && a.type !== recFilter.assetType) return false;
+      if (recFilter.q && (a.title + ' ' + a.content).toLowerCase().indexOf(recFilter.q.toLowerCase()) < 0) return false;
+      return true;
+    }).sort(function (x, y) { return y.createdAt.localeCompare(x.createdAt); });
+    if (!list.length) {
+      h += '<div class="empty"><div class="empty-ico">▤</div>还没有资产。完成一个动作并记录产出，就会出现在这里。</div>';
+    } else {
+      h += '<div class="rec-list">';
+      list.forEach(function (a) {
+        var t = ASSET_TYPES.filter(function (x) { return x.v === a.type; })[0] || { n: esc(a.type) };
+        h += '<div class="rec-item"><div class="rec-head"><span class="rec-type">' + esc(t.n) + '</span><div class="rec-body">';
+        h += '<div class="rec-title">' + esc(a.title) + '</div>';
+        h += '<div class="rec-content">' + esc(a.content) + '</div>';
+        h += '<div class="rec-foot"><span>' + prettyDate(a.createdAt.slice(0, 10)) + '</span>';
+        if (a.sessionId) h += '<span>· 来自今日动作</span>';
+        h += '</div></div><button class="rec-del" data-action="del-record" data-kind="asset" data-id="' + a.id + '">删除</button></div></div>';
+      });
+      h += '</div>';
+    }
+    return h;
+  }
+
+  function funnelCounts() {
+    var c = { person: 0, pain: 0, service: 0, payment: 0, product: 0 };
+    db.evidences.forEach(function (e) {
+      c.person++;
+      var st = e.funnelStage || funnelOf(e.type);
+      if (st === 'pain') c.pain++;
+      if (st === 'service') c.service++;
+      if (st === 'payment') c.payment++;
+    });
+    db.assets.forEach(function (a) { if (a.type === 'product') c.product++; });
+    return c;
+  }
+
+  function renderEvidence() {
+    var c = funnelCounts();
+    var max = 1;
+    FUNNEL.forEach(function (f) { if (c[f.key] > max) max = c[f.key]; });
+    var h = '';
+    h += '<div class="card" style="padding:20px;"><div class="card-title" style="font-size:15px;">北极星漏斗</div>';
+    h += '<p class="card-sub" style="margin-bottom:14px;">证据积累到哪一步了？先人 → 痛点 → 服务 → 付费 → 产品化。</p>';
+    h += '<div class="funnel">';
+    FUNNEL.forEach(function (f) {
+      var n = c[f.key];
+      h += '<div class="funnel-row"><div class="funnel-name">' + f.name + '</div><div class="funnel-track"><div class="funnel-fill" style="width:' + Math.round(n / max * 100) + '%;"></div></div><div class="funnel-num">' + n + '</div></div>';
+    });
+    h += '</div><div class="funnel-note">' + FUNNEL[c.product > 0 ? 4 : (c.payment > 0 ? 3 : (c.service > 0 ? 2 : (c.pain > 0 ? 1 : 0)))].hint + '。下一步：' + (c.product > 0 ? '已到产品化，专注售卖与反馈循环' : (c.payment > 0 ? '已经有付费信号，把服务交付做扎实' : (c.service > 0 ? '补一个付费信号（问价 / 邀约）' : (c.pain > 0 ? '把痛点转成服务，发一次邀约' : '先去捕捉 1 个真实痛点原话')))) + '</div></div>';
+    h += '<div class="chip-row" style="margin-top:4px;">';
+    h += '<button class="chip' + (recFilter.evidenceType === 'all' ? ' active' : '') + '" data-action="evidence-filter" data-type="all">全部</button>';
+    EVIDENCE_TYPES.forEach(function (t) {
+      h += '<button class="chip' + (recFilter.evidenceType === t.v ? ' active' : '') + '" data-action="evidence-filter" data-type="' + t.v + '">' + t.n + '</button>';
+    });
+    h += '</div>';
+    var list = db.evidences.filter(function (e) {
+      if (recFilter.evidenceType !== 'all' && e.type !== recFilter.evidenceType) return false;
+      return true;
+    }).sort(function (x, y) { return y.createdAt.localeCompare(x.createdAt); });
+    if (!list.length) {
+      h += '<div class="empty"><div class="empty-ico">◉</div>还没有证据。捕捉用户的真实原话、反馈、付费或拒绝，都会出现在这里。</div>';
+    } else {
+      h += '<div class="rec-list">';
+      list.forEach(function (e) {
+        var t = EVIDENCE_TYPES.filter(function (x) { return x.v === e.type; })[0] || { n: esc(e.type) };
+        h += '<div class="rec-item"><div class="rec-head"><span class="rec-type">' + esc(t.n) + '</span><div class="rec-body">';
+        h += '<div class="rec-title">' + esc(e.content) + '</div>';
+        if (e.source) h += '<div class="rec-content">来源：' + esc(e.source) + '</div>';
+        h += '<div class="rec-foot"><span>' + prettyDate(e.createdAt.slice(0, 10)) + '</span>';
+        if (e.sessionId) h += '<span>· 来自今日动作</span>';
+        h += '</div></div><button class="rec-del" data-action="del-record" data-kind="evidence" data-id="' + e.id + '">删除</button></div></div>';
+      });
+      h += '</div>';
+    }
+    return h;
+  }
+
+  /* ================= 母线页 ================= */
+  var MAINLINE_DAYS = 90;
+  var mainlineCheckState = {};
+
+  function renderMainline() {
+    var v = $id('view-mainline');
+    var h = '';
+    h += '<p class="kicker">母线 · Mainline</p>';
+    h += '<h2 class="page-title">90 天不换母线</h2>';
+    h += '<p class="page-sub">一条母线定义你 90 天的方向。倒计时内<strong>不鼓励更换</strong>，换一次记录一次。</p>';
+
+    if (!db.mainline) {
+      h += '<div class="card"><div class="card-title">设定你的母线</div>';
+      h += '<p class="card-sub" style="margin-bottom:14px;">一句话说清你接下来 90 天反复围绕的主题。例如：「AI 管理现场」「管理者 AI 陪跑」。</p>';
+      h += '<div class="field"><label class="field-label" for="mlName">母线名称</label><input id="mlName" placeholder="如：AI 管理现场" value=""></div>';
+      h += '<div class="field"><label class="field-label" for="mlStart">开始日期</label><input id="mlStart" type="date" value="' + todayStr + '"></div>';
+      h += '<div class="btn-row"><button class="btn" data-action="save-mainline">开始 90 天 →</button></div>';
+      h += '</div>';
+    } else {
+      var ml = db.mainline;
+      var endDate = addDays(ml.startDate, MAINLINE_DAYS);
+      var remain = Math.max(0, diffDays(todayStr, endDate));
+      var elapsed = Math.max(0, Math.min(MAINLINE_DAYS, diffDays(ml.startDate, todayStr)));
+      var pct = Math.round(elapsed / MAINLINE_DAYS * 100);
+      var expired = diffDays(todayStr, endDate) < 0;
+
+      h += '<div class="mainline-card">';
+      h += '<div class="mainline-name">' + esc(ml.name) + '</div>';
+      h += '<div class="mainline-dates">' + prettyDate(ml.startDate) + ' → ' + prettyDate(endDate) + ' · 已换 ' + (ml.switchedCount || 0) + ' 次</div>';
+      h += '<div class="mainline-days">' + remain + ' <small>天</small></div>';
+      h += '<div class="mainline-progress-wrap"><div class="mainline-progress"><div class="mainline-progress-fill" style="width:' + pct + '%;"></div></div>';
+      h += '<div class="mainline-progress-label">已走 ' + elapsed + ' / ' + MAINLINE_DAYS + ' 天（' + pct + '%）</div></div>';
+      if (ml.lastSwitchReason) h += '<div class="muted" style="font-size:12px;margin-top:6px;">上次更换原因：' + esc(ml.lastSwitchReason) + '</div>';
+      h += '<div class="btn-row"><button class="btn-ghost btn btn-sm" data-action="change-mainline">更换母线</button></div>';
+      h += '</div>';
+      if (expired) h += '<div class="notice" role="note">本周期已结束。如果方向不变，可「更换母线」重新开始一轮；如果变了，记录原因再换。</div>';
+
+      h += renderMainlineCheck();
+    }
+    v.innerHTML = h;
+  }
+
+  function renderMainlineCheck() {
+    var h = '';
+    var monday = mondayOf(todayStr);
+    // 本周产出（资产 + 证据，createdAt 在本周）
+    var items = weekOutputs(monday, todayStr);
+    // 已存的自检
+    var wr = db.weeklyReviews.filter(function (r) { return r.weekStart === monday; })[0] || null;
+
+    h += '<div class="card"><div class="card-title">每周一致性自检（' + prettyDate(monday) + ' 起）</div>';
+    h += '<p class="card-sub" style="margin-bottom:14px;">把本周产出逐条打标：在母线 / 跑偏 / 无关。一致性 ≥ 70% 算合格。</p>';
+
+    if (wr && wr.mainlineCheck && wr.mainlineCheck.length) {
+      var total = wr.mainlineCheck.length;
+      var on = wr.mainlineCheck.filter(function (i) { return i.onMainline; }).length;
+      var ratio = total ? Math.round(on / total * 100) : 0;
+      var ok = ratio >= 70;
+      h += '<div class="result-box ' + (ok ? 'ok' : 'warn') + '"><div class="result-big">' + ratio + '%</div>';
+      h += '<div class="result-text">' + total + ' 条产出中 ' + on + ' 条在母线上' + (ok ? ' · 合格，保持' : ' · 低于 70%，该收心了') + '</div></div>';
+      h += '<div class="btn-row"><button class="btn-ghost btn btn-sm" data-action="redo-mainline-check">重新打标</button></div>';
+    } else if (!items.length) {
+      h += '<p class="muted">本周还没有产出记录。先去「今日」完成一个动作，产出会自动进入这里。</p>';
+    } else {
+      h += '<div class="rec-list" style="margin-bottom:6px;">';
+      items.forEach(function (it, idx) {
+        var name = it.kind === 'asset' ? (it.title || it.content.slice(0, 24)) : it.content.slice(0, 30);
+        var typeCn = it.kind === 'asset' ? ((ASSET_TYPES.filter(function (x) { return x.v === it.type; })[0] || {}).n || '资产') : ((EVIDENCE_TYPES.filter(function (x) { return x.v === it.type; })[0] || {}).n || '证据');
+        var val = mainlineCheckState[it.id] || '';
+        h += '<div class="check-item"><div class="check-item-title">' + esc(name) + '</div>';
+        h += '<div class="check-item-sub">' + (it.kind === 'asset' ? '资产 · ' : '证据 · ') + typeCn + ' · ' + prettyDate(it.createdAt.slice(0, 10)) + '</div>';
+        h += '<div class="check-opts">';
+        h += '<button class="check-opt' + (val === 'on' ? ' active' : '') + '" data-action="ml-mark" data-id="' + it.id + '" data-v="on">在母线</button>';
+        h += '<button class="check-opt' + (val === 'off' ? ' active' : '') + '" data-action="ml-mark" data-id="' + it.id + '" data-v="off">跑偏</button>';
+        h += '<button class="check-opt' + (val === 'none' ? ' active' : '') + '" data-action="ml-mark" data-id="' + it.id + '" data-v="none">无关</button>';
+        h += '</div></div>';
+      });
+      h += '</div>';
+      h += '<div class="btn-row"><button class="btn" data-action="finish-mainline-check">完成检查</button></div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function weekOutputs(from, to) {
+    var out = [];
+    db.assets.forEach(function (a) {
+      var d = a.createdAt.slice(0, 10);
+      if (d >= from && d <= to) out.push({ id: a.id, kind: 'asset', type: a.type, title: a.title, content: a.content, createdAt: a.createdAt });
+    });
+    db.evidences.forEach(function (e) {
+      var d = e.createdAt.slice(0, 10);
+      if (d >= from && d <= to) out.push({ id: e.id, kind: 'evidence', type: e.type, title: '', content: e.content, createdAt: e.createdAt });
+    });
+    return out.sort(function (x, y) { return x.createdAt.localeCompare(y.createdAt); });
+  }
+
+  function finishMainlineCheck() {
+    var monday = mondayOf(todayStr);
+    var items = weekOutputs(monday, todayStr);
+    var marks = [];
+    items.forEach(function (it) {
+      var v = mainlineCheckState[it.id];
+      if (v) marks.push({ item: (it.kind === 'asset' ? it.title : it.content).slice(0, 60), onMainline: v === 'on' });
+    });
+    if (!marks.length) { toast('请至少给一条产出打标'); return; }
+    var on = marks.filter(function (m) { return m.onMainline; }).length;
+    var ratio = Math.round(on / marks.length * 100);
+    var wr = {
+      id: uid(), weekStart: monday,
+      stats: { streakDays: streak(), assetsAdded: db.assets.filter(function (a) { var d = a.createdAt.slice(0, 10); return d >= monday && d <= todayStr; }).length, evidencesAdded: db.evidences.filter(function (e) { var d = e.createdAt.slice(0, 10); return d >= monday && d <= todayStr; }).length, modeDistribution: modeDist(monday, todayStr), mainlineConsistency: ratio / 100 },
+      mainlineCheck: marks, notes: '', createdAt: nowISO()
+    };
+    db.weeklyReviews = db.weeklyReviews.filter(function (r) { return r.weekStart !== monday; });
+    db.weeklyReviews.push(wr);
+    mainlineCheckState = {};
+    persist();
+    toast('一致性 ' + ratio + '% · ' + (ratio >= 70 ? '合格' : '该收心了'));
+    render();
+  }
+
+  /* ================= 复盘页 ================= */
+  var reviewRange = 'week';
+
+  function streak() {
+    var count = 0;
+    var d = todayStr;
+    if (!sessionOf(d)) d = addDays(d, -1);
+    while (sessionOf(d)) { count++; d = addDays(d, -1); }
+    return count;
+  }
+  function modeDist(from, to) {
+    var m = { red: 0, yellow: 0, green: 0 };
+    db.dailySessions.forEach(function (s) { if (s.date >= from && s.date <= to) m[s.mode] = (m[s.mode] || 0) + 1; });
+    return m;
+  }
+  function rangeStats() {
+    var from, to, label;
+    if (reviewRange === 'week') {
+      from = mondayOf(todayStr); to = todayStr; label = '本周';
+    } else {
+      var now = new Date();
+      var py = now.getFullYear(), pm = now.getMonth() - 1;
+      if (pm < 0) { pm = 11; py--; }
+      from = py + '-' + pad(pm + 1) + '-01';
+      to = fmt(new Date(py, pm + 1, 0));
+      label = '上月';
+    }
+    return { from: from, to: to, label: label };
+  }
+
+  function renderReview() {
+    var v = $id('view-review');
+    var h = '';
+    h += '<p class="kicker">复盘 · Review</p>';
+    h += '<h2 class="page-title">只呈现事实</h2>';
+    h += '<p class="page-sub">不评判好坏、不给分数。只看：连续天数、新增资产、新增证据、母线状态。</p>';
+    h += '<div class="seg">';
+    h += '<button data-action="review-range" data-r="week" class="' + (reviewRange === 'week' ? 'active' : '') + '">本周</button>';
+    h += '<button data-action="review-range" data-r="month" class="' + (reviewRange === 'month' ? 'active' : '') + '">上月</button>';
+    h += '</div>';
+
+    var rs = rangeStats();
+    var assets = db.assets.filter(function (a) { var d = a.createdAt.slice(0, 10); return d >= rs.from && d <= rs.to; });
+    var evs = db.evidences.filter(function (e) { var d = e.createdAt.slice(0, 10); return d >= rs.from && d <= rs.to; });
+    var sessions = db.dailySessions.filter(function (s) { return s.date >= rs.from && s.date <= rs.to; });
+    var md = modeDist(rs.from, rs.to);
+    var st = streak();
+    var monday = mondayOf(todayStr);
+    var wr = db.weeklyReviews.filter(function (r) { return r.weekStart === monday; })[0] || null;
+
+    h += '<div class="stat-grid">';
+    h += '<div class="stat-card"><div class="stat-num">' + st + '</div><div class="stat-label">连续执行天数</div></div>';
+    h += '<div class="stat-card"><div class="stat-num green">+' + assets.length + '</div><div class="stat-label">资产新增</div></div>';
+    h += '<div class="stat-card"><div class="stat-num yellow">+' + evs.length + '</div><div class="stat-label">证据新增</div></div>';
+    h += '<div class="stat-card">' + (db.mainline ? '<div class="stat-num">' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + '</div><div class="stat-label">母线剩余天数</div>' : '<div class="stat-num muted" style="font-size:22px;">—</div><div class="stat-label">母线剩余天数</div>') + '</div>';
+    h += '</div>';
+
+    h += '<div class="card"><div class="card-title">' + rs.label + '模式分布</div>';
+    h += '<div class="mode-dist">';
+    h += '<div class="mode-dist-item"><div class="mode-dist-num red">' + (md.red || 0) + '</div><div class="mode-dist-label">红日</div></div>';
+    h += '<div class="mode-dist-item"><div class="mode-dist-num yellow">' + (md.yellow || 0) + '</div><div class="mode-dist-label">黄日</div></div>';
+    h += '<div class="mode-dist-item"><div class="mode-dist-num green">' + (md.green || 0) + '</div><div class="mode-dist-label">绿日</div></div>';
+    h += '</div>';
+    if (sessions.length && md.red && md.red >= sessions.length * 0.5) {
+      h += '<p class="muted" style="font-size:13px;margin-top:12px;">红日占比过半：你可能太累了，下个周期多安排恢复。</p>';
+    }
+    h += '</div>';
+
+    h += '<div class="card"><div class="card-title">母线状态</div>';
+    if (db.mainline) {
+      h += '<p style="font-size:14px;">' + esc(db.mainline.name) + '</p>';
+      if (wr && wr.mainlineCheck && wr.mainlineCheck.length) {
+        var on = wr.mainlineCheck.filter(function (i) { return i.onMainline; }).length;
+        var ratio = Math.round(on / wr.mainlineCheck.length * 100);
+        h += '<p class="muted" style="font-size:13px;margin-top:6px;">本周一致性：<b style="color:var(--text);">' + ratio + '%</b>（' + on + '/' + wr.mainlineCheck.length + ' 在母线）' + (ratio >= 70 ? '' : ' · 低于 70%') + '</p>';
+      } else {
+        h += '<p class="muted" style="font-size:13px;margin-top:6px;">本周还没做一致性自检。<a class="link" data-action="goto-mainline">去母线页检查 →</a></p>';
+      }
+    } else {
+      h += '<p class="muted" style="font-size:13px;">尚未设定 90 天母线。<a class="link" data-action="goto-mainline">现在设定 →</a></p>';
+    }
+    h += '</div>';
+
+    var summary = rs.label + '完成 ' + sessions.length + ' 天执行，新增 ' + assets.length + ' 项资产、' + evs.length + ' 条证据。' + (db.mainline ? '母线「' + db.mainline.name + '」剩余 ' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + ' 天。' : '');
+    h += '<div class="card"><div class="card-title">一句中性总结</div><p class="muted" style="font-size:14px;">' + esc(summary) + '</p></div>';
+    v.innerHTML = h;
+  }
+
+  /* ================= 设置页 ================= */
+  function renderSettings() {
+    var v = $id('view-settings');
+    var h = '';
+    h += '<p class="kicker">设置 · Settings</p>';
+    h += '<h2 class="page-title">数据与偏好</h2>';
+    h += '<p class="page-sub">数据只存在本浏览器（localStorage）。请定期导出备份——这是你的资产。</p>';
+
+    h += '<div class="card"><div class="card-title">转型阶段</div>';
+    h += '<p class="card-sub" style="margin-bottom:12px;">影响「今日唯一动作」的推荐范围。</p>';
+    h += '<div class="field"><label class="field-label" for="stageSelect">当前阶段</label><select id="stageSelect">';
+    Object.keys(STAGE_CN).forEach(function (k) {
+      h += '<option value="' + k + '"' + (db.user.stage === k ? ' selected' : '') + '>' + STAGE_CN[k] + '</option>';
+    });
+    h += '</select></div></div>';
+
+    h += '<div class="card"><div class="card-title">备份与恢复</div>';
+    h += '<p class="card-sub" style="margin-bottom:14px;">' + (db.meta.lastExportAt ? '上次导出：' + prettyDate(db.meta.lastExportAt.slice(0, 10)) : '从未导出过备份') + '</p>';
+    h += '<div class="btn-row"><button class="btn" data-action="export-backup">导出 JSON 备份</button></div>';
+    h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="import-backup">导入恢复备份</button></div>';
+    h += '<input type="file" id="importFile" accept=".json,application/json" class="hide">';
+    h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="reset-data">重置全部数据</button></div>';
+    h += '</div>';
+
+    h += '<div class="card"><div class="card-title">关于</div>';
+    h += '<div class="about-line">转型操作系统 Transition OS v0.1.0（MVP）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
+    h += '</div>';
+    v.innerHTML = h;
+  }
+
+  function exportBackup() {
+    db.meta.lastExportAt = nowISO();
+    persist();
+    var blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'transition-os-backup-' + todayStr + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    toast('已导出备份');
+  }
+  function importBackup(file) {
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var parsed = JSON.parse(reader.result);
+        if (!parsed || !parsed.user) throw new Error('bad');
+        db = normalize(parsed);
+        persist();
+        toast('导入成功');
+        render();
+      } catch (e) { toast('导入失败：不是有效的备份文件'); }
+    };
+    reader.readAsText(file);
+  }
+  function confirmModal(title, text, yesLabel, onYes) {
+    var mask = openModal('<p class="muted" style="font-size:14px;margin-bottom:18px;">' + esc(text) + '</p><div class="btn-row"><button class="btn" id="confirmYes">' + esc(yesLabel) + '</button><button class="btn-ghost" data-action="modal-close">取消</button></div>');
+    modalTitle(title);
+    $id('confirmYes').addEventListener('click', function () { closeModal(); onYes(); });
+  }
+  function resetData() {
+    var mask = openModal('<p class="muted" style="font-size:14px;margin-bottom:10px;">输入「重置」两个字确认清空全部数据（不可恢复，请先导出备份）。</p><div class="field"><label class="field-label" for="resetInput">确认输入</label><input id="resetInput" placeholder="重置"></div><div class="btn-row"><button class="btn" id="resetDo">确认清空</button><button class="btn-ghost" data-action="modal-close">取消</button></div>');
+    modalTitle('重置全部数据');
+    $id('resetDo').addEventListener('click', function () {
+      if ($id('resetInput').value.trim() === '重置') { db = emptyDB(); persist(); closeModal(); render(); toast('已重置'); }
+      else toast('请输入「重置」确认');
+    });
+  }
+
+  /* ================= 路由与渲染 ================= */
+  var ROUTES = ['today', 'records', 'mainline', 'review', 'settings'];
+  function currentRoute() {
+    var h = location.hash.replace(/^#\/?/, '');
+    return ROUTES.indexOf(h) >= 0 ? h : 'today';
+  }
+  function render() {
+    var route = currentRoute();
+    document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
+    var view = $id('view-' + route);
+    if (view) view.classList.add('active');
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.classList.toggle('active', t.getAttribute('data-route') === route);
+      if (t.getAttribute('data-route') === route) t.setAttribute('aria-current', 'page');
+      else t.removeAttribute('aria-current');
+    });
+    $id('topDate').textContent = prettyDate(todayStr) + ' · ' + (db.mainline ? '母线 ' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + ' 天' : '未设母线');
+    if (route === 'today') renderToday();
+    else if (route === 'records') renderRecords();
+    else if (route === 'mainline') renderMainline();
+    else if (route === 'review') renderReview();
+    else if (route === 'settings') renderSettings();
+    window.scrollTo({ top: 0 });
+  }
+
+  /* ================= 事件分发 ================= */
+  function handleAction(act, el) {
+    switch (act) {
+      case 'q-set': {
+        var k = el.getAttribute('data-key'), val = el.getAttribute('data-val') === 'true';
+        qForm[k] = val;
+        render();
+        break;
+      }
+      case 'confirm-checkin': confirmCheckin(); break;
+      case 'edit-today': editToday(); break;
+      case 'cancel-edit-today': cancelEditToday(); break;
+      case 'override-mode': overrideMode(el.getAttribute('data-mode')); break;
+      case 'switch-action': switchAction(); break;
+      case 'complete-action': {
+        var s = sessionOf(todayStr);
+        if (s) openRecordModal(s.id, s.actionId ? actionById(s.actionId).cat : 'content');
+        break;
+      }
+      case 'open-record': {
+        var withSession = el.getAttribute('data-session') === '1';
+        if (withSession && sessionOf(todayStr)) openRecordModal(sessionOf(todayStr).id, sessionOf(todayStr).actionId ? actionById(sessionOf(todayStr).actionId).cat : 'content');
+        else openRecordModal(null, 'content');
+        break;
+      }
+      case 'view-today-output': viewTodayOutput(); break;
+      case 'rec-tab': recFilter.tab = el.getAttribute('data-tab'); recFilter.q = ''; render(); break;
+      case 'asset-filter': recFilter.assetType = el.getAttribute('data-type'); render(); break;
+      case 'evidence-filter': recFilter.evidenceType = el.getAttribute('data-type'); render(); break;
+      case 'rec-kind': recSetKind(el.getAttribute('data-kind')); break;
+      case 'rec-subtype': recSetSubtype(el.getAttribute('data-sub')); break;
+      case 'rec-save': recSave(); break;
+      case 'del-record': {
+        var kind = el.getAttribute('data-kind'), id = el.getAttribute('data-id');
+        confirmModal('删除记录', '确定删除这条记录吗？此操作不可恢复。', '删除', function () { delRecord(kind, id); });
+        break;
+      }
+      case 'save-mainline': saveMainline(); break;
+      case 'change-mainline': changeMainline(); break;
+      case 'ml-mark': mainlineCheckState[el.getAttribute('data-id')] = el.getAttribute('data-v'); render(); break;
+      case 'finish-mainline-check': finishMainlineCheck(); break;
+      case 'redo-mainline-check': mainlineCheckState = {}; render(); break;
+      case 'review-range': reviewRange = el.getAttribute('data-r'); render(); break;
+      case 'export-backup': exportBackup(); break;
+      case 'import-backup': $id('importFile').click(); break;
+      case 'reset-data': resetData(); break;
+      case 'goto-settings': location.hash = '#/settings'; break;
+      case 'goto-mainline': location.hash = '#/mainline'; break;
+      case 'dismiss-backup': db.meta.backupDismissDate = todayStr; persist(); render(); break;
+      case 'modal-close': closeModal(); break;
+      case 'tab-nav': location.hash = '#/' + el.getAttribute('data-route'); break;
+    }
+  }
+
+  function viewTodayOutput() {
+    var s = sessionOf(todayStr);
+    if (!s) return;
+    var h = '';
+    if (s.output) h += '<p style="font-size:14px;white-space:pre-wrap;word-break:break-word;">' + esc(s.output) + '</p>';
+    else h += '<p class="muted">今日还没有产出内容。</p>';
+    h += '<div class="btn-row"><button class="btn-ghost" data-action="modal-close">关闭</button></div>';
+    openModal(h);
+    modalTitle('今日产出');
+  }
+
+  function recSetKind(kind) {
+    recordModalState.kind = kind;
+    if (kind === 'asset' && !ASSET_TYPES.some(function (t) { return t.v === recordModalState.subtype; })) recordModalState.subtype = 'article';
+    if (kind === 'evidence' && !EVIDENCE_TYPES.some(function (t) { return t.v === recordModalState.subtype; })) recordModalState.subtype = 'pain';
+    var grid = $id('recSubtypes'), extra = $id('recExtra');
+    if (grid) grid.innerHTML = subtypeButtons(kind, recordModalState.subtype);
+    if (extra) extra.innerHTML = extraField(kind, recordModalState.subtype);
+  }
+  function recSetSubtype(sub) {
+    recordModalState.subtype = sub;
+    var grid = $id('recSubtypes'), extra = $id('recExtra');
+    if (grid) {
+      grid.querySelectorAll('button').forEach(function (b) { b.classList.toggle('active', b.getAttribute('data-sub') === sub); });
+    }
+    if (extra) extra.innerHTML = extraField(recordModalState.kind, sub);
+  }
+
+  function delRecord(kind, id) {
+    if (kind === 'asset') db.assets = db.assets.filter(function (a) { return a.id !== id; });
+    else db.evidences = db.evidences.filter(function (e) { return e.id !== id; });
+    db.dailySessions.forEach(function (s) {
+      if (kind === 'asset') s.assetIds = s.assetIds.filter(function (x) { return x !== id; });
+      else s.evidenceIds = s.evidenceIds.filter(function (x) { return x !== id; });
+    });
+    persist(); toast('已删除'); render();
+  }
+
+  function saveMainline() {
+    var name = $id('mlName').value.trim();
+    var start = $id('mlStart').value || todayStr;
+    if (!name) { toast('请填写母线名称'); return; }
+    db.mainline = { id: uid(), name: name, startDate: start, switchedCount: 0, lastSwitchReason: null, updatedAt: nowISO() };
+    persist();
+    toast('母线已设定：' + name);
+    render();
+  }
+  function changeMainline() {
+    var mask = openModal('<p class="muted" style="font-size:14px;margin-bottom:10px;">更换母线会重新开始 90 天倒计时，并记录 1 次更换。想清楚再换。</p><div class="field"><label class="field-label" for="newMlName">新母线名称</label><input id="newMlName" placeholder="新方向一句话"></div><div class="field"><label class="field-label" for="newMlReason">更换原因（会记录下来）</label><input id="newMlReason" placeholder="为什么换"></div><div class="btn-row"><button class="btn" id="doChangeMl">确认更换</button><button class="btn-ghost" data-action="modal-close">取消</button></div>');
+    modalTitle('更换母线');
+    $id('doChangeMl').addEventListener('click', function () {
+      var name = $id('newMlName').value.trim() || db.mainline.name;
+      var reason = $id('newMlReason').value.trim();
+      if (!reason) { toast('请填写更换原因'); return; }
+      db.mainline.name = name;
+      db.mainline.switchedCount = (db.mainline.switchedCount || 0) + 1;
+      db.mainline.lastSwitchReason = reason;
+      db.mainline.startDate = todayStr;
+      db.mainline.updatedAt = nowISO();
+      persist(); closeModal(); toast('已更换母线（第 ' + db.mainline.switchedCount + ' 次）'); render();
+    });
+  }
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-action]');
+    if (!el) return;
+    var act = el.getAttribute('data-action');
+    handleAction(act, el);
+  });
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.addEventListener('click', function () { location.hash = '#/' + t.getAttribute('data-route'); });
+  });
+  document.addEventListener('input', function (e) {
+    var id = e.target.id;
+    if (id === 'assetSearch') {
+      recFilter.q = e.target.value.trim();
+      renderRecords();
+      var inp = $id('assetSearch');
+      if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+    }
+  });
+  document.addEventListener('change', function (e) {
+    if (e.target.id === 'stageSelect') { db.user.stage = e.target.value; persist(); toast('阶段已更新为' + STAGE_CN[db.user.stage]); render(); }
+    if (e.target.id === 'importFile' && e.target.files && e.target.files[0]) importBackup(e.target.files[0]);
+  });
+
+  window.addEventListener('hashchange', render);
+  render();
+})();
+</script>
+</body>
+</html>

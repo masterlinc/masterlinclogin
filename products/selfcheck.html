@@ -91,6 +91,25 @@
     .pay-qr-item img { width: 132px; height: 156px; border-radius: 8px; border: 1px solid #2a2a28; margin-bottom: 6px; display: block; object-fit: cover; }
     @media (max-width: 560px) { .pay-row { flex-direction: column; align-items: flex-start; } }
 
+    /* 免费资料 · 线索捕获 */
+    .leadbox { margin-top: 22px; border: 1px solid #2a2a28; border-radius: 16px; padding: 24px; background: #0b0b0b; }
+    .leadbox-tag { display: inline-block; background: transparent; border: 1px solid #f4f3ef; color: #f4f3ef; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 999px; margin-bottom: 14px; }
+    .leadbox h3 { font-size: 18px; font-weight: 750; margin-bottom: 8px; }
+    .leadbox .lead-intro { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 18px; }
+    .lead-label { display: block; font-size: 13px; font-weight: 650; color: #d9d9d6; margin: 14px 0 6px; }
+    .lead-label .req { color: #f4f3ef; }
+    .lead-input { min-height: 0; height: auto; padding: 12px 14px; font-size: 15px; }
+    .lead-textarea { min-height: 70px; }
+    .lead-consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: #a8a8a5; line-height: 1.6; margin-top: 14px; cursor: pointer; }
+    .lead-consent input { margin-top: 3px; width: 16px; height: 16px; accent-color: #f4f3ef; flex-shrink: 0; }
+    .lead-error { color: #ff9d8a; font-size: 13px; line-height: 1.6; margin-top: 12px; padding: 10px 12px; border: 1px solid rgba(255,120,90,.35); border-radius: 8px; background: rgba(255,120,90,.08); }
+    .lead-success { text-align: center; padding: 18px 8px 10px; }
+    .lead-success-icon { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: #f4f3ef; color: #050505; font-size: 18px; font-weight: 800; margin-bottom: 12px; }
+    .lead-success h3 { margin-bottom: 6px; }
+    .lead-success p { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin: 0 auto; max-width: 440px; }
+    .lead-success p strong { color: #f4f3ef; }
+    @media print { .leadbox { display: none !important; } }
+
     .progress { height: 3px; background: #1a1a1a; border-radius: 99px; margin: 0 0 26px; overflow: hidden; }
     .progress-fill { height: 100%; width: 33%; background: #f4f3ef; border-radius: 99px; transition: width 300ms ease; }
 
@@ -202,6 +221,32 @@
             <h3>自检只是第一步</h3>
             <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
             <a href="mailto:lincyang@foxmail.com?subject=%E7%AE%A1%E7%90%86%E8%80%85AI%E8%87%AA%E6%A3%80%EF%BC%9A%E6%83%B3%E7%BA%A630%E5%88%86%E9%92%9F%E8%AF%8A%E6%96%AD">约一次 30 分钟诊断（免费先聊）→</a>
+          </div>
+
+          <!-- 免费资料 · 线索捕获 -->
+          <div class="leadbox no-print" id="leadbox">
+            <span class="leadbox-tag">免费领取</span>
+            <h3>把这份自检结果带走，免费领配套资料包</h3>
+            <p class="lead-intro">留下邮箱，免费领取《管理者 AI 自检配套资料》：五步落地清单（PDF）+ 会议闭环四栏模板 + 3 个真实现场案例。不发广告，随时退订。</p>
+            <form id="leadForm" novalidate>
+              <label class="lead-label" for="leadEmail">邮箱 <span class="req">*</span></label>
+              <input class="check-input lead-input" type="email" id="leadEmail" name="email" placeholder="you@example.com" autocomplete="email" required />
+              <label class="lead-label" for="leadProblem">最想解决的一个问题（可选）</label>
+              <textarea class="check-input lead-textarea" id="leadProblem" name="problem" placeholder="例如：会议纪要总是返工，想让它一次成型"></textarea>
+              <label class="lead-consent">
+                <input type="checkbox" id="leadConsent" name="consent" required />
+                <span>我同意：仅将以上邮箱用于发送免费资料与产品更新，不用于其他目的；可随时回复「退订」取消，信息将在退订后 30 天内删除。</span>
+              </label>
+              <div class="lead-error" id="leadError" role="alert" hidden></div>
+              <div class="btn-row">
+                <button class="btn" type="submit" id="leadSubmit">免费领取资料 →</button>
+              </div>
+            </form>
+            <div class="lead-success" id="leadSuccess" hidden>
+              <div class="lead-success-icon">✓</div>
+              <h3>资料马上发到你的邮箱</h3>
+              <p>我们会在 <strong>24 小时内</strong>把《管理者 AI 自检配套资料》发到 <strong id="leadSuccessEmail"></strong>。若没收到，回复任意邮件即可联系我们。</p>
+            </div>
           </div>
 
           <div class="paybox no-print">
@@ -405,11 +450,83 @@
       qs('#step1').style.display = 'block';
       qs('#step2').style.display = 'none';
       qs('#step3').style.display = 'none';
+      // 重置线索表单（若之前提交过）
+      if (qs('#leadForm')) { qs('#leadForm').hidden = false; qs('#leadForm').reset(); qs('#leadError').hidden = true; }
+      if (qs('#leadSuccess')) { qs('#leadSuccess').hidden = true; }
       updateProgress(33);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     qs('#print').addEventListener('click', function () { window.print(); });
+
+    // ===== 免费资料 · 线索捕获 =====
+    // 接收端：FormSubmit.co（零注册零成本；首次提交会给收件邮箱发激活确认邮件，点击后即开始接收）
+    // 备选：注册 Formspree 免费账号后，把 LEAD_ENDPOINT 换成 https://formspree.io/f/你的ID
+    var LEAD_ENDPOINT = 'https://formsubmit.co/ajax/lincyang@foxmail.com';
+    var LEAD_SUBJECT = '自检页 · 免费资料领取';
+
+    var leadForm = qs('#leadForm');
+    if (leadForm) {
+      leadForm.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var errBox = qs('#leadError');
+        var email = qs('#leadEmail').value.trim();
+        var problem = qs('#leadProblem').value.trim();
+        var consent = qs('#leadConsent').checked;
+        errBox.hidden = true;
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          errBox.textContent = '请输入有效的邮箱地址。';
+          errBox.hidden = false;
+          qs('#leadEmail').focus();
+          return;
+        }
+        if (!consent) {
+          errBox.textContent = '请先勾选同意条款，我们才能使用你的邮箱。';
+          errBox.hidden = false;
+          qs('#leadConsent').focus();
+          return;
+        }
+
+        var btn = qs('#leadSubmit');
+        btn.disabled = true;
+        btn.textContent = '提交中…';
+
+        // 本地备份：即使网络/服务异常也不丢线索（仅保存在用户浏览器）
+        try {
+          var key = 'masterlinc_lead_backup';
+          var list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.push({ email: email, problem: problem, at: new Date().toISOString() });
+          localStorage.setItem(key, JSON.stringify(list.slice(-50)));
+        } catch (e) { /* 隐私模式等场景忽略 */ }
+
+        fetch(LEAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            problem: problem,
+            _subject: LEAD_SUBJECT,
+            _honey: ''
+          })
+        }).then(function (res) {
+          return res.json();
+        }).then(function (data) {
+          if (data && data.success === 'true') {
+            qs('#leadSuccessEmail').textContent = email;
+            leadForm.hidden = true;
+            qs('#leadSuccess').hidden = false;
+          } else {
+            throw new Error(data && data.message ? data.message : '提交失败');
+          }
+        }).catch(function (err) {
+          errBox.textContent = '提交失败：' + (err && err.message ? err.message : '网络异常') + '。请稍后重试，或把邮箱和问题发到页面底部的邮箱。';
+          errBox.hidden = false;
+          btn.disabled = false;
+          btn.textContent = '免费领取资料 →';
+        });
+      });
+    }
   })();
   </script>
 </body>
