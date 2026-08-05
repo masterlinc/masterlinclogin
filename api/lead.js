@@ -4,24 +4,28 @@
 //                                                   → 成功后自动发送《管理者 AI 自检配套资料》到访客邮箱
 //
 // 安全说明：
-//   - App Secret / app_token / table_id / 邮件 API key 一律从 Vercel 环境变量读取，绝不硬编码进代码或提交 git
+//   - App Secret / app_token / table_id / 邮件令牌一律从 Vercel 环境变量读取，绝不硬编码进代码或提交 git
 //   - 前端只与同域 /api/lead 通信，不暴露任何凭证
 //   - 生产环境变量（Vercel 面板 → Project → Settings → Environment Variables）：
-//       FEISHU_APP_ID      = <开放平台 App ID>
-//       FEISHU_APP_SECRET  = <开放平台 App Secret>
-//       FEISHU_APP_TOKEN   = <多维表格 app_token>
-//       FEISHU_TABLE_ID    = <线索表 table_id>
-//       RESEND_API_KEY     = <Resend API Key（可选，未配置则自动跳过发信，飞书线索照常落库）>
-//       RESEND_FROM        = <发件人，默认 凌 <hello@masterlinc.com>（需先在 Resend 验证 masterlinc.com 域名）>
+//       FEISHU_APP_ID              = <开放平台 App ID>
+//       FEISHU_APP_SECRET          = <开放平台 App Secret>
+//       FEISHU_APP_TOKEN           = <多维表格 app_token>
+//       FEISHU_TABLE_ID            = <线索表 table_id>
+//       FEISHU_MAIL_REFRESH_TOKEN  = <OAuth 授权后得到的 refresh_token（推荐，服务端自动刷新）>
+//       FEISHU_MAIL_USER_ACCESS_TOKEN = <OAuth 授权后得到的 user_access_token（可选，临时）>
+//       FEISHU_MAIL_SENDER         = <发件邮箱地址；默认 "me"（当前授权用户主邮箱）>
 //
-// 邮件方案：Resend（零依赖，直接用 Node 内置 fetch 调 REST API，附件为 base64）
-// 附件来源：仓库 deliverables/ 目录（Vercel 打包进函数，函数包 < 50MB 限制）
+// 邮件方案：飞书邮件 API（全国内链路，零外部依赖，直接用 Node 内置 fetch）
+//   发送接口：POST /open-apis/mail/v1/user_mailboxes/:user_mailbox_id/messages/send
+//   授权方式：用户 OAuth 授权（scope: mail:user_mailbox.message:send + offline_access）
+//   附件格式：attachment[]{ body(base64url), filename }
+// 未配置发信令牌时自动跳过发送（skipped），飞书线索照常落库，前端永远 ok。
 //
 // Vercel 自动把 /api 目录识别为 Serverless Functions，无需 vercel.json。
 // ============================================================================
 
 const FEISHU_BASE = 'https://open.feishu.cn/open-apis';
-const RESEND_BASE = 'https://api.resend.com/emails';
+const FEISHU_OAUTH_BASE = 'https://accounts.feishu.cn/oauth/v3/token';
 
 // ---------- 飞书：tenant_access_token（缓存 7000 秒，token 有效期 2 小时） ----------
 let tokenCache = null;
@@ -55,6 +59,61 @@ async function getTenantAccessToken() {
   return data.tenant_access_token;
 }
 
+// ---------- 飞书：user_access_token（OAuth 用户身份，用于发信） ----------
+let mailTokenCache = null;
+
+/**
+ * 获取发信用的 user_access_token。
+ * 优先用 refresh_token 自动刷新（推荐，长期有效）；否则直接用 user_access_token（约 2 小时有效）。
+ * 未配置任何令牌 → 返回 null（上层跳过发送，不影响飞书线索）。
+ */
+async function getUserMailToken() {
+  const now = Date.now();
+  if (mailTokenCache && mailTokenCache.expiresAt > now) {
+    return mailTokenCache.token;
+  }
+
+  const appId = process.env.FEISHU_APP_ID;
+  const appSecret = process.env.FEISHU_APP_SECRET;
+  const refreshToken = process.env.FEISHU_MAIL_REFRESH_TOKEN;
+  const accessToken = process.env.FEISHU_MAIL_USER_ACCESS_TOKEN;
+
+  if (!appId || !appSecret) {
+    throw new Error('FEISHU_APP_ID / FEISHU_APP_SECRET 未配置');
+  }
+
+  // 1) 有 refresh_token → 刷新 user_access_token（refresh_token 用一次即作废，响应里会给新的）
+  if (refreshToken) {
+    const res = await fetch(FEISHU_OAUTH_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        grant_type: 'refresh_token',
+        client_id: appId,
+        client_secret: appSecret,
+        refresh_token: refreshToken,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!data || data.code !== 0 || !data.access_token) {
+      const msg = (data && data.msg) ? data.msg : 'HTTP ' + res.status;
+      throw new Error('刷新 user_access_token 失败: ' + msg);
+    }
+    const expiresIn = data.expires_in || 7200;
+    mailTokenCache = { token: data.access_token, expiresAt: Date.now() + Math.max(60, expiresIn - 300) * 1000 };
+    return data.access_token;
+  }
+
+  // 2) 有 user_access_token → 直接用（无法自动续期，接近过期时由外层报错并跳过）
+  if (accessToken) {
+    mailTokenCache = { token: accessToken, expiresAt: Date.now() + 50 * 60 * 1000 }; // 保守 50 分钟
+    return accessToken;
+  }
+
+  return null; // 未配置发信令牌
+}
+
+// ---------- 飞书：多维表格写入（不变） ----------
 async function writeRecord(fields) {
   const appToken = process.env.FEISHU_APP_TOKEN;
   const tableId = process.env.FEISHU_TABLE_ID;
@@ -80,7 +139,7 @@ async function writeRecord(fields) {
   return data.data;
 }
 
-// ---------- 邮件：Resend REST API（零依赖） ----------
+// ---------- 邮件：飞书邮件 API（全国内） ----------
 
 // 附件清单：必须与 deliverables/ 目录实际文件名一致
 const DELIVERABLES = [
@@ -104,7 +163,12 @@ function deliverablesDir() {
   return candidates[0];
 }
 
-// 读取附件：{ filename, content(base64) }[]
+// 标准 base64 → base64url（飞书邮件 API 要求：+/ 替换为 -_，去掉尾部 =）
+function toBase64Url(b64) {
+  return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+// 读取附件：{ filename, body(base64url), bytes }[]
 function loadDeliverables() {
   const fs = require('fs');
   const path = require('path');
@@ -112,7 +176,7 @@ function loadDeliverables() {
   return DELIVERABLES.map((d) => {
     const abs = path.join(dir, d.file);
     const buf = fs.readFileSync(abs);
-    return { filename: d.name, content: buf.toString('base64'), type: d.type, bytes: buf.length };
+    return { filename: d.name, body: toBase64Url(buf.toString('base64')), bytes: buf.length };
   });
 }
 
@@ -143,51 +207,52 @@ function buildEmailText() {
 }
 
 /**
- * 发送《管理者 AI 自检配套资料》邮件
+ * 发送《管理者 AI 自检配套资料》邮件（飞书邮件 API）
  * @param {string} to 访客邮箱
  * @returns {Promise<{sent: boolean, skipped?: boolean}>}
- *  - RESEND_API_KEY 未配置 → 跳过发送（skipped），不抛错
+ *  - 未配置发信令牌 → 跳过发送（skipped），不抛错
  *  - 发送失败 → 抛错（由上层 catch，不影响飞书线索与前端 ok）
  */
 async function sendMaterialsEmail(to) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    console.warn('[api/lead] RESEND_API_KEY 未配置，跳过资料邮件发送（飞书线索已保留）');
+  const userToken = await getUserMailToken();
+  if (!userToken) {
+    console.warn('[api/lead] FEISHU_MAIL_REFRESH_TOKEN / FEISHU_MAIL_USER_ACCESS_TOKEN 未配置，跳过资料邮件发送（飞书线索已保留）');
     return { sent: false, skipped: true };
   }
 
-  const from = process.env.RESEND_FROM || '凌 <hello@masterlinc.com>';
+  const mailboxId = process.env.FEISHU_MAIL_SENDER || 'me'; // 默认当前授权用户主邮箱
   const attachments = loadDeliverables();
 
   const payload = {
-    from,
-    to,
     subject: '你的《管理者 AI 自检配套资料》已到',
-    text: buildEmailText(),
-    attachments: attachments.map((a) => ({ filename: a.filename, content: a.content })),
+    to: [{ mail_address: to }],
+    body_plain_text: buildEmailText(),
+    attachments,
+    dedupe_key: 'selfcheck-' + to + '-' + Date.now(), // 防重复发送（同用户并发时接口单用户串行）
   };
 
-  // 8 秒超时，避免 Resend 慢响应拖住 Serverless（Vercel 免费函数最长 10s）
+  // 10 秒超时，避免飞书慢响应拖住 Serverless（Vercel 免费函数最长 10s 量级）
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), 10000);
 
   try {
-    const res = await fetch(RESEND_BASE, {
+    const url = `${FEISHU_BASE}/mail/v1/user_mailboxes/${encodeURIComponent(mailboxId)}/messages/send`;
+    const res = await fetch(url, {
       method: 'POST',
       headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + userToken,
+        'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(payload),
       signal: controller.signal,
     });
     const data = await res.json().catch(() => ({}));
 
-    if (!res.ok || !data || data.id === undefined) {
-      const msg = (data && data.message) ? data.message : 'HTTP ' + res.status;
-      throw new Error('Resend 发送失败: ' + msg);
+    if (!data || data.code !== 0) {
+      const msg = (data && data.msg) ? data.msg : 'HTTP ' + res.status;
+      throw new Error('飞书邮件发送失败: ' + msg);
     }
-    return { sent: true, id: data.id };
+    return { sent: true, code: data.code, message_id: data.data && data.data.message_id };
   } finally {
     clearTimeout(timer);
   }
@@ -272,3 +337,5 @@ module.exports = async function handler(req, res) {
 module.exports.sendMaterialsEmail = sendMaterialsEmail;
 module.exports.loadDeliverables = loadDeliverables;
 module.exports.buildEmailText = buildEmailText;
+module.exports.toBase64Url = toBase64Url;
+module.exports.getUserMailToken = getUserMailToken;
