@@ -7,6 +7,7 @@
   <meta name="description" content="给边工作边转型的你：红黄绿日判断今日状态 → 系统推荐今日唯一动作 → 资产/证据自动沉淀 → 90 天母线不换 → 每周只呈现事实的复盘。" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#050505" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🌱</text></svg>" />
   <style>
     /* ===== Transition OS 独立样式（自包含，不依赖站点全局） ===== */
     :root {
@@ -686,7 +687,7 @@
   function backupUserId() {
     return (db && db.user && db.user.id) ? db.user.id : 'masterlinc';
   }
-  var BACKUP_VERSION = '1.18.0';
+  var BACKUP_VERSION = '1.18.2';
   var BACKUP_DEBOUNCE_MS = 3000; // 3 秒内合并多次 persist 为一次上传
   var backupTimer = null;
   var backupInFlight = false;
@@ -1590,13 +1591,28 @@
   function switchAction() {
     var s = sessionOf(todayStr);
     if (!s) return;
-    // v1.18.0 修复：真正的轮转「换一个」——按推荐排序取当前动作的下一个，
-    // 避免原来只取 rest[0] 导致在排序最高的两个动作间无限循环（学习动作永远轮不到）。
-    var rec = recommendList(s.mode, db.user.stage);
-    if (!rec.length) { render(); return; }
+    // v1.18.2 修复：轮转不再依赖 score 动态排序，改用「固定候选池顺序」取下一个。
+    // 旧实现（v1.18.0）每次按 recommendList 排序后取当前动作的下一个：切换后该动作被
+    // 写入当天 session → lastDoneDays=0 → score 骤降 → 下次排序变化 → 指针重置，
+    // 最终收敛到 2-3 个高分动作死循环，学习类动作（a-learn-*）永远轮不到。
+    // 现在：候选池 = 当前模式+阶段 的全部动作（排除近 3 天已做，与 recommendList 口径一致），
+    // 按 ACTIONS 声明顺序固定排列，轮转指针稳定 → 连续点「换一个」必能遍历池内所有动作。
+    // 「确认完成」后的 recency 降权逻辑不受影响（仍由 recommendList/score 负责推荐首动作）。
+    // 注意：阶段取 db.user.stage（session 无 stage 字段）。
+    var pool = ACTIONS.filter(function (a) {
+      return a.modes.indexOf(s.mode) >= 0 && a.stages.indexOf(db.user.stage) >= 0;
+    });
+    var recentIds = {};
+    for (var i = 1; i <= 3; i++) {
+      var ds = addDays(todayStr, -i);
+      db.dailySessions.forEach(function (x) { if (x.date === ds && x.actionId) recentIds[x.actionId] = true; });
+    }
+    var cand = pool.filter(function (a) { return !recentIds[a.id]; });
+    if (!cand.length) cand = pool;
+    if (!cand.length) { render(); return; }
     var idx = 0;
-    for (var i = 0; i < rec.length; i++) { if (rec[i].id === s.actionId) { idx = i; break; } }
-    var next = rec[(idx + 1) % rec.length];
+    for (var i = 0; i < cand.length; i++) { if (cand[i].id === s.actionId) { idx = i; break; } }
+    var next = cand[(idx + 1) % cand.length];
     s.actionId = next.id;
     s.output = '';
     s.assetIds = [];
@@ -1889,7 +1905,7 @@
 
     // 顶部摘要
     h += '<div class="learn-summary">';
-    h += '<div class="learn-summary-item"><div class="learn-summary-num">' + learnWeekCount() + '</div><div class="learn-summary-label">本周学习</div></div>';
+    h += '<div class="learn-summary-item"><div class="learn-summary-num">' + learnWeekCount() + '</div><div class="learn-summary-label">本周笔记</div></div>';
     h += '<div class="learn-summary-item"><div class="learn-summary-num">' + db.learnNotes.length + '</div><div class="learn-summary-label">累计笔记</div></div>';
     h += '<div class="learn-summary-item"><div class="learn-summary-num">' + learnConvertedCount() + '</div><div class="learn-summary-label">转成资产/证据</div></div>';
     h += '</div>';
@@ -2368,7 +2384,7 @@
     h += '</div>';
 
     h += '<div class="card"><div class="card-title">关于</div>';
-    h += '<div class="about-line">转型操作系统 Transition OS v1.18.0（设备码隐藏 + 双导师知识库）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据 · ' + db.learnNotes.length + ' 条学习笔记</div>';
+    h += '<div class="about-line">转型操作系统 Transition OS v1.18.2（设备码隐藏 + 双导师知识库 + 今日轮转修复）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据 · ' + db.learnNotes.length + ' 条学习笔记</div>';
     h += '</div>';
     v.innerHTML = h;
   }
