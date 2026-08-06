@@ -900,3 +900,95 @@ img { display: block; width: 100%; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== 申请/咨询：点击展开微信二维码（移动端 mailto 失效兜底，v1.9.0） ===== */
+.hook-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--white);
+  color: var(--black);
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.hook-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+.hook-cta:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; }
+
+.hook-panel {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 560px;
+}
+.hook-panel[hidden] { display: none; }
+.hook-qr-img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  display: block;
+  flex-shrink: 0;
+}
+.hook-panel-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  min-width: 0;
+  flex: 1;
+}
+.hook-panel-text strong { font-size: 15px; color: var(--white); margin-bottom: 2px; }
+.hook-fallback { margin-top: 4px; }
+.hook-fallback a { color: var(--white); }
+
+/* 导航「免费咨询」改为按钮 + 展开二维码 */
+button.nav-cta {
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--white);
+  border-radius: 0;
+  padding: 8px 0;
+  color: var(--white);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  cursor: pointer;
+  line-height: inherit;
+}
+.hook-nav-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: max(32px, calc((100vw - var(--max)) / 2));
+  width: min(340px, calc(100vw - 64px));
+  z-index: 40;
+  margin-top: 0;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* 大按钮（首页 hero / contact）保持 .button 视觉，仅行为改为展开 */
+button.button { font-family: inherit; letter-spacing: inherit; }
+.resource-copy > .hook-cta { align-self: flex-start; margin-top: auto; }
+
+@media (max-width: 640px) {
+  .hook-panel { flex-direction: column; align-items: center; text-align: center; }
+  .hook-qr-img { width: 176px; height: 176px; }
+  .hook-panel-text { align-items: center; }
+  .hook-nav-panel { right: max(18px, calc((100vw - 340px) / 2)); }
+}

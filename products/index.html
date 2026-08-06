@@ -29,8 +29,16 @@
       <a href="/#start">从这里开始</a>
       <a href="/#letters">现场笔记</a>
       <a href="/#about">关于</a>
-      <a class="nav-cta" href="mailto:lincyang@foxmail.com?subject=%E5%85%8D%E8%B4%B9AI%E7%AE%A1%E7%90%86%E9%80%82%E9%85%8D%E5%88%A4%E6%96%AD">免费咨询</a>
+      <button type="button" class="nav-cta" data-hook-cta aria-expanded="false" aria-controls="navConsultPanel">免费咨询</button>
       <a class="lang-switch" href="/en/products/" lang="en">EN</a>
+    </div>
+    <div class="hook-panel hook-nav-panel" id="navConsultPanel" hidden>
+      <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+      <div class="hook-panel-text">
+        <strong>扫码加微信，免费咨询</strong>
+        <span>添加时备注「产品咨询」，我尽快回复。免费先聊，不推销。</span>
+        <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+      </div>
     </div>
   </nav>
 
@@ -49,7 +57,15 @@
         <div class="product-entry-body">
           <h2>免费适配判断</h2>
           <p>不先收费，不传文件。说清最近 7 天反复发生的一件事，我帮你判断它是否适合 AI 介入，以及哪里必须由人审核。</p>
-          <a href="mailto:lincyang@foxmail.com?subject=%E5%85%8D%E8%B4%B9AI%E7%AE%A1%E7%90%86%E9%80%82%E9%85%8D%E5%88%A4%E6%96%AD">发邮件开始 <span>→</span></a>
+          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="entryFitPanel">申请免费判断 <span>→</span></button>
+          <div class="hook-panel" id="entryFitPanel" hidden>
+            <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+            <div class="hook-panel-text">
+              <strong>扫码加微信，免费适配判断</strong>
+              <span>添加时备注「适配判断」，说清最近 7 天反复发生的一件事即可。</span>
+              <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+            </div>
+          </div>
         </div>
       </article>
 
@@ -103,7 +119,15 @@
       <div class="post-foot product-foot">
         <a class="post-back" href="/#top">← 返回首页</a>
         <div class="post-pager">
-          <a href="mailto:lincyang@foxmail.com?subject=%E5%85%8D%E8%B4%B9AI%E7%AE%A1%E7%90%86%E5%92%A8%E8%AF%A2">不确定从哪开始？发邮件问 lincyang@foxmail.com →</a>
+          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="footConsultPanel">不确定从哪开始？点开扫码问 →</button>
+          <div class="hook-panel" id="footConsultPanel" hidden>
+            <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+            <div class="hook-panel-text">
+              <strong>扫码加微信，免费咨询</strong>
+              <span>添加时备注「产品咨询」，我帮你判断从哪开始最合适。</span>
+              <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -115,5 +139,7 @@
     <a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a>
     <span>© 2026 MASTER LINC</span>
   </footer>
+
+  <script src="/lib/hook-cta.js" defer></script>
 </body>
 </html>
