@@ -66,6 +66,3 @@
 
 > 想要消息分流完整版（含绿色通道设置 + 团队同步话术）？→ 免费**咨询**（企微），先聊 5 分钟看适不适合你的场景。
 > 入口：masterlinc.com 首页「免费咨询」
-
----
-author: Proma Agent（deepseek-v4-flash）

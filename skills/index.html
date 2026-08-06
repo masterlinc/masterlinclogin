@@ -358,7 +358,9 @@
       color: var(--white);
       font: inherit;
       font-size: 15px;
+      appearance: none;
     }
+    .skill-pack-input option { background: var(--black); color: var(--white); }
     .skill-pack-input::placeholder { color: #555552; }
     .skill-pack-input:focus { outline: none; border-color: var(--white); }
     .skill-pack-submit {
@@ -488,6 +490,15 @@
       <div class="skill-pack-form-wrap">
         <form class="skill-pack-form" id="packForm" novalidate>
           <input class="skill-pack-input" type="email" id="packEmail" name="email" placeholder="输入邮箱，接收全集包（免费，随时可退订）" autocomplete="email" required />
+          <select class="skill-pack-input" id="packQuestion" name="question">
+            <option value="">你最想先深挖哪个场景？（选填）</option>
+            <option value="会议">会议</option>
+            <option value="汇报周报">汇报周报</option>
+            <option value="消息协同">消息协同</option>
+            <option value="决策">决策</option>
+            <option value="工具安全">工具安全</option>
+            <option value="不确定">不确定</option>
+          </select>
           <button class="skill-pack-submit" type="submit" id="packSubmit">免费领取全集包 →</button>
           <p class="skill-pack-note">你的邮箱只用来发这份资料包，不会进广告名单，随时可退订。</p>
         </form>
@@ -653,14 +664,15 @@
     var chipsWrap = document.getElementById('skillChips');
 
     // ===== 下载埋点：localStorage 记录 skill_downloads（{skillId, count, lastAt}）=====
-    // 可选轻量上报 /api/track：当前未实现，后续日志系统接入后放开
+    // 去重口径（数据方案 §1.3）：同设备同 Skill 只计 1 次——首次下载 count=1，
+    // 重复点击仅更新 lastAt，不再累加（避免闸门 G1「某 Skill 下载 ≥50（去重）」统计虚高）。
     function trackDownload(skillId) {
       try {
         var KEY = 'skill_downloads';
         var map = {};
         try { map = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { map = {}; }
         var rec = map[skillId] || { count: 0, lastAt: 0 };
-        rec.count = (rec.count || 0) + 1;
+        if (!(rec.count > 0)) { rec.count = 1; } // 同 Skill 首次下载记 1，重复点击不累加
         rec.lastAt = Date.now();
         map[skillId] = rec;
         localStorage.setItem(KEY, JSON.stringify(map));
@@ -788,12 +800,15 @@
     }
 
     function packSource() {
+      // 口径：source 恒以 skill-pack 开头；直接访问=skill-pack，带来源=skill-pack|{来源}。
+      // 保留来源前缀用于归因分析（飞书线索表按前缀 skill-pack 筛选即可），不做收敛。
       var base = detectSource();
       return (base === '直接访问' ? 'skill-pack' : 'skill-pack|' + base).slice(0, 100);
     }
 
     var packForm = document.getElementById('packForm');
     var packEmail = document.getElementById('packEmail');
+    var packQuestion = document.getElementById('packQuestion');
     var packSubmit = document.getElementById('packSubmit');
     var packError = document.getElementById('packError');
     var packSuccess = document.getElementById('packSuccess');
@@ -802,6 +817,7 @@
       packForm.addEventListener('submit', function (ev) {
         ev.preventDefault();
         var email = packEmail.value.trim();
+        var question = packQuestion ? packQuestion.value.trim() : ''; // 场景级需求信号（可选）
         packError.hidden = true;
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -818,14 +834,14 @@
         try {
           var key = 'masterlinc_lead_backup';
           var list = JSON.parse(localStorage.getItem(key) || '[]');
-          list.push({ email: email, source: 'skill-pack', at: new Date().toISOString() });
+          list.push({ email: email, question: question, source: 'skill-pack', at: new Date().toISOString() });
           localStorage.setItem(key, JSON.stringify(list.slice(-50)));
         } catch (e) { /* ignore */ }
 
         fetch(LEAD_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-          body: JSON.stringify({ email: email, question: '', source: packSource() })
+          body: JSON.stringify({ email: email, question: question, source: packSource() })
         }).then(function (res) {
           return res.json();
         }).then(function (data) {

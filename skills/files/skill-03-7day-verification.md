@@ -63,6 +63,3 @@
 > 想做得更完整（把这件事做对、做稳的完整方法论）？→ **¥29 进阶版**
 > 不确定自己最该先改哪件？→ 先做**免费自检**，10 分钟告诉你方向。
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

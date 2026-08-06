@@ -69,6 +69,3 @@ AI 的分类只是初筛，**边界案例要你自己认**——特别是「这�
 
 > 想深挖自己的场景（不只分类，还想知道先改哪件、怎么改）？→ 免费**自检**（10 分钟）或免费**咨询**（企微）。
 > 入口：masterlinc.com/products/selfcheck.html ｜ masterlinc.com 首页「免费咨询」
-
----
-author: Proma Agent（deepseek-v4-flash）

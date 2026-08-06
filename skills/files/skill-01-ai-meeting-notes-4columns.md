@@ -65,6 +65,3 @@ AI 把一小时录音变成一页纪要，已经不难。真正危险的是，�
 
 > 想要这个场景的完整落地包（完整四栏模板 + 会后复查清单 + 更多案例）？→ **¥29 进阶版**
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

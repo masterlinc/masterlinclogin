@@ -72,6 +72,3 @@
 
 > 想判断自己该先改哪一件（先优化汇报，还是先优化会议）？→ 免费**自检**，10 分钟告诉你。
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

@@ -66,6 +66,3 @@ AI 生成后，你先别改文字——先看结构，把缺的补上（哪些�
 
 > 想系统化地省时间（不只周报，把一周的汇报材料都压下来）？→ **¥29 进阶版** / 先做**免费自检**
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

@@ -67,6 +67,3 @@ AI 帮你把答案收拢成一页，但**答不上来的那问，AI 帮不了你
 
 > 会前三问帮你「想清楚」；想把「讨论」变成「决定」？→ **¥29 进阶版**（含会议闭环四栏模板 + 会后复查清单）
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

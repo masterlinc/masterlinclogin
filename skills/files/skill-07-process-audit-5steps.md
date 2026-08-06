@@ -55,6 +55,3 @@
 
 > 想把这五步用成完整机制（含各类工作的判断细则 + 更多真实场景）？→ **¥29 进阶版**
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）

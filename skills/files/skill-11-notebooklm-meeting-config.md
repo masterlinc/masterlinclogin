@@ -58,6 +58,3 @@ AI 输出后，人只补三件事：
 
 > 想要完整的会议四栏模板（含复查清单，配 NotebookLM 直接可用）？→ **¥29 进阶版**
 > 入口：masterlinc.com/products/selfcheck.html
-
----
-author: Proma Agent（deepseek-v4-flash）
