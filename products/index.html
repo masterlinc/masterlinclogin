@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>产品与入口 · MASTER LINC</title>
-  <meta name="description" content="MASTER LINC 全部数字产品与服务统一入口：AI 工作流体检、团队工作坊、组织嵌入、管理现场笔记、免费咨询。" />
+  <meta name="description" content="MASTER LINC 为边工作边转型的管理者准备的数字产品与入口：免费自检、起步包、工具包、转型系统与一对一服务。" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#050505" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -12,13 +12,29 @@
   <link rel="stylesheet" href="/globals.css?v=20260806-1" />
 
   <meta property="og:title" content="产品与入口 · MASTER LINC" />
-  <meta property="og:description" content="从一次免费适配判断开始，到团队工作坊、组织 AI 嵌入，再到持续监测。" />
+  <meta property="og:description" content="从一次 10 分钟免费自检，到每天 15 分钟的持续积累。" />
   <meta property="og:url" content="https://www.masterlinc.com/products/" />
   <meta property="og:site_name" content="MASTER LINC" />
   <meta property="og:locale" content="zh_CN" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="https://www.masterlinc.com/og-master-linc.png" />
   <meta name="twitter:card" content="summary_large_image" />
+
+  <style>
+    /* 企业个案服务 · 降级小节（弱化视觉，不与主阶梯并排） */
+    .enterprise-note { max-width: 760px; margin: 0 auto 40px; padding: 28px; border: 1px dashed #3a3a38; border-radius: 12px; opacity: 0.8; }
+    .enterprise-note h2 { margin: 0 0 6px; font-size: 15px; font-weight: 700; letter-spacing: 0.06em; color: #8a8a87; }
+    .enterprise-note .note-sub { margin: 0 0 18px; font-size: 12px; color: #6f6f6c; }
+    .enterprise-note ul { list-style: none; margin: 0 0 18px; padding: 0; }
+    .enterprise-note li { font-size: 14px; color: #9a9a97; line-height: 1.7; padding: 12px 0; border-bottom: 1px solid #222220; }
+    .enterprise-note li:last-child { border-bottom: none; }
+    .enterprise-note li strong { color: #c9c9c5; font-weight: 650; }
+    .enterprise-note a { border-bottom: 1px solid #8a8a87; font-weight: 700; font-size: 13px; }
+    .enterprise-note a:hover { color: #6f6f6c; border-color: #6f6f6c; }
+    .enterprise-note .note-cta { margin: 0; font-size: 13px; color: #8a8a87; line-height: 1.8; }
+    .enterprise-note .note-cta button { margin-top: 10px; }
+    @media (max-width: 640px) { .enterprise-note { padding: 20px; } }
+  </style>
 </head>
 <body>
   <a class="skip-link" href="#main">跳到正文</a>
@@ -47,7 +63,7 @@
       <div class="post-head">
         <p class="kicker">ALL PRODUCTS</p>
         <h1>所有产品与入口，<br />从一个地方开始。</h1>
-        <p class="post-meta">MASTER LINC · 从一次免费判断，到组织级 AI 嵌入</p>
+        <p class="post-meta">MASTER LINC · 从一次免费自检，到每天 15 分钟的个人转型积累</p>
       </div>
     </header>
 
@@ -55,9 +71,17 @@
       <article class="product-entry">
         <p class="product-entry-num">00</p>
         <div class="product-entry-body">
-          <h2>免费适配判断</h2>
-          <p>不先收费，不传文件。说清最近 7 天反复发生的一件事，我帮你判断它是否适合 AI 介入，以及哪里必须由人审核。</p>
-          <a class="hook-cta" href="/products/selfcheck.html">开始判断 <span>→</span></a>
+          <h2>免费 AI 管理咨询</h2>
+          <p>别急着买课。说清最近 7 天反复拖住你的一件事，我先免费帮你判断：这事该不该用 AI。</p>
+          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="entryConsultPanel">扫码免费咨询 <span>→</span></button>
+          <div class="hook-panel" id="entryConsultPanel" hidden>
+            <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+            <div class="hook-panel-text">
+              <strong>扫码加企业微信，免费 AI 管理咨询</strong>
+              <span>添加时备注「免费咨询」，说清最近 7 天反复发生的一件事即可。免费先聊，不推销。</span>
+              <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+            </div>
+          </div>
         </div>
       </article>
 
@@ -65,7 +89,7 @@
         <p class="product-entry-num">01</p>
         <div class="product-entry-body">
           <h2>管理者 AI 自检（10 分钟）</h2>
-          <p>不用交资料、不学提示词。口述一周最耗时的 3 件事，自动判断哪一件最值得用 AI 改造，并给你五步流程图。免费。</p>
+          <p>10 分钟，找到你第一件最该交给 AI 的事。不交资料、不学提示词。免费。</p>
           <a href="/products/selfcheck.html">开始自检 <span>→</span></a>
         </div>
       </article>
@@ -73,45 +97,85 @@
       <article class="product-entry">
         <p class="product-entry-num">02</p>
         <div class="product-entry-body">
-          <h2>AI 工作流体检</h2>
-          <p>30–60 分钟真实工作访谈，找出一周工作里最该被 AI 接管的部分。交付一页体检报告、3 个优先场景和 1 个可用模板。</p>
-          <a href="/products/audit.html">了解体检 <span>→</span></a>
+          <h2>免费领《起步包》</h2>
+          <p>把今天的自检结论带走：一张可打印行动卡 + 会前三问清单 + 7 天验证表。0 元。</p>
+          <a href="/products/selfcheck.html">做完 10 分钟自检即可免费领取 <span>→</span></a>
         </div>
       </article>
 
       <article class="product-entry">
         <p class="product-entry-num">03</p>
         <div class="product-entry-body">
-          <h2>团队 AI 转型工作坊</h2>
-          <p>半日或全日，帮一个团队找到 AI 落点。产出团队效率热力图、TOP3 自动化机会和第一个可运行的团队 AI 工作流。</p>
-          <a href="/products/workshop.html">了解工作坊 <span>→</span></a>
+          <h2>完整工具包 + 实战群（¥29）</h2>
+          <p>三问帮你「想清楚」，四栏帮你「落得下」——整套可复制方法拿走，进实战群一起跑。</p>
+          <a href="/products/selfcheck.html">完成自检后可见进阶版入口 <span>→</span></a>
         </div>
       </article>
 
       <article class="product-entry">
         <p class="product-entry-num">04</p>
         <div class="product-entry-body">
-          <h2>组织 AI 工作流嵌入</h2>
-          <p>4–6 周，把一个部门的 5–10 个高重复流程真正嵌入 AI。交付工作流 + 操作 SOP + 培训 + 效果追踪看板。</p>
-          <a href="/products/embed.html">了解嵌入服务 <span>→</span></a>
+          <h2>转型系统 · 个人订阅</h2>
+          <p>每天 15-30 分钟：红黄绿日判断今日状态，系统只给你一个动作，资产自己长出来。免费版可用。</p>
+          <a href="/products/transition-os.html">进入转型系统 <span>→</span></a>
         </div>
       </article>
 
       <article class="product-entry">
         <p class="product-entry-num">05</p>
         <div class="product-entry-body">
+          <h2>一对一诊断 / 转型陪跑</h2>
+          <p>自检告诉你方向，诊断告诉你这一步先做哪一件；陪跑是每天 15 分钟有人看着你改。先免费聊 5 分钟再决定。</p>
+          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="serviceConsultPanel">扫码咨询 <span>→</span></button>
+          <a href="mailto:lincyang@foxmail.com?subject=%E4%B8%80%E5%AF%B9%E4%B8%80%E8%AF%8A%E6%96%AD%2F%E9%99%AA%E8%B7%91%E5%92%A8%E8%AF%A2">或邮件说明情况 <span>→</span></a>
+          <div class="hook-panel" id="serviceConsultPanel" hidden>
+            <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+            <div class="hook-panel-text">
+              <strong>扫码加企业微信，一对一诊断 / 转型陪跑</strong>
+              <span>添加时备注「诊断」或「陪跑」，先免费聊 5 分钟再决定是否开始。服务类人工承接，按次/按月报价。</span>
+              <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="product-entry">
+        <p class="product-entry-num">06</p>
+        <div class="product-entry-body">
           <h2>管理现场笔记</h2>
-          <p>不是泛泛谈 AI。每篇只处理一个具体管理动作、一个责任边界或一次真实失败。持续更新中。</p>
+          <p>每篇只处理一个真实管理动作。没有证据的效果，不写进案例。持续更新中。</p>
           <a href="/#letters">去读笔记 <span>→</span></a>
         </div>
       </article>
+    </section>
+
+    <!-- 企业个案服务 · 降级小节（不删页面，不做主动推广） -->
+    <section class="enterprise-note" aria-label="企业个案服务">
+      <h2>企业个案服务</h2>
+      <p class="note-sub">接到企业需求才做，不做主动推广。与个人线产品相互独立，不并排比较。</p>
+      <ul>
+        <li><strong>AI 工作流体检</strong>：30-60 分钟真实工作访谈，交付一页体检报告。 <a href="/products/audit.html">了解体检 <span>→</span></a></li>
+        <li><strong>团队 AI 转型工作坊</strong>：半日或全日，产出效率热力图与第一个可运行工作流。 <a href="/products/workshop.html">了解工作坊 <span>→</span></a></li>
+        <li><strong>组织 AI 工作流嵌入</strong>：4-6 周，把部门高重复流程真正嵌入 AI。 <a href="/products/embed.html">了解嵌入服务 <span>→</span></a></li>
+      </ul>
+      <p class="note-cta">需洽谈：扫码加企业微信，备注「企业个案」。
+        <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="enterpriseConsultPanel">扫码联系 <span>→</span></button>
+      </p>
+      <div class="hook-panel" id="enterpriseConsultPanel" hidden>
+        <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+        <div class="hook-panel-text">
+          <strong>扫码加企业微信，备注「企业个案」</strong>
+          <span>企业个案按需承接：体检、工作坊或嵌入，先沟通范围再报价。</span>
+          <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+        </div>
+      </div>
     </section>
 
     <section class="post shell">
       <div class="post-foot product-foot">
         <a class="post-back" href="/#top">← 返回首页</a>
         <div class="post-pager">
-          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="footConsultPanel">不确定从哪开始？点开扫码问 →</button>
+          <button type="button" class="hook-cta" data-hook-cta aria-expanded="false" aria-controls="footConsultPanel">不确定从哪开始？先做免费自检，或扫码问我 →</button>
           <div class="hook-panel" id="footConsultPanel" hidden>
             <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
             <div class="hook-panel-text">
