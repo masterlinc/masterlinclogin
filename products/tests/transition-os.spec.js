@@ -768,7 +768,7 @@ test('DS-11 数据损坏兜底：非法 JSON 不白屏 [P1]', async () => {
  * ============================================================ */
 test('MO-01 375px 无横向溢出（全部路由逐页）[P0]', async () => {
   const page = await openFresh({ viewport: { width: 375, height: 812 } });
-  const routes = ['today', 'records', 'mainline', 'review', 'settings'];
+  const routes = ['today', 'records', 'mainline', 'review', 'learn', 'settings'];
   const overflow = {};
   for (const r of routes) {
     await page.evaluate((rt) => { location.hash = '#/' + rt; }, r);
@@ -787,9 +787,9 @@ test('MO-01 375px 无横向溢出（全部路由逐页）[P0]', async () => {
       if (w > 375) overflow[r] = w;
     }
   }
-  // 底部 5 个 Tab 全部可见
-  assertEq(await page.locator('.tab').count(), 5, '底部 Tab 数量');
-  for (const t of ['今日', '记录', '母线', '复盘', '设置']) {
+  // 底部 7 个 Tab（v1.18.0 新增学习）全部可见
+  assertEq(await page.locator('.tab').count(), 7, '底部 Tab 数量');
+  for (const t of ['看板', '今日', '记录', '母线', '复盘', '学习', '设置']) {
     assert(await page.locator('.tab', { hasText: t }).count() >= 1, 'Tab 缺失: ' + t);
   }
   assertEq(Object.keys(overflow).length, 0, '存在横向溢出路由: ' + JSON.stringify(overflow));

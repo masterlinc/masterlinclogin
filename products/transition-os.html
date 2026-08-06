@@ -161,6 +161,7 @@
     .tag-cat-evidence { color: #c68fe2; border-color: rgba(198,143,226,0.35); }
     .tag-cat-product { color: #6fd3c7; border-color: rgba(111,211,199,0.35); }
     .tag-cat-review { color: #a8a8a5; border-color: rgba(168,168,165,0.35); }
+    .tag-cat-learn { color: #f2b13c; border-color: rgba(242,177,60,0.35); }
     .action-title { font-size: 18px; font-weight: 750; line-height: 1.4; margin-bottom: 8px; }
     .action-out { font-size: 14px; color: var(--sub); line-height: 1.7; background: var(--card2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 12px 14px; margin: 12px 0; }
     .action-out b { color: var(--text); font-weight: 650; }
@@ -243,7 +244,7 @@
     .field-hint { font-size: 14px; color: var(--dim); margin-top: 5px; line-height: 1.5; }
     /* 阶段一：账号与 Pro（设置页） */
     .device-row { display: flex; gap: 8px; align-items: center; }
-    .device-row code { flex: 1; min-width: 0; font-size: 12px; color: var(--sub); background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; word-break: break-all; }
+    /* v1.18.0：设备码对用户隐藏，device-row 样式不再使用（保留占位避免误删其它引用） */
     .plan-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--sub); }
     .plan-chip.pro { border-color: var(--yellow); color: var(--yellow); }
     .plan-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
@@ -277,12 +278,78 @@
       border-top: 1px solid var(--line-soft);
     }
     .tabbar-inner { max-width: 720px; margin: 0 auto; display: flex; }
-    .tab { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 0 10px; color: var(--dim); min-height: 60px; }
+    .tab { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 9px 0 10px; color: var(--dim); min-height: 60px; }
     .tab-ico { font-size: 18px; line-height: 1; }
-    .tab-label { font-size: 12px; }
+    .tab-label { font-size: 12px; white-space: nowrap; }
+    /* v1.18.0：7 个 tab（含学习 ✦）在 375px 窄屏仍放得下 */
+    @media (max-width: 420px) {
+      .tab { padding: 9px 1px 10px; }
+      .tab-ico { font-size: 17px; }
+      .tab-label { font-size: 11px; }
+    }
     .tab.active { color: var(--text); }
     .tab.active .tab-ico { transform: translateY(-1px); }
     .safe-bottom { height: env(safe-area-inset-bottom, 0px); }
+
+    /* ===== 学习页 Learn（v1.18.0：Dan Koe / Naval 双导师知识库） ===== */
+    .learn-hero { border: 1px solid var(--line); border-radius: 16px; padding: 22px; margin-bottom: 16px; background: var(--card); }
+    .learn-hero .lh-title { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; }
+    .learn-hero .lh-sub { font-size: 14px; color: var(--sub); line-height: 1.7; margin-top: 6px; }
+    .learn-hero .lh-sub b { color: var(--text); }
+    .learn-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .learn-summary-item { border: 1px solid var(--line); border-radius: 12px; padding: 12px 8px; text-align: center; background: var(--card2); }
+    .learn-summary-num { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .learn-summary-label { font-size: 12px; color: var(--dim); margin-top: 2px; }
+    .learn-path-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+    .learn-path { flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 12px 10px; text-align: center; background: var(--card2); transition: border-color 150ms ease, background 150ms ease; min-height: 74px; cursor: pointer; }
+    .learn-path.active { border-color: var(--text); background: #141414; }
+    .learn-path .lp-name { font-size: 14px; font-weight: 700; }
+    .learn-path .lp-desc { font-size: 11px; color: var(--dim); margin-top: 3px; line-height: 1.5; }
+    .learn-path .lp-lock { font-size: 11px; color: var(--yellow); margin-top: 3px; }
+    .learn-progress { font-size: 13px; color: var(--sub); background: var(--card2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; line-height: 1.7; }
+    .learn-progress b { color: var(--text); }
+    .learn-tip { border: 1px solid rgba(242,177,60,0.4); background: var(--yellow-bg); border-radius: 12px; padding: 11px 14px; font-size: 13px; color: #f0d9a8; line-height: 1.6; margin-bottom: 16px; }
+    .learn-tip b { color: #ffd98a; }
+    .k-card { border: 1px solid var(--line); border-radius: 16px; padding: 18px 18px 16px; background: var(--card); margin-bottom: 14px; }
+    .k-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+    .k-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .k-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 650; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--line); color: var(--sub); background: #141414; white-space: nowrap; }
+    .k-badge.type-book { color: #7fb5f0; border-color: rgba(127,181,240,0.35); }
+    .k-badge.type-article { color: #e0a86a; border-color: rgba(224,168,106,0.35); }
+    .k-badge.type-tweet { color: #6fd3c7; border-color: rgba(111,211,199,0.35); }
+    .k-badge.type-podcast { color: #c68fe2; border-color: rgba(198,143,226,0.35); }
+    .k-badge.type-video { color: #f2b13c; border-color: rgba(242,177,60,0.35); }
+    .k-badge.type-course { color: #e8a33d; border-color: rgba(232,163,61,0.35); }
+    .k-badge.type-tool { color: #a8a8a5; border-color: rgba(168,168,165,0.35); }
+    .k-badge.level2, .k-badge.level3 { color: var(--yellow); border-color: rgba(242,177,60,0.4); }
+    .k-badge.locked { color: var(--yellow); border-color: rgba(242,177,60,0.4); }
+    .k-title { font-size: 17px; font-weight: 750; line-height: 1.4; }
+    .k-author { font-size: 13px; color: var(--dim); margin-top: 2px; }
+    .k-summary { font-size: 14px; color: var(--sub); line-height: 1.7; margin-top: 8px; }
+    .k-summary b { color: var(--text); font-weight: 650; }
+    .k-why { font-size: 13px; color: var(--dim); line-height: 1.6; margin-top: 8px; }
+    .k-foot { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+    .k-link { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 650; color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px; min-height: 44px; text-decoration: none; transition: border-color 150ms ease; }
+    .k-link:hover { border-color: var(--text); }
+    .k-note-btn { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; font-weight: 700; color: var(--bg); background: var(--text); border: none; border-radius: 10px; padding: 9px 14px; min-height: 44px; cursor: pointer; }
+    .k-note-btn:hover { opacity: 0.88; }
+    .k-meta { margin-left: auto; font-size: 12px; color: var(--dim); font-variant-numeric: tabular-nums; }
+    .k-lock-box { display: flex; align-items: center; justify-content: space-between; gap: 10px; border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; font-size: 13px; color: var(--sub); background: var(--card2); }
+    .k-lock-box b { color: var(--yellow); }
+    .k-disclaimer { font-size: 12px; color: var(--dim); line-height: 1.7; border-top: 1px solid var(--line-soft); padding-top: 14px; margin-top: 18px; }
+    .ln-item { border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--card2); margin-bottom: 10px; }
+    .ln-head { display: flex; align-items: flex-start; gap: 8px; }
+    .ln-status { flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; margin-top: 1px; white-space: nowrap; }
+    .ln-status.planned { color: var(--yellow); border: 1px solid rgba(242,177,60,0.4); }
+    .ln-status.done { color: var(--green); border: 1px solid rgba(70,167,88,0.4); }
+    .ln-status.dropped { color: var(--dim); border: 1px solid var(--line); }
+    .ln-title { font-size: 15px; font-weight: 700; line-height: 1.45; }
+    .ln-meta { font-size: 12px; color: var(--dim); margin-top: 3px; }
+    .ln-body { font-size: 13px; color: var(--sub); line-height: 1.65; margin-top: 8px; }
+    .ln-body b { color: var(--text); font-weight: 650; }
+    .ln-ops { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .ln-ops .btn-sm { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+    .ln-empty { text-align: center; padding: 26px 14px; color: var(--dim); font-size: 13px; line-height: 1.8; border: 1px dashed var(--line); border-radius: 12px; }
 
     .about-line { font-size: 14px; color: var(--sub); line-height: 1.8; }
     .toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; font-weight: 650; padding: 10px 18px; border-radius: 999px; z-index: 200; opacity: 0; transition: opacity 200ms ease; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
@@ -503,6 +570,7 @@
       <section class="view" id="view-records"></section>
       <section class="view" id="view-mainline"></section>
       <section class="view" id="view-review"></section>
+      <section class="view" id="view-learn"></section>
       <section class="view" id="view-settings"></section>
     </main>
   </div>
@@ -514,6 +582,7 @@
       <button class="tab" data-route="records"><span class="tab-ico">▤</span><span class="tab-label">记录</span></button>
       <button class="tab" data-route="mainline"><span class="tab-ico">➤</span><span class="tab-label">母线</span></button>
       <button class="tab" data-route="review"><span class="tab-ico">▦</span><span class="tab-label">复盘</span></button>
+      <button class="tab" data-route="learn"><span class="tab-ico">✦</span><span class="tab-label">学习</span></button>
       <button class="tab" data-route="settings"><span class="tab-ico">⚙</span><span class="tab-label">设置</span></button>
     </div>
     <div class="safe-bottom"></div>
@@ -557,6 +626,7 @@
       assets: [],
       evidences: [],
       weeklyReviews: [],
+      learnNotes: [], // v1.18.0：学习笔记（提升记录），独立于资产/证据，通过转资产/转证据沉淀
       meta: { lastExportAt: null, backupDismissDate: null, profileTipDismissDate: null, shownWelcomeIds: [], createdAt: nowISO() }
     };
   }
@@ -586,6 +656,7 @@
     if (!Array.isArray(d.assets)) d.assets = [];
     if (!Array.isArray(d.evidences)) d.evidences = [];
     if (!Array.isArray(d.weeklyReviews)) d.weeklyReviews = [];
+    if (!Array.isArray(d.learnNotes)) d.learnNotes = []; // v1.18.0：老数据自动补空数组
     return d;
   }
   function save(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch (e) { toast('存储失败：空间不足或浏览器限制'); } }
@@ -615,7 +686,7 @@
   function backupUserId() {
     return (db && db.user && db.user.id) ? db.user.id : 'masterlinc';
   }
-  var BACKUP_VERSION = '1.17.0';
+  var BACKUP_VERSION = '1.18.0';
   var BACKUP_DEBOUNCE_MS = 3000; // 3 秒内合并多次 persist 为一次上传
   var backupTimer = null;
   var backupInFlight = false;
@@ -702,7 +773,7 @@
 
   /* ================= 动作库（22 个，覆盖五类） ================= */
   var STAGE_CN = { explore: '探索', validate: '验证', productize: '产品化', scale: '规模化' };
-  var CAT_CN = { content: '内容', service: '服务', evidence: '证据', product: '产品', review: '复盘' };
+  var CAT_CN = { content: '内容', service: '服务', evidence: '证据', product: '产品', review: '复盘', learn: '学习' };
   var ACTIONS = [
     // —— 内容类 ——
     { id: 'a-case-card', cat: 'content', priority: 2, minutes: 20, modes: ['yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
@@ -774,12 +845,134 @@
       out: '做了什么 / 产出什么 / 卡在哪，三段各 1 句' },
     { id: 'a-funnel-check', cat: 'review', priority: 2, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['validate', 'productize'],
       title: '检查证据漏斗走到哪一步',
-      out: '看一遍五段计数，写下当前所在段位 + 下一步要补的一段' }
+      out: '看一遍五段计数，写下当前所在段位 + 下一步要补的一段' },
+    // —— 学习类（v1.18.0：双导师知识库 → 学习笔记 → 转资产/证据） ——
+    { id: 'a-learn-read', cat: 'learn', priority: 2, minutes: 3, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '读 1 张知识卡，记 1 句收获',
+      out: '1 条学习笔记：读 1 张知识卡（标题+摘要），记 1 句收获 + 1 句应用方向（学习页有今日推荐）' },
+    { id: 'a-learn-note', cat: 'learn', priority: 2, minutes: 15, modes: ['yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '精读 1 篇导师内容，写完整学习笔记',
+      out: '1 条学习笔记：收获 ≥1 段 + 「我要怎么用」1 条（去学习页挑一条内容）' },
+    { id: 'a-learn-apply', cat: 'learn', priority: 3, minutes: 45, modes: ['green'], stages: ['validate', 'productize', 'scale'],
+      title: '深学 1 条 → 转成 1 项资产或证据',
+      out: '1 条学习笔记完成「转资产 / 转证据」：案例卡 / 文章 / 模板，或 1 条真实反馈' },
+    { id: 'a-learn-review', cat: 'learn', priority: 1, minutes: 5, modes: ['red', 'yellow', 'green'], stages: ['explore', 'validate', 'productize', 'scale'],
+      title: '回看本周学习笔记，挑 1 条补上应用',
+      out: '1 条学习笔记完成应用（转资产/转证据）或标记「已放弃」' }
   ];
   // 'all' 兼容
   ACTIONS.forEach(function (a) {
     if (a.stages.indexOf('all') >= 0) a.stages = ['explore', 'validate', 'productize', 'scale'];
   });
+
+  /* ================= 知识库（v1.18.0：Dan Koe / Naval 双导师） =================
+   * 静态内置内容库，不占 localStorage；只做「指引 + 摘要 + 官方外链」，不搬运全文。
+   * theme 主主题 t1-t6；mentor：dan | naval | both；level：1 入门 | 2 实践 | 3 体系。
+   * L1 免费完整可用；L2/L3 Pro 解锁（isPro()）。
+   */
+  var LEARN_THEMES = [
+    { key: 't1', name: '一人公司' },
+    { key: 't2', name: '个人品牌' },
+    { key: 't3', name: '知识变现' },
+    { key: 't4', name: '判断力' },
+    { key: 't5', name: '杠杆' },
+    { key: 't6', name: '长期主义' }
+  ];
+  var LEARN_MENTORS = [
+    { key: 'dan', name: 'Dan Koe' },
+    { key: 'naval', name: 'Naval' },
+    { key: 'both', name: '双导师' }
+  ];
+  var LEARN_TYPES = [
+    { key: 'book', name: '书籍' }, { key: 'article', name: '文章' }, { key: 'tweet', name: '推文' },
+    { key: 'podcast', name: '播客' }, { key: 'video', name: '视频' }, { key: 'course', name: '课程工具' }
+  ];
+  var KNOWLEDGE = [
+    // —— T1 一人公司 ——
+    { id: 'k-t1-book-1', title: 'The One Person Business', author: 'Dan Koe', type: 'book', theme: 't1', themes: ['t1', 't3'], mentor: 'dan', level: 1, minutes: 240, link: 'https://thedankoe.com', linkNote: '作者官网入口',
+      summary: 'Dan Koe 的代表作，讲一个人如何把「最小而完整的生意」跑起来：先定义一个人群，再卖给他们一样东西。与转型系统的今日唯一动作「最小而完整」直接对应。',
+      why: '一人公司的最小闭环，就是你每天做的那件「最小而完整」的事。', tips: ['建议先读目录与第 1 章，建立整体框架', '读完后用 1 句话回答：我要卖给谁、卖什么'] },
+    { id: 'k-t1-art-1', title: 'The Art of Solopreneurship（系列文章）', author: 'Dan Koe', type: 'article', theme: 't1', themes: ['t1', 't2'], mentor: 'dan', level: 1, minutes: 15, link: 'https://thedankoe.com/blog', linkNote: '作者官网博客',
+      summary: 'Dan Koe 的博客长文系列，拆解「一人创业者」如何不靠团队、不靠办公室，用内容与产品建立自己的生意飞轮。',
+      why: '先定义人群再卖东西，而不是先做产品再找人——这是转型的第一个判断。', tips: ['挑 1 篇和当前阶段最相关的精读', '黄日 15 分钟：读 + 记一条学习笔记'] },
+    { id: 'k-t1-tweet-1', title: '所有权：Own Your Time', author: 'Naval', type: 'tweet', theme: 't1', themes: ['t1', 't5'], mentor: 'naval', level: 2, minutes: 3, link: 'https://x.com/naval', linkNote: 'X（Twitter）@naval',
+      summary: 'Naval 反复强调：财富来自拥有你时间的所有权，而不是出租时间。工作不是目的，拥有才是目的。',
+      why: '你正在做的每一件事，是在「出租时间」还是「积累所有权」？', tips: ['把这条推文和你的母线对照看'] },
+    { id: 'k-t1-course-1', title: 'Kortex（AI 学习 / 内容工具）', author: 'Dan Koe', type: 'course', theme: 't1', themes: ['t1', 't3'], mentor: 'dan', level: 2, minutes: 60, link: 'https://thedankoe.com', linkNote: '从作者官网进入（付费工具）',
+      summary: 'Dan Koe 推出的 AI 学习与内容工具，把「学 + 写 + 发」串成一条线，适合 L2/L3 阶段把学到的内容转成产出。付费工具，进阶可选。',
+      why: '内容工具是杠杆，但工具不替代思考——先有笔记，再谈工具。', tips: ['先完成 3 条学习笔记再试用工具', '用它把 1 条笔记转成 1 篇初稿'] },
+    // —— T2 个人品牌与个人垄断 ——
+    { id: 'k-t2-book-1', title: 'The Almanack of Naval Ravikant（个人垄断章节）', author: 'Naval', type: 'book', theme: 't2', themes: ['t2', 't4'], mentor: 'naval', level: 1, minutes: 60, link: 'https://www.navalmanack.com', linkNote: '官方免费在线阅读',
+      summary: '纳瓦尔年鉴是 Naval 思想的官方整理。个人垄断章节讲：找到你的特殊知识（specific knowledge），把它做到别人难以复制。',
+      why: '你的母线（受众 + 问题 + 载体）就是你的个人垄断起点。', tips: ['读「特殊知识」与「杠杆」两章即可', '读完给母线补一句「我的特殊知识是什么」'] },
+    { id: 'k-t2-art-1', title: '个人垄断 / 注意力经济系列长文', author: 'Dan Koe', type: 'article', theme: 't2', themes: ['t2', 't3'], mentor: 'dan', level: 1, minutes: 20, link: 'https://thedankoe.com', linkNote: '作者官网博客 / 通讯',
+      summary: 'Dan Koe 的「个人垄断」理论：品牌不是 Logo，是你在某个具体问题上的独特立场与持续输出。注意力经济里，输出即资产。',
+      why: '内容不是流量生意，是「让对的人记住你」的长期投资。', tips: ['读后列出：你愿意持续输出的 1 个具体问题'] },
+    { id: 'k-t2-tweet-1', title: '特殊知识（Specific Knowledge）推文合集', author: 'Naval', type: 'tweet', theme: 't2', themes: ['t2', 't4'], mentor: 'naval', level: 1, minutes: 5, link: 'https://www.navalmanack.com', linkNote: '官方整理合集（X 原线程 @naval）',
+      summary: 'Naval 的经典论断：特殊知识无法靠培训获得，只能通过你的好奇心、天赋和真实经历积累，且很难外包。',
+      why: '你过去十年踩过的坑、管过的人、用过的 AI，就是你的特殊知识。', tips: ['逐条读，把最戳你的 1 条抄进笔记'] },
+    { id: 'k-t2-podcast-1', title: 'The Knowledge Project（特殊知识与判断力对谈）', author: 'Naval × Shane Parrish', type: 'podcast', theme: 't2', themes: ['t2', 't4', 't5'], mentor: 'naval', level: 2, minutes: 90, link: 'https://fs.blog', linkNote: 'Farnam Street 播客',
+      summary: 'Naval 在 Farnam Street 的对谈，深入讨论特殊知识、判断力、如何做决定。通勤时听完，胜过刷 100 条短视频。',
+      why: '判断力是可以练习的肌肉，先听高手怎么用。', tips: ['分 2 次听完（黄日各 15 分钟）', '听完记 1 条「我要怎么用」'] },
+    // —— T3 知识变现 ——
+    { id: 'k-t3-book-1', title: 'Digital Economics（数字经济学）', author: 'Dan Koe', type: 'book', theme: 't3', themes: ['t3', 't5'], mentor: 'dan', level: 2, minutes: 180, link: 'https://thedankoe.com', linkNote: '作者官网（电子书 / 数字产品）',
+      summary: 'Dan Koe 的数字经济学：数字产品让「一次构建、多次销售」成为可能，知识工作者的单位时间价值不再线性。',
+      why: '资产五类里的「产品」就是数字经济学的最小单位。', tips: ['重点读「数字产品」与「多次销售」两章', '读后列 1 个你能卖的数字产品雏形'] },
+    { id: 'k-t3-art-1', title: '创建者经济（Creator Economy）长文', author: 'Dan Koe', type: 'article', theme: 't3', themes: ['t3', 't2'], mentor: 'dan', level: 1, minutes: 15, link: 'https://thedankoe.com', linkNote: '作者官网博客',
+      summary: 'Dan Koe 对创建者经济的观察：创作者不是网红，是「用自己的知识服务一群人」的微型企业主。',
+      why: '你不需要 10 万粉丝，你只需要 100 个愿意付费的人。', tips: ['读后写下：我的知识在服务哪一群人'] },
+    { id: 'k-t3-tweet-1', title: '媒体杠杆推文', author: 'Naval', type: 'tweet', theme: 't3', themes: ['t3', 't5'], mentor: 'naval', level: 1, minutes: 3, link: 'https://x.com/naval', linkNote: 'X（Twitter）@naval',
+      summary: 'Naval：媒体是最新的杠杆，代码和媒体是不需要许可的杠杆，可以让你睡觉时也在工作。',
+      why: '发布一条内容 = 一次不需要许可的杠杆。', tips: ['对照：你的资产里哪些是可复用的媒体杠杆'] },
+    { id: 'k-t3-course-1', title: 'The One Person Business Newsletter', author: 'Dan Koe', type: 'course', theme: 't3', themes: ['t3', 't1'], mentor: 'dan', level: 1, minutes: 10, link: 'https://thedankoe.com', linkNote: '作者官网订阅',
+      summary: 'Dan Koe 的长期邮件通讯，持续输出一人公司、知识变现的最新方法与案例，是低成本持续输入源。',
+      why: '一个高质量信息源，胜过 50 个碎片订阅。', tips: ['订阅后每月挑 1 篇精读并记笔记'] },
+    // —— T4 判断力与决策 ——
+    { id: 'k-t4-book-1', title: 'The Almanack of Naval Ravikant（判断力章节）', author: 'Naval', type: 'book', theme: 't4', themes: ['t4'], mentor: 'naval', level: 1, minutes: 60, link: 'https://www.navalmanack.com', linkNote: '官方免费在线阅读',
+      summary: 'Naval 的判断力章节：决策质量是长期回报的复利来源。他说「如果无法决定，答案是否定的」。',
+      why: '每周复盘「继续 / 调整 / 停止」，就是判断力在系统里的落点。', tips: ['读「决策」章节，抄 3 条决策原则'] },
+    { id: 'k-t4-book-cn', title: '《纳瓦尔宝典》（中文正版）', author: 'Naval · 中信出版', type: 'book', theme: 't4', themes: ['t4', 't6'], mentor: 'naval', level: 1, minutes: 120, link: 'https://www.navalmanack.com', linkNote: '中文正版由中信出版，官网含原版全文',
+      summary: '中文读者首选入口。中信出版的中文正版，翻译完整、注释清晰，适合系统精读。',
+      why: '母语阅读更接近「用自己的话重述」，这是学习笔记的第一步。', tips: ['建议按主题跳读（判断力 / 杠杆 / 长期游戏）'] },
+    { id: 'k-t4-art-1', title: 'Seek Wealth, Not Money or Status', author: 'Naval', type: 'article', theme: 't4', themes: ['t4', 't5'], mentor: 'naval', level: 2, minutes: 10, link: 'https://www.navalmanack.com', linkNote: '官方收录（演讲 / 文章）',
+      summary: 'Naval 的经典演讲：追求财富（可以睡觉时替你工作的资产）而不是金钱或地位。',
+      why: '想清楚「你在积累财富还是积累表面繁荣」。', tips: ['读后给上周产出打一次「资产 vs 表面」的标签'] },
+    { id: 'k-t4-tweet-1', title: '关于阅读的推文', author: 'Naval', type: 'tweet', theme: 't4', themes: ['t4', 't6'], mentor: 'naval', level: 1, minutes: 3, link: 'https://x.com/naval', linkNote: 'X（Twitter）@naval',
+      summary: 'Naval：「读你爱读的，直到你爱读」——阅读没有捷径，但可以从兴趣出发，最终读遍所有好书。',
+      why: '高质量输入决定高质量输出，先从每天 15 分钟开始。', tips: ['在知识库里挑一本你「真的想读」的'] },
+    { id: 'k-t4-podcast-1', title: 'Joe Rogan Experience #1309', author: 'Naval', type: 'podcast', theme: 't4', themes: ['t4', 't6'], mentor: 'naval', level: 3, minutes: 120, link: 'https://open.spotify.com', linkNote: '在 Spotify / 各大播客平台搜索 #1309',
+      summary: 'JRE 与 Naval 的经典长谈：财富、幸福、判断力、冥想，一集听出 Naval 思维全貌。适合体系化阶段完整听。',
+      why: '长谈最能暴露一个人的思维模型，这是进阶必听。', tips: ['分 2-3 次听完，每次记 1 条收获'] },
+    // —— T5 杠杆与复利 ——
+    { id: 'k-t5-book-1', title: 'The Almanack of Naval Ravikant（杠杆章节）', author: 'Naval', type: 'book', theme: 't5', themes: ['t5'], mentor: 'naval', level: 1, minutes: 60, link: 'https://www.navalmanack.com', linkNote: '官方免费在线阅读',
+      summary: 'Naval 的杠杆理论：劳动力、资本、代码、媒体四类杠杆，后两者不需要许可，是普通人可用的杠杆。',
+      why: '资产「可复用 ≥70%」的标准，就是在检验你的杠杆。', tips: ['读后列：我的资产用的是哪类杠杆'] },
+    { id: 'k-t5-tweet-1', title: 'How to Get Rich (without getting lucky)', author: 'Naval', type: 'tweet', theme: 't5', themes: ['t5', 't6'], mentor: 'naval', level: 1, minutes: 5, link: 'https://x.com/naval', linkNote: 'X（Twitter）@naval 经典线程（2018）',
+      summary: 'Naval 最著名的推文线程，浓缩「如何不靠运气变富」的原则：特殊知识、杠杆、复利、长期游戏。',
+      why: '一条线索引你读完整个知识库——这就是锚点内容。', tips: ['收藏这条线程，每月重读 1 次'] },
+    { id: 'k-t5-podcast-1', title: 'How to Get Rich（对谈版）', author: 'Naval × Shane Parrish', type: 'podcast', theme: 't5', themes: ['t5', 't6'], mentor: 'naval', level: 2, minutes: 180, link: 'https://fs.blog', linkNote: 'Farnam Street 播客（有免费文字版）',
+      summary: 'Naval 与 Shane Parrish 的深度对谈，把 40 条原则展开成 3 小时的长谈，可分 4 段听。',
+      why: '黄日 15 分钟听 1 段，碎片时间也能完成一次深度输入。', tips: ['每周 1 段，听完记 1 条笔记', '对应 L1 的推文线程，先看文字再看长谈'] },
+    { id: 'k-t5-video-1', title: 'Dan Koe 的 YouTube 频道', author: 'Dan Koe', type: 'video', theme: 't5', themes: ['t5', 't1', 't3'], mentor: 'dan', level: 2, minutes: 15, link: 'https://www.youtube.com/results?search_query=Dan+Koe', linkNote: 'YouTube 搜索 Dan Koe',
+      summary: 'Dan Koe 的频道以一人公司、知识变现、创作者经济为主题，10-20 分钟/期，适合通勤看。',
+      why: '「一次构建、多次销售」在视频里有大量实操演示。', tips: ['挑 1 期和当前阶段最相关的看完'] },
+    // —— T6 长期主义 ——
+    { id: 'k-t6-book-1', title: 'The Almanack of Naval Ravikant（长期游戏章节）', author: 'Naval', type: 'book', theme: 't6', themes: ['t6', 't5'], mentor: 'naval', level: 1, minutes: 60, link: 'https://www.navalmanack.com', linkNote: '官方免费在线阅读',
+      summary: 'Naval 的长期游戏：与长期玩家玩长期游戏，复利会替你工作。他说「所有回报最终都来自长期游戏」。',
+      why: '90 天母线机制，就是长期游戏在系统里的最小闭环。', tips: ['读后给母线写一句「我在玩什么长期游戏」'] },
+    { id: 'k-t6-art-1', title: 'Navalmanack.com 全文阅读版', author: 'Eric Jorgenson / Naval', type: 'article', theme: 't6', themes: ['t6', 't4', 't5'], mentor: 'both', level: 1, minutes: 120, link: 'https://www.navalmanack.com', linkNote: '官方免费在线阅读',
+      summary: '纳瓦尔年鉴官方在线阅读版，涵盖财富与幸福两大主题，是长期主义主题的核心外链。',
+      why: '一个官方入口，长期反复回来读。', tips: ['收藏到书签，每周回来读 1 章'] },
+    { id: 'k-t6-tweet-1', title: '长期游戏推文合集', author: 'Naval', type: 'tweet', theme: 't6', themes: ['t6'], mentor: 'naval', level: 2, minutes: 5, link: 'https://www.navalmanack.com', linkNote: '官方整理合集（X 原线程 @naval）',
+      summary: 'Naval 关于长期游戏、复利与耐心的推文整理：选择有长期玩伴的长期游戏。',
+      why: '当你想换方向时，回看这几条，提醒自己 90 天纪律。', tips: ['换母线前先读这条，再决定'] },
+    { id: 'k-t6-podcast-1', title: 'How to Get Rich 第 4 段（长期游戏）', author: 'Naval × Shane Parrish', type: 'podcast', theme: 't6', themes: ['t6', 't4'], mentor: 'naval', level: 3, minutes: 45, link: 'https://fs.blog', linkNote: 'Farnam Street 播客',
+      summary: '3 小时长谈的最后一段聚焦长期游戏与幸福，是 L3 体系化的收尾内容。',
+      why: '听完这段，你就有了「长期主义」的完整心智模型。', tips: ['体系化阶段收尾时听，听完输出 1 篇方法论文档'] }
+  ];
+  function knowledgeById(id) {
+    return KNOWLEDGE.filter(function (k) { return k.id === id; })[0] || null;
+  }
 
   function actionById(id) {
     return ACTIONS.filter(function (a) { return a.id === id; })[0] || null;
@@ -961,7 +1154,7 @@
       '<div class="ob-hint">现在不验证、不发骚扰邮件。当你换手机 / 清缓存时，用它找回你的数据。</div>' +
       '<label class="ob-consent"><input type="checkbox" id="obConsent">' +
       '<span>我同意：邮箱仅用于「<b>防丢失与数据找回</b>」，不用于营销，不共享给第三方，可随时删除。详见下方声明。</span></label>' +
-      '<div class="ob-legal">📄 个人信息处理声明（摘要）：昵称用于系统内称呼；邮箱仅用于防丢失 / 数据找回 / 后续升级账号，不做任何营销用途。数据默认保存在本机浏览器；开启自动备份后，以匿名设备码标识上传云端，仅用于防丢失。我们不会将你的个人信息出售、共享或用于任何第三方分析。你可随时在设置中修改、删除，或「重置全部数据」彻底删除。依据《中华人民共和国个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利。联系：lincyang@foxmail.com。</div>' +
+      '<div class="ob-legal">📄 个人信息处理声明（摘要）：昵称用于系统内称呼；邮箱仅用于防丢失 / 数据找回 / 后续升级账号，不做任何营销用途。数据默认保存在本机浏览器；开启自动备份后，以匿名数据标识上传云端，仅用于防丢失。我们不会将你的个人信息出售、共享或用于任何第三方分析。你可随时在设置中修改、删除，或「重置全部数据」彻底删除。依据《中华人民共和国个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利。联系：lincyang@foxmail.com。</div>' +
       '</div>' +
       '<button class="ob-browse-link" data-action="onboard-browse">暂不填写，先看看系统长什么样 →</button>' +
       '</div></div>';
@@ -1397,8 +1590,18 @@
   function switchAction() {
     var s = sessionOf(todayStr);
     if (!s) return;
-    var rec = recommendList(s.mode, db.user.stage, s.actionId);
-    if (rec.length) { s.actionId = rec[0].id; s.output = ''; s.assetIds = []; s.evidenceIds = []; persist(); }
+    // v1.18.0 修复：真正的轮转「换一个」——按推荐排序取当前动作的下一个，
+    // 避免原来只取 rest[0] 导致在排序最高的两个动作间无限循环（学习动作永远轮不到）。
+    var rec = recommendList(s.mode, db.user.stage);
+    if (!rec.length) { render(); return; }
+    var idx = 0;
+    for (var i = 0; i < rec.length; i++) { if (rec[i].id === s.actionId) { idx = i; break; } }
+    var next = rec[(idx + 1) % rec.length];
+    s.actionId = next.id;
+    s.output = '';
+    s.assetIds = [];
+    s.evidenceIds = [];
+    persist();
     render();
   }
 
@@ -1459,6 +1662,7 @@
     var title = kind === 'asset' && $id('recTitle') ? ($id('recTitle').value.trim() || content.slice(0, 30)) : '';
     var source = kind === 'evidence' && $id('recSource') ? $id('recSource').value.trim() : '';
     var s = recordModalState.sessionId ? sessionOf(todayStr) : null;
+    var wasConvert = !!recordConvertNote; // v1.18.0：来自学习笔记转资产/转证据（markConverted 会清空标志，先保存）
 
     if (kind === 'asset') {
       var asset = {
@@ -1467,6 +1671,7 @@
       };
       db.assets.push(asset);
       if (s) { s.output = s.output ? s.output + '\n' + content : content; s.assetIds.push(asset.id); }
+      markConverted(asset.id, 'asset');
     } else {
       var ev = {
         id: uid(), type: subtype, content: content, source: source || '', funnelStage: funnelOf(subtype),
@@ -1474,11 +1679,24 @@
       };
       db.evidences.push(ev);
       if (s) { s.output = s.output ? s.output + '\n' + content : content; s.evidenceIds.push(ev.id); }
+      markConverted(ev.id, 'evidence');
     }
     persist();
     closeModal();
-    toast('已沉淀 → ' + (kind === 'asset' ? '资产库' : '证据库'));
+    toast(wasConvert ? '已沉淀 → ' + (kind === 'asset' ? '资产库' : '证据库') + ' · 学习笔记已标记为已应用' : '已沉淀 → ' + (kind === 'asset' ? '资产库' : '证据库'));
     render();
+  }
+  // v1.18.0：学习笔记 → 资产/证据 后标记原笔记已应用（recordConvertNote 由学习页转换弹层设置）
+  function markConverted(convertedId, kind) {
+    if (!recordConvertNote) return;
+    var n = learnNoteById(recordConvertNote.id);
+    if (n) {
+      n.applyStatus = 'done';
+      n.convertedAt = nowISO();
+      n.convertedKind = kind;
+      n.convertedId = convertedId;
+    }
+    recordConvertNote = null;
   }
   function funnelOf(t) {
     if (t === 'pain') return 'pain';
@@ -1495,7 +1713,8 @@
     h += '<p class="kicker">资产 · 证据</p>';
     h += '<h2 class="page-title">你积累了什么</h2>';
     h += '<p class="page-sub">每一条产出，要么是<strong>可复用资产</strong>，要么是<strong>真实市场证据</strong>。分开管理，互相可见。</p>';
-    h += '<div class="btn-row" style="margin-top:0;"><button class="btn" data-action="open-record" data-session="0">＋ 新增记录</button></div>';
+    h += '<div class="btn-row" style="margin-top:0;"><button class="btn" data-action="open-record" data-session="0">＋ 新增记录</button>';
+    h += '<button class="btn-ghost" data-action="goto-learn">✦ 学习笔记 (' + db.learnNotes.length + ')</button></div>';
     h += '<div style="height:14px;"></div>';
     h += '<div class="seg">';
     h += '<button data-action="rec-tab" data-tab="asset" class="' + (recFilter.tab === 'asset' ? 'active' : '') + '">资产库 (' + db.assets.length + ')</button>';
@@ -1595,6 +1814,275 @@
       h += '</div>';
     }
     return h;
+  }
+
+  /* ================= 学习页（v1.18.0：双导师知识库 + 提升记录） ================= */
+  var learnFilter = { level: 1, theme: 'all', mentor: 'all', type: 'all' };
+  var recordConvertNote = null; // 学习笔记 → 资产/证据 时关联的笔记（recSave 里检测并标记）
+
+  function learnTypeName(t) { var x = LEARN_TYPES.filter(function (i) { return i.key === t; })[0]; return x ? x.name : t; }
+  function learnThemeName(t) { var x = LEARN_THEMES.filter(function (i) { return i.key === t; })[0]; return x ? x.name : t; }
+  function learnMentorName(m) { var x = LEARN_MENTORS.filter(function (i) { return i.key === m; })[0]; return x ? x.name : m; }
+  function learnLevelName(l) { return l === 1 ? 'L1 认知入门' : (l === 2 ? 'L2 方法实践' : 'L3 体系化'); }
+
+  function learnWeekCount() {
+    var monday = mondayOf(todayStr);
+    return db.learnNotes.filter(function (n) { var d = (n.date || n.createdAt || '').slice(0, 10); return d >= monday && d <= todayStr; }).length;
+  }
+  function learnConvertedCount() {
+    return db.learnNotes.filter(function (n) { return n.applyStatus === 'done' && n.convertedId; }).length;
+  }
+  function learnNoteById(id) {
+    return db.learnNotes.filter(function (n) { return n.id === id; })[0] || null;
+  }
+  function learnTodayRecommend() {
+    var recent = {};
+    for (var i = 0; i < 7; i++) {
+      var d = addDays(todayStr, -i);
+      db.learnNotes.forEach(function (n) { if ((n.date || '').slice(0, 10) === d && n.knowledgeId) recent[n.knowledgeId] = true; });
+    }
+    var stageThemes = { explore: ['t1', 't2', 't3'], validate: ['t4', 't5'], productize: ['t3', 't5', 't6'], scale: ['t3', 't5', 't6'] };
+    var themes = stageThemes[db.user.stage] || ['t1', 't2', 't3'];
+    var pool = KNOWLEDGE.filter(function (k) { return k.level === 1 && themes.indexOf(k.theme) >= 0 && !recent[k.id]; });
+    if (!pool.length) pool = KNOWLEDGE.filter(function (k) { return k.level === 1 && !recent[k.id]; });
+    if (!pool.length) pool = KNOWLEDGE.filter(function (k) { return k.level === 1; });
+    if (!pool.length) pool = KNOWLEDGE.slice(0, 1);
+    return pool[0];
+  }
+  function kCardHTML(k, locked) {
+    var t = learnTypeName(k.type);
+    var minutes = k.minutes >= 60 ? (Math.round(k.minutes / 60 * 10) / 10) + ' 小时' : k.minutes + ' 分钟';
+    var h = '<div class="k-card' + (locked ? ' locked' : '') + '">';
+    h += '<div class="k-head"><div class="k-badges">';
+    h += '<span class="k-badge type-' + k.type + '">' + t + '</span>';
+    h += '<span class="k-badge">' + learnMentorName(k.mentor) + '</span>';
+    h += '<span class="k-badge level' + k.level + '">L' + k.level + '</span>';
+    if (locked) h += '<span class="k-badge locked">🔒 Pro</span>';
+    h += '</div></div>';
+    h += '<div class="k-title">' + esc(k.title) + '</div>';
+    h += '<div class="k-author">' + esc(k.author) + ' · ' + minutes + ' · ' + learnThemeName(k.theme) + '</div>';
+    if (locked) {
+      h += '<div class="k-lock-box"><span><b>🔒 Pro 权益</b> · 完整知识库与 L2/L3 路径升级后解锁</span>';
+      h += '<button class="btn-ghost btn btn-sm" data-action="goto-settings">看看 Pro</button></div>';
+    } else {
+      h += '<div class="k-summary">' + esc(k.summary) + '</div>';
+      h += '<div class="k-why">💡 ' + esc(k.why) + '</div>';
+      h += '<div class="k-foot">';
+      h += '<a class="k-link" href="' + esc(k.link) + '" target="_blank" rel="noopener noreferrer">去学习 ↗</a>';
+      h += '<button class="k-note-btn" data-action="learn-note" data-kid="' + k.id + '">记一条提升</button>';
+      h += '<span class="k-meta">' + esc(k.linkNote || '') + '</span>';
+      h += '</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function renderLearn() {
+    var v = $id('view-learn');
+    var pro = isPro();
+    var curLevel = learnFilter.level;
+    var levelLocked = curLevel > 1 && !pro;
+    var h = '';
+    h += '<p class="kicker">学习 · Learn</p>';
+    h += '<h2 class="page-title">每天学一点，变成资产</h2>';
+    h += '<p class="page-sub">Dan Koe + Naval 双导师知识库。<strong>学 → 记 → 转</strong>：每天 3-60 分钟，把「看了很有道理」变成「学了有产出」。</p>';
+
+    // 顶部摘要
+    h += '<div class="learn-summary">';
+    h += '<div class="learn-summary-item"><div class="learn-summary-num">' + learnWeekCount() + '</div><div class="learn-summary-label">本周学习</div></div>';
+    h += '<div class="learn-summary-item"><div class="learn-summary-num">' + db.learnNotes.length + '</div><div class="learn-summary-label">累计笔记</div></div>';
+    h += '<div class="learn-summary-item"><div class="learn-summary-num">' + learnConvertedCount() + '</div><div class="learn-summary-label">转成资产/证据</div></div>';
+    h += '</div>';
+
+    // 学习路径切换
+    var pathDefs = [
+      { lv: 1, name: 'L1 认知入门', desc: '免费全开放' },
+      { lv: 2, name: 'L2 方法实践', desc: pro ? '已解锁' : 'Pro 解锁' },
+      { lv: 3, name: 'L3 体系化', desc: pro ? '已解锁' : 'Pro 解锁' }
+    ];
+    h += '<div class="learn-path-bar">';
+    pathDefs.forEach(function (p) {
+      h += '<button class="learn-path' + (curLevel === p.lv ? ' active' : '') + '" data-action="learn-path" data-lv="' + p.lv + '">';
+      h += '<div class="lp-name">' + p.name + '</div><div class="lp-desc">' + p.desc + '</div>';
+      if (p.lv > 1 && !pro) h += '<div class="lp-lock">🔒 Pro</div>';
+      h += '</button>';
+    });
+    h += '</div>';
+
+    // 路径进度 + 锁定提示
+    h += '<div class="learn-progress">当前路径 <b>' + learnLevelName(curLevel) + '</b> · 累计学习笔记 <b>' + db.learnNotes.length + '</b> 条' +
+      (curLevel === 1 ? ' · 完成 6 条后进入 L2 实践' : '') +
+      (curLevel === 2 ? ' · 转成资产/证据 ' + learnConvertedCount() + ' / 3 条后挑战 L3' : '') +
+      '</div>';
+    if (levelLocked) {
+      h += '<div class="learn-tip"><b>🔒 L' + curLevel + ' 为 Pro 权益</b>：完整知识库与进阶学习路径升级后解锁。L1 免费完整可用，先把认知入门学完。</div>';
+    }
+
+    // 筛选：主题 / 导师 / 类型
+    h += '<div class="chip-row">';
+    h += '<button class="chip' + (learnFilter.theme === 'all' ? ' active' : '') + '" data-action="learn-theme" data-t="all">全部主题</button>';
+    LEARN_THEMES.forEach(function (t) {
+      h += '<button class="chip' + (learnFilter.theme === t.key ? ' active' : '') + '" data-action="learn-theme" data-t="' + t.key + '">' + t.name + '</button>';
+    });
+    h += '</div>';
+    h += '<div class="chip-row">';
+    h += '<button class="chip' + (learnFilter.mentor === 'all' ? ' active' : '') + '" data-action="learn-mentor" data-m="all">全部导师</button>';
+    LEARN_MENTORS.forEach(function (m) {
+      h += '<button class="chip' + (learnFilter.mentor === m.key ? ' active' : '') + '" data-action="learn-mentor" data-m="' + m.key + '">' + m.name + '</button>';
+    });
+    h += '<button class="chip' + (learnFilter.type === 'all' ? ' active' : '') + '" data-action="learn-type" data-ty="all">全部类型</button>';
+    LEARN_TYPES.forEach(function (ty) {
+      h += '<button class="chip' + (learnFilter.type === ty.key ? ' active' : '') + '" data-action="learn-type" data-ty="' + ty.key + '">' + ty.name + '</button>';
+    });
+    h += '</div>';
+
+    // 今日推荐
+    var rec = learnTodayRecommend();
+    h += '<div class="card"><div class="card-title">今日推荐</div>';
+    h += '<p class="card-sub" style="margin-bottom:10px;">按你的阶段（' + STAGE_CN[db.user.stage] + '）挑一条 L1 入门内容，先读它。</p>';
+    h += kCardHTML(rec, false);
+    h += '</div>';
+
+    // 内容卡列表
+    var list = KNOWLEDGE.filter(function (k) {
+      if (k.level !== curLevel) return false;
+      if (learnFilter.theme !== 'all' && k.theme !== learnFilter.theme && k.themes.indexOf(learnFilter.theme) < 0) return false;
+      if (learnFilter.mentor !== 'all' && k.mentor !== learnFilter.mentor) return false;
+      if (learnFilter.type !== 'all' && k.type !== learnFilter.type) return false;
+      return true;
+    });
+    h += '<div style="display:flex;align-items:baseline;justify-content:space-between;margin:2px 2px 12px;"><div style="font-size:15px;font-weight:700;">' + learnLevelName(curLevel) + ' 内容</div><div class="muted" style="font-size:12px;">共 ' + list.length + ' 条</div></div>';
+    if (!list.length) {
+      h += '<div class="empty"><div class="empty-ico">✦</div>这个筛选下暂无内容，换个组合试试。</div>';
+    } else {
+      list.forEach(function (k) { h += kCardHTML(k, levelLocked); });
+    }
+
+    // 我的提升记录
+    h += '<div style="margin-top:8px;"><div style="font-size:15px;font-weight:700;margin:0 2px 10px;">我的提升记录</div>';
+    var notes = db.learnNotes.slice().sort(function (x, y) { return (y.createdAt || '').localeCompare(x.createdAt || ''); });
+    if (!notes.length) {
+      h += '<div class="ln-empty">还没有提升记录。读完一张知识卡，点「记一条提升」，把收获和下一步行动写下来。<br>学习笔记不算成果，但它是资产的原料——每条都可以转成资产或证据。</div>';
+    } else {
+      h += '<div class="rec-list">';
+      notes.forEach(function (n) { h += learnNoteItemHTML(n); });
+      h += '</div>';
+    }
+    h += '</div>';
+
+    // 版权合规页脚
+    h += '<div class="k-disclaimer">知识库内容仅提供指引与学习入口，版权归原作者所有；请通过官方来源获取完整内容。学习笔记是你的个人数据，只保存在本设备与你的云端备份中。</div>';
+    v.innerHTML = h;
+  }
+
+  function learnNoteItemHTML(n) {
+    var st = n.applyStatus || 'planned';
+    var stMap = { planned: ['待应用', 'planned'], done: ['已转' + (n.convertedKind === 'evidence' ? '证据' : '资产'), 'done'], dropped: ['已放弃', 'dropped'] };
+    var stCfg = stMap[st] || stMap.planned;
+    var h = '<div class="ln-item"><div class="ln-head"><span class="ln-status ' + stCfg[1] + '">' + stCfg[0] + '</span><div style="flex:1;min-width:0;">';
+    h += '<div class="ln-title">' + esc(n.sourceTitle || '自由记录') + '</div>';
+    h += '<div class="ln-meta">' + prettyDate((n.date || n.createdAt || '').slice(0, 10)) +
+      (n.mentor ? ' · ' + learnMentorName(n.mentor) : '') +
+      (n.theme ? ' · ' + learnThemeName(n.theme) : '') +
+      (n.mainlineId && db.mainline ? ' · 🎯 关联母线' : '') +
+      '</div></div></div>';
+    h += '<div class="ln-body"><b>收获：</b>' + esc(n.harvest || '') + '</div>';
+    h += '<div class="ln-body"><b>应用：</b>' + esc(n.apply || '') + '</div>';
+    h += '<div class="ln-ops">';
+    if (st !== 'done') {
+      h += '<button class="btn btn-sm" data-action="learn-convert-asset" data-id="' + n.id + '">转资产</button>';
+      h += '<button class="btn-ghost btn btn-sm" data-action="learn-convert-evidence" data-id="' + n.id + '">转证据</button>';
+      if (st !== 'dropped') h += '<button class="btn-ghost btn btn-sm" data-action="learn-drop" data-id="' + n.id + '">标记放弃</button>';
+    }
+    h += '<button class="btn-ghost btn btn-sm" data-action="learn-del" data-id="' + n.id + '">删除</button>';
+    h += '</div></div>';
+    return h;
+  }
+
+  function openLearnNoteModal(knowledgeId) {
+    var k = knowledgeId ? knowledgeById(knowledgeId) : null;
+    var html = '';
+    html += '<div class="field"><label class="field-label">日期</label><input value="' + prettyDate(todayStr) + '" disabled></div>';
+    html += '<div class="field"><label class="field-label" for="lnSource">来源内容</label><input id="lnSource" maxlength="120" value="' + esc(k ? k.title : '') + '" placeholder="如：The Almanack 判断力章节 / 自由记录"></div>';
+    html += '<div class="field"><label class="field-label" for="lnMentor">导师</label><select id="lnMentor">' + LEARN_MENTORS.map(function (m) { return '<option value="' + m.key + '"' + (k && m.key === k.mentor ? ' selected' : '') + '>' + m.name + '</option>'; }).join('') + '</select></div>';
+    html += '<div class="field"><label class="field-label" for="lnTheme">主题</label><select id="lnTheme">' + LEARN_THEMES.map(function (t) { return '<option value="' + t.key + '"' + (k && t.key === k.theme ? ' selected' : '') + '>' + t.name + '</option>'; }).join('') + '</select></div>';
+    html += '<div class="field"><label class="field-label" for="lnHarvest">我的收获 <span style="color:var(--red);">*</span></label><textarea id="lnHarvest" rows="3" placeholder="学到了什么？至少 1 句，建议 3-5 句。"></textarea></div>';
+    html += '<div class="field"><label class="field-label" for="lnApply">我要怎么用 <span style="color:var(--red);">*</span></label><textarea id="lnApply" rows="2" placeholder="接下来具体做什么？没有应用方向的学习不算提升。"></textarea></div>';
+    html += '<div class="field"><label class="field-label" for="lnMainline">关联母线</label><select id="lnMainline">' +
+      '<option value="">不关联</option>' +
+      (db.mainline ? '<option value="' + esc(db.mainline.id) + '">当前母线：' + esc(db.mainline.name) + '</option>' : '') +
+      '</select></div>';
+    html += '<div class="btn-row"><button class="btn" data-action="learn-note-save">保存提升记录</button><button class="btn-ghost" data-action="modal-close">取消</button></div>';
+    openModal(html);
+    modalTitle(k ? '记一条提升' : '记一条提升（自由记录）');
+  }
+
+  function learnNoteSave() {
+    var source = $id('lnSource') ? $id('lnSource').value.trim() : '';
+    var harvest = $id('lnHarvest') ? $id('lnHarvest').value.trim() : '';
+    var apply = $id('lnApply') ? $id('lnApply').value.trim() : '';
+    if (!source) { toast('请填写来源内容'); return; }
+    if (!harvest) { toast('先写一句：我的收获'); return; }
+    if (!apply) { toast('先写一句：接下来我要拿它做什么'); return; }
+    var mentor = $id('lnMentor') ? $id('lnMentor').value : '';
+    var theme = $id('lnTheme') ? $id('lnTheme').value : 't1';
+    var mainlineId = $id('lnMainline') ? $id('lnMainline').value : '';
+    var note = {
+      id: uid(), knowledgeId: '', date: todayStr, sourceTitle: source,
+      sourceLink: '', mentor: mentor, theme: theme,
+      harvest: harvest, apply: apply, applyStatus: 'planned',
+      mainlineId: mainlineId || null, createdAt: nowISO(),
+      convertedAt: null, convertedKind: null, convertedId: null
+    };
+    db.learnNotes.push(note);
+    persist();
+    closeModal();
+    toast('提升已记录 🎉 别忘了应用它');
+    render();
+  }
+
+  // 学习笔记 → 资产 / 证据（复用现有记录弹层，预填内容；保存后笔记标记 done）
+  function openConvertAssetModal(id) {
+    var n = learnNoteById(id);
+    if (!n) { toast('笔记不存在'); return; }
+    recordConvertNote = n;
+    recordModalState = { kind: 'asset', subtype: 'article', sessionId: null, defaultTitle: n.sourceTitle || '', defaultCat: 'content' };
+    var html = '';
+    html += '<div class="field"><label class="field-label" for="recContent">产出内容（一段话即可）</label>';
+    html += '<textarea id="recContent" rows="4">' + esc(n.harvest) + '\n\n我要应用：' + esc(n.apply) + '</textarea></div>';
+    html += '<div class="field"><label class="field-label">归类</label><div class="type-toggle">';
+    html += '<button data-action="rec-kind" data-kind="asset" class="active">资产类（可复用）</button>';
+    html += '<button data-action="rec-kind" data-kind="evidence" class="">证据类（真实反馈）</button>';
+    html += '</div><div class="subtype-grid" id="recSubtypes">' + subtypeButtons('asset', 'article') + '</div></div>';
+    html += '<div class="field" id="recExtra">' + extraField('asset', 'article') + '</div>';
+    html += '<div class="btn-row"><button class="btn" data-action="rec-save">保存到资产库</button><button class="btn-ghost" data-action="modal-close">取消</button></div>';
+    openModal(html);
+    modalTitle('学习笔记 → 资产');
+  }
+  function openConvertEvidenceModal(id) {
+    var n = learnNoteById(id);
+    if (!n) { toast('笔记不存在'); return; }
+    recordConvertNote = n;
+    recordModalState = { kind: 'evidence', subtype: 'pain', sessionId: null, defaultTitle: '', defaultCat: 'content' };
+    var html = '';
+    html += '<div class="field"><label class="field-label" for="recContent">应用后的真实反馈（一段话即可）</label>';
+    html += '<textarea id="recContent" rows="4">' + esc(n.harvest) + '\n\n应用情况：' + esc(n.apply) + '</textarea></div>';
+    html += '<div class="field"><label class="field-label">归类</label><div class="type-toggle">';
+    html += '<button data-action="rec-kind" data-kind="asset" class="">资产类（可复用）</button>';
+    html += '<button data-action="rec-kind" data-kind="evidence" class="active">证据类（真实反馈）</button>';
+    html += '</div><div class="subtype-grid" id="recSubtypes">' + subtypeButtons('evidence', 'pain') + '</div></div>';
+    html += '<div class="field" id="recExtra">' + extraField('evidence', 'pain') + '</div>';
+    html += '<div class="btn-row"><button class="btn" data-action="rec-save">保存到证据库</button><button class="btn-ghost" data-action="modal-close">取消</button></div>';
+    openModal(html);
+    modalTitle('学习笔记 → 证据');
+  }
+  function learnDel(id) {
+    db.learnNotes = db.learnNotes.filter(function (n) { return n.id !== id; });
+    persist(); toast('已删除'); render();
+  }
+  function learnDrop(id) {
+    var n = learnNoteById(id);
+    if (n) { n.applyStatus = 'dropped'; n.droppedAt = nowISO(); persist(); toast('已标记为放弃'); render(); }
   }
 
   /* ================= 母线页 ================= */
@@ -1832,11 +2320,10 @@
     h += '<input id="emailInput" type="email" value="' + esc(db.user.email || '') + '" placeholder="you@example.com" autocomplete="off">';
     h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。' +
       (db.user.privacy && db.user.privacy.agreedAt ? '<br>✅ 已同意隐私声明：' + db.user.privacy.agreedAt.slice(0, 10) : '') + '</p></div>';
-    h += '<div class="field"><label class="field-label">设备码（你的数据标识）</label>';
-    h += '<div class="device-row"><code id="deviceIdText">' + esc(db.user.id) + '</code><button class="btn btn-sm" data-action="copy-device-id">复制</button></div></div>';
+    // v1.18.0：设备码对用户隐藏——数据标识由系统自动生成并用于云端恢复，无需用户记忆/复制/输入
     h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
     h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">🔒 你的数据属于你</div>';
-    h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失，不做任何其他用途。昵称与邮箱会随匿名备份上传（防丢失用途）。</p>';
+    h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅一组随机数据标识，用于区分设备）安全保存到云端，仅用于防丢失，不做任何其他用途。昵称与邮箱会随匿名备份上传（防丢失用途）。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">你可以随时：导出数据报告（查看 / 带走全部产出）、导出 JSON 备份（完整备份用于恢复）、从云端恢复、重置全部数据（彻底清除本设备数据）。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">我们不会把你的数据用于营销、分析或共享给任何第三方。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">依据《个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利——本页的导出与重置功能即对应「数据可携带权」与「删除权」；如需删除云端历史备份，请发邮件至 <a href="mailto:lincyang@foxmail.com?subject=' + encodeURIComponent('转型系统云端数据删除申请') + '" style="color:var(--sub);text-decoration:underline;">lincyang@foxmail.com</a>（主题「转型系统云端数据删除申请」），我们将在 7 个工作日内处理。</p>';
@@ -1874,14 +2361,14 @@
     h += '<input type="file" id="importFile" accept=".json,application/json" class="hide">';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="reset-data">重置全部数据</button></div>';
     h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">📦 云端找回说明</div>';
-    h += '<p class="privacy-note">开启自动备份后，你的数据会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失。你可以随时手动「立即备份到云端」或「从云端恢复」。</p>';
-    h += '<p class="privacy-note" style="margin-top:8px;">换设备 / 清缓存后如何找回：① 设置 → 备份与恢复 →「从云端恢复」；② 输入恢复口令 + 你的设备码（导出数据报告中已包含设备码）；③ 点击「读取并覆盖」，云端最新快照会恢复到当前设备。</p>';
-    h += '<p class="privacy-note" style="margin-top:8px;">恢复口令从哪来：首次使用或忘记口令时，发邮件到 lincyang@foxmail.com 申请（主题「申请转型系统恢复口令」）。口令用于保障只有你能拉回自己的数据。换设备前请先导出数据报告，保存设备码。</p>';
+    h += '<p class="privacy-note">开启自动备份后，你的数据会以匿名方式安全保存到云端，仅用于防丢失。你可以随时手动「立即备份到云端」或「从云端恢复」。</p>';
+    h += '<p class="privacy-note" style="margin-top:8px;">换设备 / 清缓存后如何找回：① 新设备打开转型系统 → 设置 → 备份与恢复 →「从云端恢复」；② 输入你的恢复口令；③ 点击「读取并覆盖」——系统会自动使用你的数据标识读取云端快照，无需手动输入任何标识。用同一个邮箱绑定账号，恢复更稳妥。</p>';
+    h += '<p class="privacy-note" style="margin-top:8px;">恢复口令从哪来：首次使用或忘记口令时，发邮件到 lincyang@foxmail.com 申请（主题「申请转型系统恢复口令」）。口令用于保障只有你能拉回自己的数据。</p>';
     h += '</div>';
     h += '</div>';
 
     h += '<div class="card"><div class="card-title">关于</div>';
-    h += '<div class="about-line">转型操作系统 Transition OS v1.17.0（首次引导 + 欢迎页）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
+    h += '<div class="about-line">转型操作系统 Transition OS v1.18.0（设备码隐藏 + 双导师知识库）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据 · ' + db.learnNotes.length + ' 条学习笔记</div>';
     h += '</div>';
     v.innerHTML = h;
   }
@@ -1924,7 +2411,8 @@
     // 1. 总览
     section('总览');
     row(['字段', '值']);
-    row(['设备码', db.user.id]);
+    row(['数据标识', (db.user.nickname || '').trim() || '—']);
+    row(['绑定邮箱', db.user.email || '']);
     row(['转型阶段', STAGE_CN[db.user.stage] || db.user.stage]);
     row(['创建时间', (db.user.createdAt || '').slice(0, 19).replace('T', ' ')]);
     if (db.mainline) {
@@ -1937,6 +2425,7 @@
     row(['连续执行天数', streak()]);
     row(['资产数', db.assets.length]);
     row(['证据数', db.evidences.length]);
+    row(['学习笔记数', db.learnNotes.length]);
     blank();
 
     // 2. 资产清单
@@ -1961,6 +2450,17 @@
       var stName = '';
       if (st) { var f = FUNNEL.filter(function (x) { return x.key === st; })[0]; stName = f ? f.name : st; }
       row([(e.createdAt || '').slice(0, 10), '', t ? t.n : e.type, e.content || '', e.source || '', stName]);
+    });
+    blank();
+
+    // 3.5 学习笔记（提升记录，v1.18.0）
+    section('学习笔记');
+    row(['日期', '来源', '导师', '主题', '收获', '应用', '状态']);
+    var notesSorted = db.learnNotes.slice().sort(function (x, y) { return (x.date || '').localeCompare(y.date || ''); });
+    if (!notesSorted.length) row(['（暂无）', '', '', '', '', '', '']);
+    notesSorted.forEach(function (n) {
+      var stName = n.applyStatus === 'done' ? '已应用' : (n.applyStatus === 'dropped' ? '已放弃' : '待应用');
+      row([(n.date || (n.createdAt || '')).slice(0, 10), n.sourceTitle || '', n.mentor ? learnMentorName(n.mentor) : '', n.theme ? learnThemeName(n.theme) : '', n.harvest || '', n.apply || '', stName]);
     });
     blank();
 
@@ -2017,19 +2517,6 @@
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
     toast('已导出数据报告');
   }
-  function copyDeviceId() {
-    var txt = db.user && db.user.id ? db.user.id : '';
-    if (!txt) { toast('暂无设备码'); return; }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(txt).then(function () { toast('设备码已复制'); })
-        .catch(function () { toast('复制失败，请手动选择复制'); });
-    } else {
-      var ta = document.createElement('textarea');
-      ta.value = txt; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); toast('设备码已复制'); } catch (e) { toast('复制失败，请手动选择复制'); }
-      document.body.removeChild(ta);
-    }
-  }
   function unlockPro() {
     var keyEl = $id('proKeyInput');
     var key = keyEl ? keyEl.value.trim() : '';
@@ -2065,13 +2552,13 @@
     var mask = openModal(
       '<p class="muted" style="font-size:14px;margin-bottom:10px;">读取云端的最新备份，覆盖当前本地数据（换设备 / 清缓存 / 数据丢失时使用）。需要输入恢复口令。</p>' +
       '<div class="field"><label class="field-label" for="restoreKey">恢复口令</label><input id="restoreKey" type="password" placeholder="请输入恢复口令" autocomplete="off"></div>' +
-      '<div class="field"><label class="field-label" for="restoreUser">用户标识</label><input id="restoreUser" value="' + backupUserId() + '" placeholder="' + backupUserId() + '"></div>' +
+      '<p class="muted" style="font-size:12px;margin:-6px 0 12px;">系统会自动使用当前设备的数据标识读取云端快照，无需你手动输入。</p>' +
       '<div class="btn-row"><button class="btn" id="restoreDo">读取并覆盖</button><button class="btn-ghost" data-action="modal-close">取消</button></div>'
     );
     modalTitle('从云端恢复');
     $id('restoreDo').addEventListener('click', function () {
       var key = $id('restoreKey').value.trim();
-      var u = $id('restoreUser').value.trim() || backupUserId();
+      var u = backupUserId(); // v1.18.0：恢复标识内部仍用设备码（db.user.id），但用户层面隐藏，无需输入
       if (!key) { toast('请输入恢复口令'); return; }
       fetch(BACKUP_API + '?op=latest&userId=' + encodeURIComponent(u), {
         headers: { 'x-backup-key': key }
@@ -2197,6 +2684,8 @@
       modeCard +
       '<div class="stat-card"><div class="stat-num num-in" style="color:var(--asset);">' + db.assets.length + '</div><div class="stat-label">累计资产</div></div>' +
       '<div class="stat-card"><div class="stat-num num-in" style="color:var(--evidence);">' + db.evidences.length + '</div><div class="stat-label">累计证据</div></div>' +
+      '<div class="stat-card"><div class="stat-num num-in" style="color:var(--yellow);">' + db.learnNotes.length + '</div><div class="stat-label">学习笔记 · 本周 ' + learnWeekCount() + '</div></div>' +
+      '<div class="stat-card"><div class="stat-num num-in" style="color:var(--green);">' + learnConvertedCount() + '</div><div class="stat-label">提升转化（转资产/证据）</div></div>' +
       '</div>';
   }
 
@@ -2347,7 +2836,7 @@
   }
 
   /* ================= 路由与渲染 ================= */
-  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'settings'];
+  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'learn', 'settings'];
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, '');
     return ROUTES.indexOf(h) >= 0 ? h : 'today';
@@ -2373,6 +2862,7 @@
     else if (route === 'records') renderRecords();
     else if (route === 'mainline') renderMainline();
     else if (route === 'review') renderReview();
+    else if (route === 'learn') renderLearn();
     else if (route === 'settings') renderSettings();
     window.scrollTo({ top: 0 });
   }
@@ -2382,7 +2872,8 @@
   var BROWSE_BLOCKED = ['confirm-checkin', 'complete-action', 'open-record', 'rec-save',
     'save-mainline', 'change-mainline', 'finish-mainline-check', 'redo-mainline-check', 'ml-mark',
     'del-record', 'export-report', 'export-backup', 'import-backup', 'cloud-restore', 'cloud-backup-now',
-    'reset-data'];
+    'reset-data',
+    'learn-note', 'learn-note-save', 'learn-convert-asset', 'learn-convert-evidence', 'learn-del', 'learn-drop'];
   function handleAction(act, el) {
     if (browseMode && BROWSE_BLOCKED.indexOf(act) >= 0) {
       toast('先完成昵称和邮箱，才能开始记录');
@@ -2447,7 +2938,6 @@
       case 'review-range': reviewRange = el.getAttribute('data-r'); render(); break;
       case 'export-report': exportReport(); break;
       case 'export-backup': exportBackup(); break;
-      case 'copy-device-id': copyDeviceId(); break;
       case 'unlock-pro': unlockPro(); break;
       case 'import-backup': $id('importFile').click(); break;
       case 'cloud-backup-now': doBackup(); break;
@@ -2456,6 +2946,21 @@
       case 'goto-today': location.hash = '#/today'; break;
       case 'goto-settings': location.hash = '#/settings'; break;
       case 'goto-mainline': location.hash = '#/mainline'; break;
+      case 'goto-learn': location.hash = '#/learn'; break;
+      case 'learn-path': learnFilter.level = parseInt(el.getAttribute('data-lv'), 10) || 1; render(); break;
+      case 'learn-theme': learnFilter.theme = el.getAttribute('data-t'); render(); break;
+      case 'learn-mentor': learnFilter.mentor = el.getAttribute('data-m'); render(); break;
+      case 'learn-type': learnFilter.type = el.getAttribute('data-ty'); render(); break;
+      case 'learn-note': openLearnNoteModal(el.getAttribute('data-kid')); break;
+      case 'learn-note-save': learnNoteSave(); break;
+      case 'learn-convert-asset': openConvertAssetModal(el.getAttribute('data-id')); break;
+      case 'learn-convert-evidence': openConvertEvidenceModal(el.getAttribute('data-id')); break;
+      case 'learn-del': {
+        var lnid = el.getAttribute('data-id');
+        confirmModal('删除学习笔记', '确定删除这条提升记录吗？此操作不可恢复。', '删除', function () { learnDel(lnid); });
+        break;
+      }
+      case 'learn-drop': learnDrop(el.getAttribute('data-id')); break;
       case 'dismiss-backup': db.meta.backupDismissDate = todayStr; persist(); render(); break;
       case 'modal-close': closeModal(); break;
       case 'tab-nav': location.hash = '#/' + el.getAttribute('data-route'); break;

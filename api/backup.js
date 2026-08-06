@@ -138,12 +138,19 @@ function buildLightSnapshot(db) {
   const reviews = (Array.isArray(db.weeklyReviews) ? db.weeklyReviews : []).map((r) => ({
     date: r.date, points: truncate((r.points || r.summary || ''), 200),
   }));
+  const learnNotes = (Array.isArray(db.learnNotes) ? db.learnNotes : []).map((n) => ({
+    id: n.id, date: n.date || null, sourceTitle: truncate(n.sourceTitle || '', 80),
+    mentor: n.mentor || '', theme: n.theme || '',
+    harvest: truncate(n.harvest || '', 200), apply: truncate(n.apply || '', 200),
+    applyStatus: n.applyStatus || 'planned', convertedKind: n.convertedKind || null,
+  }));
   return {
     light: true, user: db.user, mainline: db.mainline, meta: db.meta,
-    dailySessions: sessions, assets, evidences, weeklyReviews: reviews,
+    dailySessions: sessions, assets, evidences, weeklyReviews: reviews, learnNotes,
     counts: {
       days: (db.dailySessions || []).length, assets: (db.assets || []).length,
       evidences: (db.evidences || []).length, reviews: (db.weeklyReviews || []).length,
+      learnNotes: (db.learnNotes || []).length,
     },
   };
 }
