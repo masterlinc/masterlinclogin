@@ -154,9 +154,9 @@
       <a class="lang-switch" href="/en/products/selfcheck.html" lang="en">EN</a>
     </div>
     <div class="hook-panel hook-nav-panel" id="navConsultPanel" hidden>
-      <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+      <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
       <div class="hook-panel-text">
-        <strong>扫码加微信，免费咨询</strong>
+        <strong>扫码加企业微信，免费咨询</strong>
         <span>添加时备注「自检」，我尽快回复。免费先聊，不推销。</span>
         <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
       </div>
@@ -247,9 +247,9 @@
             <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
             <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">免费 AI 管理咨询：画出一项高频工作的现状流程 →</button>
             <div class="hook-panel" id="diagPanel" hidden>
-              <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+              <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
               <div class="hook-panel-text">
-                <strong>扫码加微信，免费 AI 管理咨询</strong>
+                <strong>扫码加企业微信，免费 AI 管理咨询</strong>
                 <span>一起画出一项高频工作的现状流程，找出重复、等待、返工和责任模糊的位置，再决定最小试跑动作。添加时备注「自检」，我来安排时间。</span>
                 <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
               </div>
@@ -339,7 +339,7 @@
     bindOpts('#step2', 'sel2', '#to3');
     bindOpts('#step3', 'sel3', '#submit');
 
-    // 预约诊断：点击展开微信二维码（替代 mailto，移动端可靠）
+    // 预约诊断：点击展开企业微信二维码（替代 mailto，移动端可靠）
     (function () {
       var cta = qs('#diagCta');
       var panel = qs('#diagPanel');
@@ -360,7 +360,7 @@
       if (state.task1.length > 0 && state.sel1) qs('#to2').disabled = false;
     });
 
-    // 导航免费咨询：展开微信二维码（复用 hook-cta.js 逻辑）
+    // 导航免费咨询：展开企业微信二维码（复用 hook-cta.js 逻辑）
     (function () {
       var cta = document.querySelector('.nav-cta[data-hook-cta]');
       var panel = document.getElementById('navConsultPanel');
