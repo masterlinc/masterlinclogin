@@ -1,7 +1,7 @@
 // ============================================================================
 // api/lead.js — Vercel Serverless Function
 // selfcheck.html 邮箱线索收集代理：浏览器 POST /api/lead → 服务端写入飞书多维表格
-//                                                   → 成功后自动发送《管理者 AI 自检配套资料》到访客邮箱
+//                                                   → 成功后自动发送《自检结果入门包》到访客邮箱
 //
 // 安全说明：
 //   - App Secret / app_token / table_id / 邮件令牌一律从 Vercel 环境变量读取，绝不硬编码进代码或提交 git
@@ -75,10 +75,12 @@ async function writeRecord(fields) {
 // ---------- 邮件：飞书邮件 API（全国内） ----------
 
 // 附件清单：必须与 deliverables/ 目录实际文件名一致
+// v1.10.0 业务逻辑重构：自检页免费区改为《自检结果入门包》（起步包三件套）；
+// ¥29 完整工具包（方法手册+四栏模板+复查清单）为人工发货（微信收款后手动发），不经由此接口自动发。
 const DELIVERABLES = [
-  { file: 'AI会议闭环四栏方法手册.pdf', type: 'application/pdf', name: 'AI会议闭环四栏方法手册.pdf' },
-  { file: '会议闭环四栏模板.md', type: 'text/markdown', name: '会议闭环四栏模板.md' },
-  { file: '3-真实现场案例.md', type: 'text/markdown', name: '3-真实现场案例.md' },
+  { file: '起步包-自检结果行动卡.md', type: 'text/markdown', name: '起步包-自检结果行动卡.md' },
+  { file: '起步包-会前三问清单.md', type: 'text/markdown', name: '起步包-会前三问清单.md' },
+  { file: '起步包-7天验证表.md', type: 'text/markdown', name: '起步包-7天验证表.md' },
 ];
 
 // 解析 deliverables 目录绝对路径（兼容 Vercel 打包后的 cwd 与 __dirname 两种布局）
@@ -113,17 +115,17 @@ function loadDeliverables() {
   });
 }
 
-// 组装邮件正文（凌客风格 · 300 字内 · 欢迎 + 资料 + 1 个轻钩子）
+// 组装邮件正文（凌客风格 · 欢迎 + 入门包三件套 + 1 个升级钩子）
 function buildEmailText() {
   return [
     '凌：',
     '',
-    '你刚在 masterlinc.com 做完「管理者 AI 自检」，这份配套资料已发到你的邮箱，先拿着。',
+    '你刚在 masterlinc.com 做完「管理者 AI 自检」，这份《自检结果入门包》已发到你的邮箱，先拿着。',
     '',
-    '📎 三个附件',
-    '1. 《AI 会议闭环四栏方法手册》PDF——五步落地清单',
-    '2. 会议闭环四栏模板（可直接复制使用）',
-    '3. 3 个真实现场案例（脱敏）',
+    '📎 三个附件（起步包）',
+    '1. 自检结果行动卡——把「最该让 AI 先动手的那一件」落到第一步',
+    '2. 会前三问清单——开会前 1 分钟，直接照着问',
+    '3. 7 天验证表——一周内每天勾一次，看变化',
     '',
     '先说明白一件事：自检会告诉你「最该让 AI 先动手的是哪一件」，但它没告诉你的是——大多数人卡住，不是不会用 AI，而是那件最该改的事，恰恰是他最不想碰的。',
     '',
@@ -133,6 +135,8 @@ function buildEmailText() {
     '',
     '你上周，有没有一场会、一份周报，是开完/写完都知道浪费、但不得不做的？它叫什么名字？有多久？',
     '',
+    '想要完整方法手册与会议四栏模板，见下方 ¥29 完整工具包。',
+    '',
     '——凌',
     '在路上的 AI 管理博士',
     'masterlinc.com',
@@ -140,7 +144,7 @@ function buildEmailText() {
 }
 
 /**
- * 发送《管理者 AI 自检配套资料》邮件（飞书邮件 API）
+ * 发送《自检结果入门包》邮件（飞书邮件 API）
  * @param {string} to 访客邮箱
  * @returns {Promise<{sent: boolean, skipped?: boolean}>}
  *  - 未配置发信令牌 → 跳过发送（skipped），不抛错
@@ -157,7 +161,7 @@ async function sendMaterialsEmail(to) {
   const attachments = loadDeliverables();
 
   const payload = {
-    subject: '你的《管理者 AI 自检配套资料》已到',
+    subject: '你的《自检结果入门包》已到',
     to: [{ mail_address: to }],
     body_plain_text: buildEmailText(),
     attachments,
