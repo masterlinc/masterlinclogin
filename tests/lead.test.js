@@ -17,12 +17,60 @@ let feishuMailCalls = [];
 let feishuMailBehavior = { status: 200, body: { code: 0, data: { message_id: 'om_mock_1' } } };
 let oauthCalls = [];
 
+// mock 多维表格（token 表）：内存状态机
+let tokenTable = { tableId: 'mock-token-table', exists: true, records: [] };
+let tokenRecordSeq = 0;
+let tokenWriteFail = false; // 模拟写回失败
+
+function tokenTableMock(path, opts) {
+  const method = (opts && opts.method) || 'GET';
+  // 表列表 / 创建表
+  if (/\/tables$/.test(path)) {
+    if (method === 'GET') {
+      return { status: 200, json: async () => ({ code: 0, data: { items: tokenTable.exists ? [{ table_id: tokenTable.tableId, name: 'mail_token' }] : [] } }) };
+    }
+    if (method === 'POST') {
+      tokenTable.exists = true;
+      tokenTable.tableId = 'mock-token-table';
+      return { status: 200, json: async () => ({ code: 0, data: { table_id: tokenTable.tableId } }) };
+    }
+  }
+  // 记录：读取 / 创建 / 更新（仅 token 表，tableId 为 mock-token-table）
+  if (path.includes('/tables/mock-token-table/records')) {
+    if (method === 'GET') {
+      return { status: 200, json: async () => ({ code: 0, data: { items: tokenTable.records } }) };
+    }
+    if (method === 'POST') {
+      if (tokenWriteFail) {
+        return { status: 200, json: async () => ({ code: 1254044, msg: 'mock write fail' }) };
+      }
+      const fields = JSON.parse(opts.body).fields;
+      const rec = { record_id: 'token-rec-' + (++tokenRecordSeq), fields };
+      tokenTable.records.push(rec);
+      return { status: 200, json: async () => ({ code: 0, data: { record: rec } }) };
+    }
+    if (method === 'PUT') {
+      if (tokenWriteFail) {
+        return { status: 200, json: async () => ({ code: 1254044, msg: 'mock write fail' }) };
+      }
+      const fields = JSON.parse(opts.body).fields;
+      const rid = path.split('/').pop();
+      const rec = tokenTable.records.find((r) => r.record_id === rid) || { record_id: rid };
+      rec.fields = fields;
+      if (!tokenTable.records.find((r) => r.record_id === rid)) tokenTable.records.push(rec);
+      return { status: 200, json: async () => ({ code: 0, data: { record: rec } }) };
+    }
+  }
+  // 其它 bitable 请求（线索表等）：通用成功
+  return { status: 200, json: async () => ({ code: 0, data: { record: { record_id: 'mock-rec-1' } } }) };
+}
+
 async function mockFetch(url, opts) {
   if (url.includes('/auth/v3/tenant_access_token')) {
     return { status: 200, json: async () => ({ code: 0, tenant_access_token: 'mock-tenant-token', expire: 7200 }) };
   }
   if (url.includes('/bitable/v1/apps/')) {
-    return { status: 200, json: async () => ({ code: 0, data: { record: { record_id: 'mock-rec-1' } } }) };
+    return tokenTableMock(new URL(url).pathname, opts);
   }
   if (url.includes('accounts.feishu.cn/oauth/v3/token')) {
     oauthCalls.push({ url, opts });
@@ -64,6 +112,9 @@ function reset() {
   feishuMailCalls = [];
   oauthCalls = [];
   feishuMailBehavior = { status: 200, body: { code: 0, data: { message_id: 'om_mock_1' } } };
+  tokenTable = { tableId: 'mock-token-table', exists: true, records: [] };
+  tokenRecordSeq = 0;
+  tokenWriteFail = false;
   global.fetch = mockFetch; // 必须挂到全局，api/lead.js 用的是内置 fetch
 }
 
@@ -71,6 +122,8 @@ function reset() {
 reset();
 
 function loadHandler() {
+  // 必须同时清 lib 模块缓存（含 mailTokenCache），否则用例间 token 缓存残留
+  delete require.cache[require.resolve('../lib/feishu-token.js')];
   delete require.cache[require.resolve('../api/lead.js')];
   return require('../api/lead.js');
 }
@@ -169,7 +222,53 @@ async function run() {
   assert.ok(url5.includes(encodeURIComponent('ling@dcnzcdpxknwp.feishu.cn')), '用例5: URL 应使用自定义发件邮箱');
   console.log('✅ 用例5 通过：自定义发件邮箱生效');
 
-  console.log('\n🎉 全部 5 个用例通过');
+  // 用例 6：refresh_token 刷新后写回多维表格（保活核心）
+  reset();
+  setBaseEnv();
+  process.env.FEISHU_MAIL_REFRESH_TOKEN = 'mock-refresh-1';
+  delete process.env.FEISHU_MAIL_USER_ACCESS_TOKEN;
+  const handler6 = loadHandler();
+  const res6 = makeRes();
+  await handler6(makeReq({ email: 'visitor6@example.com' }), res6);
+  assert.strictEqual(res6.body.ok, true, '用例6: ok 应为 true');
+  assert.strictEqual(res6.body.emailSent, true, '用例6: emailSent 应为 true');
+  assert.strictEqual(tokenTable.records.length, 1, '用例6: 应写回 1 条 token 记录');
+  assert.strictEqual(tokenTable.records[0].fields.refresh_token, 'mock-refresh-2', '用例6: 表格应存新 refresh_token');
+  assert.ok(tokenTable.records[0].fields.updated_at > 0, '用例6: 应记录 updated_at 时间戳');
+  console.log('✅ 用例6 通过：刷新后新 refresh_token 写回多维表格');
+
+  // 用例 7：表格已有 token 时优先用它（不用 env）
+  reset();
+  setBaseEnv();
+  process.env.FEISHU_MAIL_REFRESH_TOKEN = 'mock-refresh-stale'; // env 是旧值
+  delete process.env.FEISHU_MAIL_USER_ACCESS_TOKEN;
+  tokenTable.records = [{ record_id: 'token-rec-9', fields: { refresh_token: 'mock-refresh-table', updated_at: Date.now() } }];
+  const handler7 = loadHandler();
+  const res7 = makeRes();
+  await handler7(makeReq({ email: 'visitor7@example.com' }), res7);
+  assert.strictEqual(res7.body.ok, true, '用例7: ok 应为 true');
+  assert.strictEqual(res7.body.emailSent, true, '用例7: emailSent 应为 true');
+  const oauthBody7 = JSON.parse(oauthCalls[0].opts.body);
+  assert.strictEqual(oauthBody7.refresh_token, 'mock-refresh-table', '用例7: 应使用表格里的 refresh_token');
+  assert.strictEqual(tokenTable.records.length, 1, '用例7: 应更新同一条记录而非新增');
+  assert.strictEqual(tokenTable.records[0].fields.refresh_token, 'mock-refresh-2', '用例7: 更新后的新 token 写回');
+  console.log('✅ 用例7 通过：表格 token 优先于 env，刷新后原位更新');
+
+  // 用例 8：写回失败不阻断发信（保活兜底重试）
+  reset();
+  setBaseEnv();
+  process.env.FEISHU_MAIL_REFRESH_TOKEN = 'mock-refresh-1';
+  delete process.env.FEISHU_MAIL_USER_ACCESS_TOKEN;
+  tokenWriteFail = true;
+  const handler8 = loadHandler();
+  const res8 = makeRes();
+  await handler8(makeReq({ email: 'visitor8@example.com' }), res8);
+  assert.strictEqual(res8.body.ok, true, '用例8: ok 应为 true');
+  assert.strictEqual(res8.body.emailSent, true, '用例8: 写回失败不应影响发信');
+  assert.strictEqual(feishuMailCalls.length, 1, '用例8: 邮件应照常发送');
+  console.log('✅ 用例8 通过：表格写回失败不影响发信，保留旧值下次重试');
+
+  console.log('\n🎉 全部 8 个用例通过');
 }
 
 run().catch((err) => {

@@ -14,6 +14,12 @@
 //       FEISHU_MAIL_REFRESH_TOKEN  = <OAuth 授权后得到的 refresh_token（推荐，服务端自动刷新）>
 //       FEISHU_MAIL_USER_ACCESS_TOKEN = <OAuth 授权后得到的 user_access_token（可选，临时）>
 //       FEISHU_MAIL_SENDER         = <发件邮箱地址；默认 "me"（当前授权用户主邮箱）>
+//       FEISHU_KEEPALIVE_SECRET    = <可选，保活端点鉴权 secret（与 vercel.json cron 联动）>
+//
+// refresh_token 保活（v1.5.0）：
+//   每次刷新后把新 refresh_token 写回多维表格 mail_token 表（lib/feishu-token.js）；
+//   api/keepalive.js 每天由 Vercel Cron 触发一次强制续期 → 永不过期，无需每月重新授权。
+//   首次运行时表格无记录，自动用 env FEISHU_MAIL_REFRESH_TOKEN 初始化。
 //
 // 邮件方案：飞书邮件 API（全国内链路，零外部依赖，直接用 Node 内置 fetch）
 //   发送接口：POST /open-apis/mail/v1/user_mailboxes/:user_mailbox_id/messages/send
@@ -21,96 +27,23 @@
 //   附件格式：attachment[]{ body(base64url), filename }
 // 未配置发信令牌时自动跳过发送（skipped），飞书线索照常落库，前端永远 ok。
 //
-// Vercel 自动把 /api 目录识别为 Serverless Functions，无需 vercel.json。
+// Vercel 自动把 /api 目录识别为 Serverless Functions；vercel.json 仅用于 Cron（每天保活一次）。
 // ============================================================================
 
 const FEISHU_BASE = 'https://open.feishu.cn/open-apis';
-const FEISHU_OAUTH_BASE = 'https://accounts.feishu.cn/oauth/v3/token';
 
-// ---------- 飞书：tenant_access_token（缓存 7000 秒，token 有效期 2 小时） ----------
-let tokenCache = null;
-
-async function getTenantAccessToken() {
-  const now = Date.now();
-  if (tokenCache && tokenCache.expiresAt > now) {
-    return tokenCache.token;
-  }
-
-  const appId = process.env.FEISHU_APP_ID;
-  const appSecret = process.env.FEISHU_APP_SECRET;
-  if (!appId || !appSecret) {
-    throw new Error('FEISHU_APP_ID / FEISHU_APP_SECRET 未配置');
-  }
-
-  const res = await fetch(`${FEISHU_BASE}/auth/v3/tenant_access_token/internal`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ app_id: appId, app_secret: appSecret }),
-  });
-  const data = await res.json().catch(() => ({}));
-
-  if (!data || data.code !== 0 || !data.tenant_access_token) {
-    const msg = (data && data.msg) ? data.msg : 'HTTP ' + res.status;
-    throw new Error('获取 tenant_access_token 失败: ' + msg);
-  }
-
-  const expiresAt = Date.now() + Math.max(60, (data.expire || 7200) - 200) * 1000;
-  tokenCache = { token: data.tenant_access_token, expiresAt };
-  return data.tenant_access_token;
-}
+// 飞书 refresh_token 保活存储（多维表格方案）：负责 OAuth 刷新 + 新 refresh_token 写回表格
+const { getTenantAccessToken, obtainUserMailToken } = require('../lib/feishu-token.js');
 
 // ---------- 飞书：user_access_token（OAuth 用户身份，用于发信） ----------
-let mailTokenCache = null;
-
 /**
- * 获取发信用的 user_access_token。
- * 优先用 refresh_token 自动刷新（推荐，长期有效）；否则直接用 user_access_token（约 2 小时有效）。
+ * 获取发信用的 user_access_token（保活版）。
+ * 链路：表格里读 refresh_token（首次用 env FEISHU_MAIL_REFRESH_TOKEN）→ OAuth 刷新
+ *       → 新 refresh_token 写回多维表格 → 缓存 user token。
  * 未配置任何令牌 → 返回 null（上层跳过发送，不影响飞书线索）。
  */
 async function getUserMailToken() {
-  const now = Date.now();
-  if (mailTokenCache && mailTokenCache.expiresAt > now) {
-    return mailTokenCache.token;
-  }
-
-  const appId = process.env.FEISHU_APP_ID;
-  const appSecret = process.env.FEISHU_APP_SECRET;
-  const refreshToken = process.env.FEISHU_MAIL_REFRESH_TOKEN;
-  const accessToken = process.env.FEISHU_MAIL_USER_ACCESS_TOKEN;
-
-  if (!appId || !appSecret) {
-    throw new Error('FEISHU_APP_ID / FEISHU_APP_SECRET 未配置');
-  }
-
-  // 1) 有 refresh_token → 刷新 user_access_token（refresh_token 用一次即作废，响应里会给新的）
-  if (refreshToken) {
-    const res = await fetch(FEISHU_OAUTH_BASE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({
-        grant_type: 'refresh_token',
-        client_id: appId,
-        client_secret: appSecret,
-        refresh_token: refreshToken,
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!data || data.code !== 0 || !data.access_token) {
-      const msg = (data && data.msg) ? data.msg : 'HTTP ' + res.status;
-      throw new Error('刷新 user_access_token 失败: ' + msg);
-    }
-    const expiresIn = data.expires_in || 7200;
-    mailTokenCache = { token: data.access_token, expiresAt: Date.now() + Math.max(60, expiresIn - 300) * 1000 };
-    return data.access_token;
-  }
-
-  // 2) 有 user_access_token → 直接用（无法自动续期，接近过期时由外层报错并跳过）
-  if (accessToken) {
-    mailTokenCache = { token: accessToken, expiresAt: Date.now() + 50 * 60 * 1000 }; // 保守 50 分钟
-    return accessToken;
-  }
-
-  return null; // 未配置发信令牌
+  return obtainUserMailToken();
 }
 
 // ---------- 飞书：多维表格写入（不变） ----------
