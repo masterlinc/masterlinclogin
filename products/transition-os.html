@@ -47,6 +47,17 @@
     select { -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23a8a8a5' fill='none' stroke-width='1.6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
     .hide { display: none !important; }
 
+    /* 云备份开关（switch） */
+    .switch-row { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; font-size: 14px; color: var(--sub); }
+    .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; inset: 0; background: var(--line); border-radius: 24px; transition: .2s; }
+    .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+    .switch input:checked + .slider { background: var(--green); }
+    .switch input:checked + .slider:before { transform: translateX(20px); }
+    .cloud-backup-box { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--card2); margin-bottom: 4px; }
+    .cloud-backup-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+
     .app { max-width: 720px; margin: 0 auto; padding: 0 16px 110px; }
     .topbar { display: flex; align-items: center; justify-content: space-between; padding: 22px 2px 18px; }
     .brand { display: flex; align-items: center; gap: 12px; }
@@ -324,7 +335,74 @@
   function save(d) { try { localStorage.setItem(LS_KEY, JSON.stringify(d)); } catch (e) { toast('存储失败：空间不足或浏览器限制'); } }
 
   var db = load();
-  function persist() { save(db); }
+
+  /* ================= 云备份（飞书多维表格 · 自动实时） =================
+   * 目标：用户零手动操作，数据自动备份到云端（飞书）+ 本地镜像（Obsidian）。
+   * 机制：每次 persist() → save 本地后 3 秒节流合并 → POST /api/backup
+   *       服务端写入飞书 transition_backup 表。网络失败静默，本地数据不受影响，
+   *       下次 persist 自动重试；云端备份成功后把状态写回 meta（直接 save，不触发再备份）。
+   * 隐私：数据含个人产出，飞书表格有权限保护；前端不暴露任何凭证，只同域调 /api/backup。
+   */
+  var BACKUP_API = '/api/backup';
+  var BACKUP_USER_ID = 'masterlinc';
+  var BACKUP_VERSION = '1.6.0';
+  var BACKUP_DEBOUNCE_MS = 3000; // 3 秒内合并多次 persist 为一次上传
+  var backupTimer = null;
+  var backupInFlight = false;
+
+  function scheduleBackup() {
+    if (db.meta.cloudBackupDisabled) return;
+    if (backupTimer) clearTimeout(backupTimer);
+    backupTimer = setTimeout(flushBackup, BACKUP_DEBOUNCE_MS);
+  }
+  function flushBackup() {
+    backupTimer = null;
+    if (backupInFlight) return; // 上一次还在传，等下次 persist 再触发
+    doBackup();
+  }
+  function doBackup() {
+    if (!db || !db.user || backupInFlight) return;
+    backupInFlight = true;
+    var payload = { db: db, userId: BACKUP_USER_ID, version: BACKUP_VERSION, ts: Date.now() };
+    fetch(BACKUP_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true // 页面关闭时也尽量发出
+    }).then(function (r) { return r.json().catch(function () { return {}; }); })
+      .then(function (data) {
+        backupInFlight = false;
+        if (data && data.ok) {
+          db.meta.lastCloudBackupAt = nowISO();
+          db.meta.lastCloudBackupType = data.snapshotType || 'full';
+          db.meta.cloudBackupStatus = 'ok';
+          if (data.truncated) toast('云端备份完成（数据量大，已存核心摘要）');
+        } else {
+          db.meta.cloudBackupStatus = 'failed';
+          db.meta.lastCloudBackupFailAt = nowISO();
+        }
+        save(db); // 直接 save，不触发 scheduleBackup，避免循环
+      })
+      .catch(function () {
+        backupInFlight = false;
+        db.meta.cloudBackupStatus = 'offline';
+        db.meta.lastCloudBackupFailAt = nowISO();
+        save(db); // 静默失败：本地数据正常，下次 persist 自动重试
+      });
+  }
+
+  function persist() { save(db); scheduleBackup(); }
+
+  function cloudBackupStatusText() {
+    if (db.meta.cloudBackupDisabled) return '自动备份已关闭，可在下方重新开启。';
+    var s = db.meta.cloudBackupStatus;
+    var at = db.meta.lastCloudBackupAt;
+    var t = at ? at.slice(0, 16).replace('T', ' ') : '从未备份';
+    if (s === 'ok') return '上次云端备份：' + t + ' · 已自动存入飞书';
+    if (s === 'offline') return '上次云端备份未成功：' + t + '（离线或服务不可用；本地数据不受影响，下次自动重试）';
+    if (s === 'failed') return '上次云端备份失败：' + t + '（本地数据不受影响）';
+    return '尚未执行过云端备份。';
+  }
 
   function lastSessionDate() {
     var best = null;
@@ -1136,7 +1214,17 @@
 
     h += '<div class="card"><div class="card-title">备份与恢复</div>';
     h += '<p class="card-sub" style="margin-bottom:14px;">' + (db.meta.lastExportAt ? '上次导出：' + prettyDate(db.meta.lastExportAt.slice(0, 10)) : '从未导出过备份') + '</p>';
-    h += '<div class="btn-row"><button class="btn" data-action="export-backup">导出 JSON 备份</button></div>';
+
+    // 云端自动备份（飞书）：零手动操作，persist 后自动上传
+    h += '<div class="cloud-backup-box">';
+    h += '<div class="cloud-backup-title">☁ 云端自动备份（飞书）</div>';
+    h += '<p class="card-sub" style="margin-bottom:8px;">' + cloudBackupStatusText() + '</p>';
+    h += '<label class="switch-row"><span class="switch-label">自动备份</span><span class="switch"><input type="checkbox" id="cloudBackupToggle"' + (db.meta.cloudBackupDisabled ? '' : ' checked') + '><span class="slider"></span></span></label>';
+    h += '<div class="btn-row" style="margin-top:10px;"><button class="btn" data-action="cloud-backup-now">立即备份到云端</button></div>';
+    h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="cloud-restore">从云端恢复</button></div>';
+    h += '</div>';
+
+    h += '<div class="btn-row" style="margin-top:14px;"><button class="btn" data-action="export-backup">导出 JSON 备份</button></div>';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="import-backup">导入恢复备份</button></div>';
     h += '<input type="file" id="importFile" accept=".json,application/json" class="hide">';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="reset-data">重置全部数据</button></div>';
@@ -1172,6 +1260,46 @@
       } catch (e) { toast('导入失败：不是有效的备份文件'); }
     };
     reader.readAsText(file);
+  }
+
+  // 从云端（飞书 transition_backup 表）读取最新快照并覆盖本地。需要恢复口令
+  // （= 服务端环境变量 BACKUP_READ_KEY），口令不写入前端代码，只在用户输入时使用。
+  function cloudRestore() {
+    var mask = openModal(
+      '<p class="muted" style="font-size:14px;margin-bottom:10px;">读取飞书云端的最新备份，覆盖当前本地数据（换设备 / 数据丢失时使用）。需要输入恢复口令。</p>' +
+      '<div class="field"><label class="field-label" for="restoreKey">恢复口令</label><input id="restoreKey" type="password" placeholder="服务端 BACKUP_READ_KEY" autocomplete="off"></div>' +
+      '<div class="field"><label class="field-label" for="restoreUser">用户标识</label><input id="restoreUser" value="' + BACKUP_USER_ID + '" placeholder="' + BACKUP_USER_ID + '"></div>' +
+      '<div class="btn-row"><button class="btn" id="restoreDo">读取并覆盖</button><button class="btn-ghost" data-action="modal-close">取消</button></div>'
+    );
+    modalTitle('从云端恢复');
+    $id('restoreDo').addEventListener('click', function () {
+      var key = $id('restoreKey').value.trim();
+      var u = $id('restoreUser').value.trim() || BACKUP_USER_ID;
+      if (!key) { toast('请输入恢复口令'); return; }
+      fetch(BACKUP_API + '?op=latest&userId=' + encodeURIComponent(u), {
+        headers: { 'x-backup-key': key }
+      })
+        .then(function (r) { return r.json().catch(function () { return {}; }); })
+        .then(function (data) {
+          if (!data || !data.ok || !data.data) {
+            toast(data && data.message ? '云端读取失败：' + data.message : '云端读取失败');
+            return;
+          }
+          var snapshot = null;
+          try { snapshot = JSON.parse(data.data.snapshot); } catch (e) { snapshot = null; }
+          if (!snapshot || !snapshot.user) { toast('云端快照格式异常'); return; }
+          var backupTime = data.data.backupTime ? new Date(data.data.backupTime).toLocaleString() : '未知时间';
+          var summary = data.data.summary || '';
+          closeModal();
+          confirmModal('覆盖确认', '将用云端快照（' + backupTime + '）覆盖本地数据。\n' + esc(summary) + '\n\n确认继续？', '覆盖', function () {
+            db = normalize(snapshot);
+            persist(); // 恢复后自动触发一次新备份，正常
+            render();
+            toast('已从云端恢复');
+          });
+        })
+        .catch(function () { toast('网络错误，无法连接云端'); });
+    });
   }
   function confirmModal(title, text, yesLabel, onYes) {
     var mask = openModal('<p class="muted" style="font-size:14px;margin-bottom:18px;">' + esc(text) + '</p><div class="btn-row"><button class="btn" id="confirmYes">' + esc(yesLabel) + '</button><button class="btn-ghost" data-action="modal-close">取消</button></div>');
@@ -1257,6 +1385,8 @@
       case 'review-range': reviewRange = el.getAttribute('data-r'); render(); break;
       case 'export-backup': exportBackup(); break;
       case 'import-backup': $id('importFile').click(); break;
+      case 'cloud-backup-now': doBackup(); break;
+      case 'cloud-restore': cloudRestore(); break;
       case 'reset-data': resetData(); break;
       case 'goto-settings': location.hash = '#/settings'; break;
       case 'goto-mainline': location.hash = '#/mainline'; break;
@@ -1349,6 +1479,12 @@
   });
   document.addEventListener('change', function (e) {
     if (e.target.id === 'stageSelect') { db.user.stage = e.target.value; persist(); toast('阶段已更新为' + STAGE_CN[db.user.stage]); render(); }
+    if (e.target.id === 'cloudBackupToggle') {
+      db.meta.cloudBackupDisabled = !e.target.checked;
+      save(db); // 开关状态不触发备份，避免循环
+      if (e.target.checked) { scheduleBackup(); toast('自动云端备份已开启'); render(); }
+      else toast('自动云端备份已关闭（本地数据仍正常）');
+    }
     if (e.target.id === 'importFile' && e.target.files && e.target.files[0]) importBackup(e.target.files[0]);
   });
 
