@@ -251,6 +251,7 @@
     .pro-steps b { color: var(--text); }
     .pro-steps code { font-size: 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; }
     .pro-ok { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--yellow); margin-bottom: 6px; }
+    .pro-coming { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 650; color: var(--sub); border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; margin: 2px 0 4px; }
     .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .type-toggle button { border: 1px solid var(--line); border-radius: 10px; padding: 11px; text-align: center; font-size: 14px; min-height: 44px; color: var(--sub); background: var(--card2); }
     .type-toggle button.active { border-color: var(--text); background: #141414; color: var(--text); font-weight: 700; }
@@ -1344,24 +1345,17 @@
     h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
     h += '</div>';
 
-    // 阶段一：升级 Pro（人工解锁流程，验证期不公开售卖）
-    h += '<div class="card' + (isPro() ? ' pro-card' : '') + '"><div class="card-title">' + (isPro() ? '⭐ 已解锁 Pro' : '升级 Pro') + '</div>';
+    // 阶段一：升级 Pro（闸门纪律：验证期不公开报价；免费版完整可用，Pro 敬请期待）
+    h += '<div class="card' + (isPro() ? ' pro-card' : '') + '"><div class="card-title">' + (isPro() ? '⭐ 已解锁 Pro' : 'Pro 版本') + '</div>';
     if (isPro()) {
       h += '<p class="pro-ok">✓ 已解锁 Pro</p>';
       h += '<p class="card-sub" style="margin-bottom:10px;">当前阶段 Pro 权益（功能将随迭代陆续上线，核心循环始终免费）：</p>';
       h += '<ul class="pro-perks"><li>看板完整版（趋势图 / 母线检查 / 资产增长 / 留存统计）</li><li>多设备同步（邮箱登录后任意设备）</li><li>报告导出（周报 / 月报 Markdown / PDF）</li></ul>';
       if (db.user.planNote) h += '<p class="privacy-note">解锁备注：' + esc(db.user.planNote) + '</p>';
     } else {
-      h += '<p class="card-sub" style="margin-bottom:8px;">核心循环（红黄绿日 / 今日动作 / 记录 / 母线 / 复盘）永远免费。Pro 解锁「积累与洞察」：</p>';
-      h += '<ul class="pro-perks"><li>看板完整版（趋势图 / 母线检查 / 资产增长 / 留存统计）</li><li>多设备同步（邮箱登录后任意设备）</li><li>报告导出（周报 / 月报 Markdown / PDF）</li></ul>';
-      h += '<p class="pro-price">¥99/月 或 ¥699/年</p>';
-      h += '<div class="pro-qr-row">';
-      h += '<div class="pro-qr-box"><img src="/pay-qr.png" alt="微信收款码"><span>微信扫码付款</span></div>';
-      h += '<div class="pro-steps"><p>1. 扫码付款 ¥99/月（或 ¥699/年）</p><p>2. 付款留言：<b>转型Pro+你的设备码</b></p><p>3. 你的设备码：<code>' + esc(db.user.id) + '</code> <button class="btn btn-sm" data-action="copy-device-id">复制</button></p><p>4. 24 小时内人工核对解锁</p></div>';
-      h += '</div>';
-      h += '<div class="field"><label class="field-label" for="proKeyInput">输入解锁码（付款后由我们发放）</label>';
-      h += '<input id="proKeyInput" placeholder="如 PRO-2026-001" autocomplete="off"></div>';
-      h += '<div class="btn-row"><button class="btn" data-action="unlock-pro">解锁 Pro</button></div>';
+      // 免费用户：不展示价格 / 收款码 / 付款流程 / 解锁码（闸门未过前不公开报价）
+      h += '<p class="card-sub" style="margin-bottom:8px;">核心循环（红黄绿日 / 今日动作 / 记录 / 母线 / 复盘）永远免费。</p>';
+      h += '<p class="pro-coming">🛠 Pro 版本建设中 · 敬请期待</p>';
     }
     h += '</div>';
 

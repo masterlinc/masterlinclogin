@@ -637,6 +637,20 @@ img { display: block; width: 100%; }
   letter-spacing: 0.08em;
 }
 
+.post-enterprise {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 0;
+  padding: 6px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
 .post-body {
   max-width: 700px;
   margin: 0 auto;
