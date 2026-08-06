@@ -72,7 +72,18 @@
       width: 40px; height: 40px; border-radius: 12px; background: var(--text); color: var(--bg);
       display: inline-flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 800; letter-spacing: -1px;
       flex-shrink: 0;
+      text-decoration: none; /* 作为返回主页链接时去掉下划线 */
     }
+    a.brand-mark:hover { opacity: 0.85; }
+    a.brand-mark:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; border-radius: 12px; }
+    .home-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 13px; color: var(--dim); text-decoration: none;
+      padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px;
+      min-height: 36px; transition: color 150ms ease, border-color 150ms ease;
+    }
+    .home-link:hover { color: var(--text); border-color: var(--line-soft); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
     .brand-name { font-size: 17px; font-weight: 750; line-height: 1.2; }
     .brand-sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-top: 2px; }
     /* 阶段一：plan 徽章（顶部，不打扰） */
@@ -348,13 +359,16 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <span class="brand-mark">◤</span>
+        <a class="brand-mark" href="/#top" aria-label="返回 masterlinc.com 主页" title="返回主页">◤</a>
         <div>
           <div class="brand-name">转型操作系统<span class="plan-badge" id="planBadge">免费版</span></div>
           <div class="brand-sub">Transition OS</div>
         </div>
       </div>
-      <div class="top-date" id="topDate"></div>
+      <div class="topbar-right">
+        <a class="home-link" href="/#top">← 返回主页</a>
+        <div class="top-date" id="topDate"></div>
+      </div>
     </header>
 
     <main>
