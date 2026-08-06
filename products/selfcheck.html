@@ -101,9 +101,12 @@
     .pay-btn { display: inline-flex; align-items: center; gap: 8px; background: #f4f3ef; color: #050505; border-radius: 10px; padding: 13px 24px; font-size: 15px; font-weight: 700; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease; }
     .pay-btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .pay-note { font-size: 12px; color: #666; margin-top: 12px; }
-    .pay-qr-row { display: flex; gap: 20px; margin-top: 18px; flex-wrap: wrap; }
-    .pay-qr-item { text-align: center; font-size: 12px; color: #888; }
-    .pay-qr-item img { width: 132px; height: 156px; border-radius: 8px; border: 1px solid #2a2a28; margin-bottom: 6px; display: block; object-fit: cover; }
+    .pay-qr-guide { margin-top: 14px; font-size: 13px; font-weight: 650; color: #f4f3ef; text-align: center; line-height: 1.6; }
+    .pay-qr-row { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 14px; }
+    .pay-qr-item { text-align: center; font-size: 12px; color: #888; max-width: 100%; }
+    .pay-qr-item img { display: block; margin: 0 auto 8px; border-radius: 8px; border: 1px solid #2a2a28; object-fit: contain; background: #fff; }
+    .pay-qr-item.pay-main img { width: 220px; height: 260px; }
+    .pay-qr-item.pay-sub img { width: 140px; height: 140px; }
     @media (max-width: 560px) { .pay-row { flex-direction: column; align-items: flex-start; } }
 
     /* 免费资料 · 线索捕获 */
@@ -296,9 +299,10 @@
             <div class="pay-row">
               <span class="pay-price">¥29 <small>一次买断 · 微信付款 · 24 小时内人工核对发货</small></span>
             </div>
+            <p class="pay-qr-guide">微信扫一扫 → 先对准上方「收款码」付款，再扫下方「公众号码」关注</p>
             <div class="pay-qr-row">
-              <div class="pay-qr-item"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「完整工具包」</span></div>
-              <div class="pay-qr-item"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「完整工具包」</span></div>
+              <div class="pay-qr-item pay-main"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「完整工具包」</span></div>
+              <div class="pay-qr-item pay-sub"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「完整工具包」</span></div>
             </div>
             <p class="pay-note">付款后把截图发给公众号/微信，24 小时内人工核对发货（发货时同步邀请进群）。免费入门包解决「知道方向」，完整工具包解决「拿到方法」——如果你要的是可直接用的全套交付物，这里才是完整的那一份。</p>
           </div>
