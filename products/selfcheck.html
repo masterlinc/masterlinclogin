@@ -71,6 +71,21 @@
     .hook h3 { font-size: 17px; font-weight: 750; margin-bottom: 10px; }
     .hook p { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 16px; }
     .hook a { color: #f4f3ef; text-decoration: underline; text-underline-offset: 3px; }
+    .hook-cta { display: inline-block; background: #f4f3ef; color: #050505; border: none; border-radius: 10px; padding: 12px 20px; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none; transition: opacity 150ms ease, transform 150ms ease; }
+    .hook-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+    .hook-cta:focus-visible { outline: 2px solid #f4f3ef; outline-offset: 2px; }
+    .hook-panel { margin-top: 16px; padding: 16px; border: 1px solid #2a2a28; border-radius: 12px; background: #0b0b0b; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .hook-panel[hidden] { display: none; }
+    .hook-qr-img { width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #2a2a28; display: block; flex-shrink: 0; }
+    .hook-panel-text { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #a8a8a5; line-height: 1.7; min-width: 0; flex: 1; }
+    .hook-panel-text strong { font-size: 15px; color: #f4f3ef; margin-bottom: 2px; }
+    .hook-fallback { margin-top: 4px; }
+    .hook-fallback a { color: #f4f3ef; }
+    @media (max-width: 480px) {
+      .hook-panel { flex-direction: column; align-items: center; text-align: center; }
+      .hook-qr-img { width: 176px; height: 176px; }
+      .hook-panel-text { align-items: center; }
+    }
 
     /* 付费进阶版 */
     .paybox { margin-top: 22px; border: 1px solid #3a3a38; border-radius: 16px; padding: 24px; background: linear-gradient(180deg, #101010 0%, #0b0b0b 100%); }
@@ -220,7 +235,15 @@
           <div class="hook no-print">
             <h3>自检只是第一步</h3>
             <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
-            <a href="mailto:lincyang@foxmail.com?subject=%E7%AE%A1%E7%90%86%E8%80%85AI%E8%87%AA%E6%A3%80%EF%BC%9A%E6%83%B3%E7%BA%A630%E5%88%86%E9%92%9F%E8%AF%8A%E6%96%AD">约一次 30 分钟诊断（免费先聊）→</a>
+            <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">约一次 30 分钟诊断（免费先聊）→</button>
+            <div class="hook-panel" id="diagPanel" hidden>
+              <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
+              <div class="hook-panel-text">
+                <strong>扫码加微信，约 30 分钟诊断</strong>
+                <span>添加时备注「自检诊断」，我来安排时间。免费先聊，不推销。</span>
+                <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+              </div>
+            </div>
           </div>
 
           <!-- 免费资料 · 线索捕获 -->
@@ -304,6 +327,18 @@
     bindOpts('#step1', 'sel1', '#to2');
     bindOpts('#step2', 'sel2', '#to3');
     bindOpts('#step3', 'sel3', '#submit');
+
+    // 预约诊断：点击展开微信二维码（替代 mailto，移动端可靠）
+    (function () {
+      var cta = qs('#diagCta');
+      var panel = qs('#diagPanel');
+      if (!cta || !panel) return;
+      cta.addEventListener('click', function () {
+        var willShow = panel.hidden;
+        panel.hidden = !willShow;
+        cta.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+      });
+    })();
 
     function updateProgress(pct) {
       qs('#progressFill').style.width = pct + '%';
