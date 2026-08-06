@@ -75,6 +75,14 @@
     }
     .brand-name { font-size: 17px; font-weight: 750; line-height: 1.2; }
     .brand-sub { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-top: 2px; }
+    /* 阶段一：plan 徽章（顶部，不打扰） */
+    .plan-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+      border: 1px solid var(--line); color: var(--sub); border-radius: 999px;
+      padding: 2px 9px; margin-left: 10px; vertical-align: 2px; white-space: nowrap;
+    }
+    .plan-badge.pro { border-color: var(--yellow); color: var(--yellow); }
     .top-date { text-align: right; font-size: 14px; color: var(--sub); line-height: 1.5; font-variant-numeric: tabular-nums; }
 
     .view { display: none; animation: fadeIn 200ms ease; }
@@ -222,6 +230,27 @@
     .field { margin-bottom: 14px; }
     .field-label { font-size: 14px; color: var(--sub); margin-bottom: 6px; display: block; }
     .field-hint { font-size: 14px; color: var(--dim); margin-top: 5px; line-height: 1.5; }
+    /* 阶段一：账号与 Pro（设置页） */
+    .device-row { display: flex; gap: 8px; align-items: center; }
+    .device-row code { flex: 1; min-width: 0; font-size: 12px; color: var(--sub); background: var(--card2); border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; word-break: break-all; }
+    .plan-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-size: 13px; color: var(--sub); }
+    .plan-chip.pro { border-color: var(--yellow); color: var(--yellow); }
+    .plan-chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
+    .plan-chip.pro .dot { background: var(--yellow); }
+    .privacy-note { font-size: 12px; color: var(--dim); line-height: 1.7; margin-top: 6px; }
+    .pro-card { border-color: rgba(242,177,60,0.4); }
+    .pro-price { font-size: 15px; font-weight: 700; margin: 4px 0 10px; }
+    .pro-perks { margin: 4px 0 12px; padding: 0; list-style: none; }
+    .pro-perks li { font-size: 13px; color: var(--sub); padding: 4px 0 4px 22px; position: relative; }
+    .pro-perks li:before { content: "✓"; position: absolute; left: 2px; color: var(--yellow); font-weight: 700; }
+    .pro-qr-row { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; margin: 12px 0 6px; }
+    .pro-qr-box { text-align: center; flex-shrink: 0; }
+    .pro-qr-box img { width: 132px; height: 156px; border-radius: 8px; border: 1px solid var(--line); object-fit: cover; display: block; }
+    .pro-qr-box span { display: block; font-size: 12px; color: var(--dim); margin-top: 6px; }
+    .pro-steps { flex: 1; min-width: 200px; font-size: 13px; color: var(--sub); line-height: 1.9; }
+    .pro-steps b { color: var(--text); }
+    .pro-steps code { font-size: 12px; background: var(--card2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; word-break: break-all; }
+    .pro-ok { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; color: var(--yellow); margin-bottom: 6px; }
     .type-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .type-toggle button { border: 1px solid var(--line); border-radius: 10px; padding: 11px; text-align: center; font-size: 14px; min-height: 44px; color: var(--sub); background: var(--card2); }
     .type-toggle button.active { border-color: var(--text); background: #141414; color: var(--text); font-weight: 700; }
@@ -320,7 +349,7 @@
       <div class="brand">
         <span class="brand-mark">◤</span>
         <div>
-          <div class="brand-name">转型操作系统</div>
+          <div class="brand-name">转型操作系统<span class="plan-badge" id="planBadge">免费版</span></div>
           <div class="brand-sub">Transition OS</div>
         </div>
       </div>
@@ -380,7 +409,7 @@
 
   function emptyDB() {
     return {
-      user: { id: uid(), name: 'masterlinc', stage: 'validate', createdAt: nowISO() },
+      user: { id: uid(), name: 'masterlinc', stage: 'validate', plan: 'free', email: '', planNote: '', createdAt: nowISO() },
       mainline: null,
       dailySessions: [],
       assets: [],
@@ -401,6 +430,9 @@
   function normalize(d) {
     if (!d.meta) d.meta = { lastExportAt: null, backupDismissDate: null, createdAt: nowISO() };
     if (!d.user) d.user = emptyDB().user;
+    if (!d.user.plan) d.user.plan = 'free';           // 阶段一：plan 开关（老数据迁移默认 free）
+    if (d.user.email == null) d.user.email = '';       // 阶段一：邮箱钩子（只存不验证）
+    if (!d.user.planNote) d.user.planNote = '';        // 阶段一：解锁备注
     if (!Array.isArray(d.dailySessions)) d.dailySessions = [];
     if (!Array.isArray(d.assets)) d.assets = [];
     if (!Array.isArray(d.evidences)) d.evidences = [];
@@ -411,6 +443,16 @@
 
   var db = load();
 
+  /* ================= 阶段一：plan 开关框架（免费/付费） =================
+   * db.user.plan = 'free' | 'pro'（默认 free，老数据迁移见 normalize）。
+   * isPro() 供所有需要判断权益的前端逻辑使用；PRO_KEYS 为验证期预置激活码，
+   * 付款后由 masterlinc 人工发放，用户输入匹配即解锁（验证期最简单方案）。
+   */
+  var PRO_KEYS = ['PRO-2026-001', 'PRO-2026-002', 'PRO-2026-003'];
+  function isPro() {
+    return !!(db.user && db.user.plan === 'pro');
+  }
+
   /* ================= 云备份（飞书多维表格 · 自动实时） =================
    * 目标：用户零手动操作，数据自动备份到云端（飞书）+ 本地镜像（Obsidian）。
    * 机制：每次 persist() → save 本地后 3 秒节流合并 → POST /api/backup
@@ -419,8 +461,12 @@
    * 隐私：数据含个人产出，飞书表格有权限保护；前端不暴露任何凭证，只同域调 /api/backup。
    */
   var BACKUP_API = '/api/backup';
-  var BACKUP_USER_ID = 'masterlinc';
-  var BACKUP_VERSION = '1.6.0';
+  // 阶段一：设备 ID 匿名 —— 备份标识改为 db.user.id（每浏览器首次生成，各设备数据独立），
+  // 不再共用硬编码 masterlinc；历史 legacy 备份保留，可在恢复框手动输入 masterlinc 找回。
+  function backupUserId() {
+    return (db && db.user && db.user.id) ? db.user.id : 'masterlinc';
+  }
+  var BACKUP_VERSION = '1.8.0';
   var BACKUP_DEBOUNCE_MS = 3000; // 3 秒内合并多次 persist 为一次上传
   var backupTimer = null;
   var backupInFlight = false;
@@ -438,7 +484,7 @@
   function doBackup() {
     if (!db || !db.user || backupInFlight) return;
     backupInFlight = true;
-    var payload = { db: db, userId: BACKUP_USER_ID, version: BACKUP_VERSION, ts: Date.now() };
+    var payload = { db: db, userId: backupUserId(), version: BACKUP_VERSION, ts: Date.now() };
     fetch(BACKUP_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1287,6 +1333,38 @@
     });
     h += '</select></div></div>';
 
+    // 阶段一：账号与身份（设备 ID 匿名 + 邮箱钩子 + plan 开关）
+    h += '<div class="card"><div class="card-title">账号与身份</div>';
+    h += '<p class="card-sub" style="margin-bottom:12px;">当前为设备匿名模式：数据绑定本设备，各设备数据独立。绑定邮箱可防止数据丢失，为后续升级账号做准备。</p>';
+    h += '<div class="field"><label class="field-label">设备码（你的数据标识）</label>';
+    h += '<div class="device-row"><code id="deviceIdText">' + esc(db.user.id) + '</code><button class="btn btn-sm" data-action="copy-device-id">复制</button></div></div>';
+    h += '<div class="field"><label class="field-label" for="emailInput">绑定邮箱（可选，只存不验证）</label>';
+    h += '<input id="emailInput" type="email" value="' + esc(db.user.email || '') + '" placeholder="you@example.com" autocomplete="off">';
+    h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。</p></div>';
+    h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
+    h += '</div>';
+
+    // 阶段一：升级 Pro（人工解锁流程，验证期不公开售卖）
+    h += '<div class="card' + (isPro() ? ' pro-card' : '') + '"><div class="card-title">' + (isPro() ? '⭐ 已解锁 Pro' : '升级 Pro') + '</div>';
+    if (isPro()) {
+      h += '<p class="pro-ok">✓ 已解锁 Pro</p>';
+      h += '<p class="card-sub" style="margin-bottom:10px;">当前阶段 Pro 权益（功能将随迭代陆续上线，核心循环始终免费）：</p>';
+      h += '<ul class="pro-perks"><li>看板完整版（趋势图 / 母线检查 / 资产增长 / 留存统计）</li><li>多设备同步（邮箱登录后任意设备）</li><li>报告导出（周报 / 月报 Markdown / PDF）</li></ul>';
+      if (db.user.planNote) h += '<p class="privacy-note">解锁备注：' + esc(db.user.planNote) + '</p>';
+    } else {
+      h += '<p class="card-sub" style="margin-bottom:8px;">核心循环（红黄绿日 / 今日动作 / 记录 / 母线 / 复盘）永远免费。Pro 解锁「积累与洞察」：</p>';
+      h += '<ul class="pro-perks"><li>看板完整版（趋势图 / 母线检查 / 资产增长 / 留存统计）</li><li>多设备同步（邮箱登录后任意设备）</li><li>报告导出（周报 / 月报 Markdown / PDF）</li></ul>';
+      h += '<p class="pro-price">¥99/月 或 ¥699/年</p>';
+      h += '<div class="pro-qr-row">';
+      h += '<div class="pro-qr-box"><img src="/pay-qr.png" alt="微信收款码"><span>微信扫码付款</span></div>';
+      h += '<div class="pro-steps"><p>1. 扫码付款 ¥99/月（或 ¥699/年）</p><p>2. 付款留言：<b>转型Pro+你的设备码</b></p><p>3. 你的设备码：<code>' + esc(db.user.id) + '</code> <button class="btn btn-sm" data-action="copy-device-id">复制</button></p><p>4. 24 小时内人工核对解锁</p></div>';
+      h += '</div>';
+      h += '<div class="field"><label class="field-label" for="proKeyInput">输入解锁码（付款后由我们发放）</label>';
+      h += '<input id="proKeyInput" placeholder="如 PRO-2026-001" autocomplete="off"></div>';
+      h += '<div class="btn-row"><button class="btn" data-action="unlock-pro">解锁 Pro</button></div>';
+    }
+    h += '</div>';
+
     h += '<div class="card"><div class="card-title">备份与恢复</div>';
     h += '<p class="card-sub" style="margin-bottom:14px;">' + (db.meta.lastExportAt ? '上次导出：' + prettyDate(db.meta.lastExportAt.slice(0, 10)) : '从未导出过备份') + '</p>';
 
@@ -1306,7 +1384,7 @@
     h += '</div>';
 
     h += '<div class="card"><div class="card-title">关于</div>';
-    h += '<div class="about-line">转型操作系统 Transition OS v0.1.0（MVP）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
+    h += '<div class="about-line">转型操作系统 Transition OS v1.8.0（阶段一·轻量用户体系）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
     h += '</div>';
     v.innerHTML = h;
   }
@@ -1321,6 +1399,33 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
     toast('已导出备份');
+  }
+  function copyDeviceId() {
+    var txt = db.user && db.user.id ? db.user.id : '';
+    if (!txt) { toast('暂无设备码'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () { toast('设备码已复制'); })
+        .catch(function () { toast('复制失败，请手动选择复制'); });
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = txt; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); toast('设备码已复制'); } catch (e) { toast('复制失败，请手动选择复制'); }
+      document.body.removeChild(ta);
+    }
+  }
+  function unlockPro() {
+    var keyEl = $id('proKeyInput');
+    var key = keyEl ? keyEl.value.trim() : '';
+    if (!key) { toast('请输入解锁码'); return; }
+    if (PRO_KEYS.indexOf(key) >= 0) {
+      db.user.plan = 'pro';
+      db.user.planNote = '解锁码 ' + key + ' · ' + nowISO();
+      persist();
+      toast('已解锁 Pro 🎉');
+      render();
+    } else {
+      toast('解锁码无效，请核对后重试');
+    }
   }
   function importBackup(file) {
     var reader = new FileReader();
@@ -1343,13 +1448,13 @@
     var mask = openModal(
       '<p class="muted" style="font-size:14px;margin-bottom:10px;">读取飞书云端的最新备份，覆盖当前本地数据（换设备 / 数据丢失时使用）。需要输入恢复口令。</p>' +
       '<div class="field"><label class="field-label" for="restoreKey">恢复口令</label><input id="restoreKey" type="password" placeholder="服务端 BACKUP_READ_KEY" autocomplete="off"></div>' +
-      '<div class="field"><label class="field-label" for="restoreUser">用户标识</label><input id="restoreUser" value="' + BACKUP_USER_ID + '" placeholder="' + BACKUP_USER_ID + '"></div>' +
+      '<div class="field"><label class="field-label" for="restoreUser">用户标识</label><input id="restoreUser" value="' + backupUserId() + '" placeholder="' + backupUserId() + '"></div>' +
       '<div class="btn-row"><button class="btn" id="restoreDo">读取并覆盖</button><button class="btn-ghost" data-action="modal-close">取消</button></div>'
     );
     modalTitle('从云端恢复');
     $id('restoreDo').addEventListener('click', function () {
       var key = $id('restoreKey').value.trim();
-      var u = $id('restoreUser').value.trim() || BACKUP_USER_ID;
+      var u = $id('restoreUser').value.trim() || backupUserId();
       if (!key) { toast('请输入恢复口令'); return; }
       fetch(BACKUP_API + '?op=latest&userId=' + encodeURIComponent(u), {
         headers: { 'x-backup-key': key }
@@ -1637,6 +1742,11 @@
       else t.removeAttribute('aria-current');
     });
     $id('topDate').textContent = prettyDate(todayStr) + ' · ' + (db.mainline ? '母线 ' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + ' 天' : '未设母线');
+    var badge = $id('planBadge');
+    if (badge) {
+      badge.textContent = isPro() ? 'Pro' : '免费版';
+      badge.classList.toggle('pro', isPro());
+    }
     if (route === 'dashboard') renderDashboard();
     else if (route === 'today') renderToday();
     else if (route === 'records') renderRecords();
@@ -1690,6 +1800,8 @@
       case 'redo-mainline-check': mainlineCheckState = {}; render(); break;
       case 'review-range': reviewRange = el.getAttribute('data-r'); render(); break;
       case 'export-backup': exportBackup(); break;
+      case 'copy-device-id': copyDeviceId(); break;
+      case 'unlock-pro': unlockPro(); break;
       case 'import-backup': $id('importFile').click(); break;
       case 'cloud-backup-now': doBackup(); break;
       case 'cloud-restore': cloudRestore(); break;
@@ -1786,6 +1898,13 @@
   });
   document.addEventListener('change', function (e) {
     if (e.target.id === 'stageSelect') { db.user.stage = e.target.value; persist(); toast('阶段已更新为' + STAGE_CN[db.user.stage]); render(); }
+    if (e.target.id === 'emailInput') {
+      var v = e.target.value.trim();
+      db.user.email = v;
+      persist();
+      toast(v ? '邮箱已绑定（仅本机保存，用于防丢失）' : '邮箱已清除');
+      render();
+    }
     if (e.target.id === 'cloudBackupToggle') {
       db.meta.cloudBackupDisabled = !e.target.checked;
       save(db); // 开关状态不触发备份，避免循环
