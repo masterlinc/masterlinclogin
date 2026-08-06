@@ -934,10 +934,10 @@ img { display: block; width: 100%; }
   max-width: 560px;
 }
 .hook-panel[hidden] { display: none; }
-.hook-qr-img {
+.hook-panel .hook-qr-img {
   width: 140px;
   height: 140px;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
   border: 1px solid var(--line-strong);
   display: block;
@@ -988,7 +988,7 @@ button.button { font-family: inherit; letter-spacing: inherit; }
 
 @media (max-width: 640px) {
   .hook-panel { flex-direction: column; align-items: center; text-align: center; }
-  .hook-qr-img { width: 176px; height: 176px; }
+  .hook-panel .hook-qr-img { width: 176px; height: 176px; }
   .hook-panel-text { align-items: center; }
   .hook-nav-panel { right: max(18px, calc((100vw - 340px) / 2)); }
 }
