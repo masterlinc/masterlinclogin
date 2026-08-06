@@ -102,12 +102,26 @@
     .pay-btn:hover { opacity: 0.88; transform: translateY(-1px); }
     .pay-note { font-size: 12px; color: #666; margin-top: 12px; }
     .pay-qr-guide { margin-top: 14px; font-size: 13px; font-weight: 650; color: #f4f3ef; text-align: center; line-height: 1.6; }
-    .pay-qr-row { display: flex; flex-direction: column; align-items: center; gap: 22px; margin-top: 14px; }
+    .pay-qr-row { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 18px; margin-top: 14px; }
     .pay-qr-item { text-align: center; font-size: 12px; color: #888; max-width: 100%; }
-    .pay-qr-item img { display: block; margin: 0 auto 8px; border-radius: 8px; border: 1px solid #2a2a28; object-fit: contain; background: #fff; }
+    .pay-qr-item img { display: block; margin: 0 auto 8px; border-radius: 8px; border: 1px solid #2a2a28; object-fit: contain; background: #fff; cursor: zoom-in; transition: transform 200ms ease, box-shadow 200ms ease; }
     .pay-qr-item.pay-main img { width: 220px; height: 260px; }
-    .pay-qr-item.pay-sub img { width: 140px; height: 140px; }
-    @media (max-width: 560px) { .pay-row { flex-direction: column; align-items: flex-start; } }
+    .pay-qr-item.pay-sub img { width: 180px; height: 180px; }
+    /* 桌面端：鼠标悬停单独放大当前二维码，微信对准大图扫 */
+    @media (hover: hover) {
+      .pay-qr-item img:hover { transform: scale(1.45); position: relative; z-index: 5; box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55); }
+    }
+    /* 点击放大浮层（全端） */
+    .pay-qr-lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.86); display: none; align-items: center; justify-content: center; flex-direction: column; gap: 14px; z-index: 9999; padding: 20px; cursor: zoom-out; }
+    .pay-qr-lightbox.open { display: flex; }
+    .pay-qr-lightbox img { max-width: min(440px, 88vw); max-height: 72vh; border-radius: 12px; background: #fff; padding: 10px; box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6); cursor: zoom-out; }
+    .pay-qr-lightbox .lb-tip { color: #d9d9d6; font-size: 13px; text-align: center; line-height: 1.7; }
+    @media (max-width: 560px) {
+      .pay-row { flex-direction: column; align-items: flex-start; }
+      .pay-qr-row { gap: 12px; }
+      .pay-qr-item.pay-main img { width: 156px; height: 184px; }
+      .pay-qr-item.pay-sub img { width: 136px; height: 136px; }
+    }
 
     /* 免费资料 · 线索捕获 */
     .leadbox { margin-top: 22px; border: 1px solid #2a2a28; border-radius: 16px; padding: 24px; background: #0b0b0b; }
@@ -299,7 +313,7 @@
             <div class="pay-row">
               <span class="pay-price">¥29 <small>一次买断 · 微信付款 · 24 小时内人工核对发货</small></span>
             </div>
-            <p class="pay-qr-guide">微信扫一扫 → 先对准上方「收款码」付款，再扫下方「公众号码」关注</p>
+            <p class="pay-qr-guide">微信扫一扫 → 先扫「收款码」付款，再扫「公众号码」关注（悬停或点击图片可放大）</p>
             <div class="pay-qr-row">
               <div class="pay-qr-item pay-main"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「完整工具包」</span></div>
               <div class="pay-qr-item pay-sub"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「完整工具包」</span></div>
@@ -602,6 +616,35 @@
         });
       });
     }
+  })();
+
+  // 支付二维码：点击放大浮层（桌面 hover 放大由 CSS 负责，全端点击浮层）
+  (function () {
+    var qrImgs = document.querySelectorAll('.pay-qr-item img');
+    if (!qrImgs.length) return;
+    var lb = document.createElement('div');
+    lb.className = 'pay-qr-lightbox';
+    lb.innerHTML = '<img alt="" /><p class="lb-tip">点外部关闭 · 手机端可长按保存二维码，用微信「扫一扫 → 相册」识别</p>';
+    document.body.appendChild(lb);
+    var lbImg = lb.querySelector('img');
+    function openLb(src, alt) {
+      lbImg.src = src;
+      lbImg.alt = alt || '';
+      lb.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLb() {
+      lb.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    qrImgs.forEach(function (img) {
+      img.addEventListener('click', function (e) {
+        e.preventDefault();
+        openLb(img.currentSrc || img.src, img.alt);
+      });
+    });
+    lb.addEventListener('click', closeLb);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
   })();
   </script>
 </body>
