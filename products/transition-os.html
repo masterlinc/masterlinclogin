@@ -468,12 +468,12 @@
     return !!(db.user && db.user.plan === 'pro');
   }
 
-  /* ================= 云备份（飞书多维表格 · 自动实时） =================
-   * 目标：用户零手动操作，数据自动备份到云端（飞书）+ 本地镜像（Obsidian）。
+  /* ================= 云备份（云端匿名快照 · 自动实时） =================
+   * 目标：用户零手动操作，数据自动备份到云端 + 本地镜像（Obsidian）。
    * 机制：每次 persist() → save 本地后 3 秒节流合并 → POST /api/backup
-   *       服务端写入飞书 transition_backup 表。网络失败静默，本地数据不受影响，
+   *       服务端写入云端备份存储。网络失败静默，本地数据不受影响，
    *       下次 persist 自动重试；云端备份成功后把状态写回 meta（直接 save，不触发再备份）。
-   * 隐私：数据含个人产出，飞书表格有权限保护；前端不暴露任何凭证，只同域调 /api/backup。
+   * 隐私：数据含个人产出，云端备份仅用于防丢失；前端不暴露任何凭证，只同域调 /api/backup。
    */
   var BACKUP_API = '/api/backup';
   // 阶段一：设备 ID 匿名 —— 备份标识改为 db.user.id（每浏览器首次生成，各设备数据独立），
@@ -534,7 +534,7 @@
     var s = db.meta.cloudBackupStatus;
     var at = db.meta.lastCloudBackupAt;
     var t = at ? at.slice(0, 16).replace('T', ' ') : '从未备份';
-    if (s === 'ok') return '上次云端备份：' + t + ' · 已自动存入飞书';
+    if (s === 'ok') return '上次云端备份：' + t + ' · 已安全保存到云端';
     if (s === 'offline') return '上次云端备份未成功：' + t + '（离线或服务不可用；本地数据不受影响，下次自动重试）';
     if (s === 'failed') return '上次云端备份失败：' + t + '（本地数据不受影响）';
     return '尚未执行过云端备份。';
@@ -1357,6 +1357,12 @@
     h += '<input id="emailInput" type="email" value="' + esc(db.user.email || '') + '" placeholder="you@example.com" autocomplete="off">';
     h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。</p></div>';
     h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
+    h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">🔒 你的数据属于你</div>';
+    h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失，不做任何其他用途。</p>';
+    h += '<p class="privacy-note" style="margin-top:6px;">你可以随时：导出数据报告（查看 / 带走全部产出）、导出 JSON 备份（完整备份用于恢复）、从云端恢复、重置全部数据（彻底清除本设备数据）。</p>';
+    h += '<p class="privacy-note" style="margin-top:6px;">我们不会把你的数据用于营销、分析或共享给任何第三方。</p>';
+    h += '<p class="privacy-note" style="margin-top:6px;">依据《个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利——本页的导出与重置功能即对应「数据可携带权」与「删除权」。</p>';
+    h += '</div>';
     h += '</div>';
 
     // 阶段一：升级 Pro（闸门纪律：验证期不公开报价；免费版完整可用，Pro 敬请期待）
@@ -1376,19 +1382,24 @@
     h += '<div class="card"><div class="card-title">备份与恢复</div>';
     h += '<p class="card-sub" style="margin-bottom:14px;">' + (db.meta.lastExportAt ? '上次导出：' + prettyDate(db.meta.lastExportAt.slice(0, 10)) : '从未导出过备份') + '</p>';
 
-    // 云端自动备份（飞书）：零手动操作，persist 后自动上传
+    // 云端自动备份：零手动操作，persist 后自动上传
     h += '<div class="cloud-backup-box">';
-    h += '<div class="cloud-backup-title">☁ 云端自动备份（飞书）</div>';
+    h += '<div class="cloud-backup-title">☁ 云端自动备份</div>';
     h += '<p class="card-sub" style="margin-bottom:8px;">' + cloudBackupStatusText() + '</p>';
     h += '<label class="switch-row"><span class="switch-label">自动备份</span><span class="switch"><input type="checkbox" id="cloudBackupToggle"' + (db.meta.cloudBackupDisabled ? '' : ' checked') + '><span class="slider"></span></span></label>';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn" data-action="cloud-backup-now">立即备份到云端</button></div>';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="cloud-restore">从云端恢复</button></div>';
     h += '</div>';
 
-    h += '<div class="btn-row" style="margin-top:14px;"><button class="btn" data-action="export-backup">导出 JSON 备份</button></div>';
+    h += '<div class="btn-row" style="margin-top:14px;"><button class="btn" data-action="export-report">导出数据报告 (CSV)</button><button class="btn" data-action="export-backup">导出 JSON 备份</button></div>';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="import-backup">导入恢复备份</button></div>';
     h += '<input type="file" id="importFile" accept=".json,application/json" class="hide">';
     h += '<div class="btn-row" style="margin-top:10px;"><button class="btn-ghost" data-action="reset-data">重置全部数据</button></div>';
+    h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">📦 云端找回说明</div>';
+    h += '<p class="privacy-note">开启自动备份后，你的数据会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失。你可以随时手动「立即备份到云端」或「从云端恢复」。</p>';
+    h += '<p class="privacy-note" style="margin-top:8px;">换设备 / 清缓存后如何找回：① 设置 → 备份与恢复 →「从云端恢复」；② 输入恢复口令 + 你的设备码（导出数据报告中已包含设备码）；③ 点击「读取并覆盖」，云端最新快照会恢复到当前设备。</p>';
+    h += '<p class="privacy-note" style="margin-top:8px;">恢复口令从哪来：首次使用或忘记口令时，发邮件到 lincyang@foxmail.com 申请（主题「申请转型系统恢复口令」）。口令用于保障只有你能拉回自己的数据。换设备前请先导出数据报告，保存设备码。</p>';
+    h += '</div>';
     h += '</div>';
 
     h += '<div class="card"><div class="card-title">关于</div>';
@@ -1407,6 +1418,126 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
     toast('已导出备份');
+  }
+
+  // CSV 字段转义：含逗号 / 引号 / 换行时用双引号包裹，内部引号翻倍
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function streakUntil(d) {
+    if (d > todayStr) d = todayStr;
+    var count = 0;
+    while (sessionOf(d)) { count++; d = addDays(d, -1); }
+    return count;
+  }
+
+  // 导出数据报告（人类可读 CSV，含 UTF-8 BOM，Excel/WPS 中文不乱码）
+  // 与 JSON 备份分工：JSON 用于导入恢复，CSV 用于查看 / 带走 / 分享给教练。
+  function exportReport() {
+    db.meta.lastExportAt = nowISO();
+    persist();
+    var L = [];
+    function row(cells) { L.push(cells.map(csvCell).join(',')); }
+    function section(name) { row(['[' + name + ']']); }
+    function blank() { L.push(''); }
+
+    // 1. 总览
+    section('总览');
+    row(['字段', '值']);
+    row(['设备码', db.user.id]);
+    row(['转型阶段', STAGE_CN[db.user.stage] || db.user.stage]);
+    row(['创建时间', (db.user.createdAt || '').slice(0, 19).replace('T', ' ')]);
+    if (db.mainline) {
+      row(['母线名称', db.mainline.name]);
+      row(['母线开始日期', db.mainline.startDate]);
+      row(['母线剩余天数', Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS)))]);
+    } else {
+      row(['母线名称', '（未设定）']);
+    }
+    row(['连续执行天数', streak()]);
+    row(['资产数', db.assets.length]);
+    row(['证据数', db.evidences.length]);
+    blank();
+
+    // 2. 资产清单
+    section('资产清单');
+    row(['日期', '标题', '类型', '内容']);
+    var assetsSorted = db.assets.slice().sort(function (x, y) { return (x.createdAt || '').localeCompare(y.createdAt || ''); });
+    if (!assetsSorted.length) row(['（暂无）', '', '', '']);
+    assetsSorted.forEach(function (a) {
+      var t = ASSET_TYPES.filter(function (x) { return x.v === a.type; })[0];
+      row([(a.createdAt || '').slice(0, 10), a.title || '', t ? t.n : a.type, a.content || '']);
+    });
+    blank();
+
+    // 3. 证据清单
+    section('证据清单');
+    row(['日期', '标题', '类型', '内容', '来源', '漏斗阶段']);
+    var evsSorted = db.evidences.slice().sort(function (x, y) { return (x.createdAt || '').localeCompare(y.createdAt || ''); });
+    if (!evsSorted.length) row(['（暂无）', '', '', '', '', '']);
+    evsSorted.forEach(function (e) {
+      var t = EVIDENCE_TYPES.filter(function (x) { return x.v === e.type; })[0];
+      var st = e.funnelStage || funnelOf(e.type);
+      var stName = '';
+      if (st) { var f = FUNNEL.filter(function (x) { return x.key === st; })[0]; stName = f ? f.name : st; }
+      row([(e.createdAt || '').slice(0, 10), '', t ? t.n : e.type, e.content || '', e.source || '', stName]);
+    });
+    blank();
+
+    // 4. 每日执行记录（最近 14 天）
+    section('每日执行记录（最近 14 天）');
+    row(['日期', '模式', '是否完成', '动作标题']);
+    var dayRows = [];
+    for (var i = 13; i >= 0; i--) {
+      var d = addDays(todayStr, -i);
+      var s = sessionOf(d);
+      if (s) {
+        var done = !!(s.output || (s.assetIds && s.assetIds.length) || (s.evidenceIds && s.evidenceIds.length));
+        var actTitle = '';
+        if (s.actionId) { var act = actionById(s.actionId); if (act) actTitle = act.title; }
+        else if (s.customAction) actTitle = s.customAction;
+        dayRows.push([d, MODE_META[s.mode] ? MODE_META[s.mode].name : s.mode, done ? '是' : '否', actTitle]);
+      }
+    }
+    if (!dayRows.length) row(['（最近 14 天无执行记录）', '', '', '']);
+    else dayRows.forEach(function (r) { row(r); });
+    blank();
+
+    // 5. 每周复盘（最近 8 周）
+    section('每周复盘（最近 8 周）');
+    row(['周开始日期', '连续天数', '资产新增', '证据新增', '母线一致性']);
+    var monday = mondayOf(todayStr);
+    for (var w = 7; w >= 0; w--) {
+      var ws = addDays(monday, -w * 7);
+      var we = addDays(ws, 6);
+      if (ws > todayStr) continue;
+      var wr = db.weeklyReviews.filter(function (r) { return r.weekStart === ws; })[0] || null;
+      var streakD, aAdd, eAdd, cons;
+      if (wr && wr.stats) {
+        streakD = wr.stats.streakDays != null ? wr.stats.streakDays : streakUntil(Math.min(we, todayStr));
+        aAdd = wr.stats.assetsAdded != null ? wr.stats.assetsAdded : 0;
+        eAdd = wr.stats.evidencesAdded != null ? wr.stats.evidencesAdded : 0;
+        cons = (typeof wr.stats.mainlineConsistency === 'number') ? Math.round(wr.stats.mainlineConsistency * 100) + '%' : '';
+      } else {
+        streakD = streakUntil(Math.min(we, todayStr));
+        aAdd = db.assets.filter(function (a) { var d = (a.createdAt || '').slice(0, 10); return d >= ws && d <= we; }).length;
+        eAdd = db.evidences.filter(function (e) { var d = (e.createdAt || '').slice(0, 10); return d >= ws && d <= we; }).length;
+        cons = '';
+      }
+      row([ws, streakD, aAdd, eAdd, cons]);
+    }
+    blank();
+
+    var csv = '\uFEFF' + L.join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'transition-os-report-' + todayStr + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 2000);
+    toast('已导出数据报告');
   }
   function copyDeviceId() {
     var txt = db.user && db.user.id ? db.user.id : '';
@@ -1450,12 +1581,12 @@
     reader.readAsText(file);
   }
 
-  // 从云端（飞书 transition_backup 表）读取最新快照并覆盖本地。需要恢复口令
-  // （= 服务端环境变量 BACKUP_READ_KEY），口令不写入前端代码，只在用户输入时使用。
+  // 从云端读取最新快照并覆盖本地。需要恢复口令
+  // （口令由服务端人工发放），口令不写入前端代码，只在用户输入时使用。
   function cloudRestore() {
     var mask = openModal(
-      '<p class="muted" style="font-size:14px;margin-bottom:10px;">读取飞书云端的最新备份，覆盖当前本地数据（换设备 / 数据丢失时使用）。需要输入恢复口令。</p>' +
-      '<div class="field"><label class="field-label" for="restoreKey">恢复口令</label><input id="restoreKey" type="password" placeholder="服务端 BACKUP_READ_KEY" autocomplete="off"></div>' +
+      '<p class="muted" style="font-size:14px;margin-bottom:10px;">读取云端的最新备份，覆盖当前本地数据（换设备 / 清缓存 / 数据丢失时使用）。需要输入恢复口令。</p>' +
+      '<div class="field"><label class="field-label" for="restoreKey">恢复口令</label><input id="restoreKey" type="password" placeholder="请输入恢复口令" autocomplete="off"></div>' +
       '<div class="field"><label class="field-label" for="restoreUser">用户标识</label><input id="restoreUser" value="' + backupUserId() + '" placeholder="' + backupUserId() + '"></div>' +
       '<div class="btn-row"><button class="btn" id="restoreDo">读取并覆盖</button><button class="btn-ghost" data-action="modal-close">取消</button></div>'
     );
@@ -1807,6 +1938,7 @@
       case 'finish-mainline-check': finishMainlineCheck(); break;
       case 'redo-mainline-check': mainlineCheckState = {}; render(); break;
       case 'review-range': reviewRange = el.getAttribute('data-r'); render(); break;
+      case 'export-report': exportReport(); break;
       case 'export-backup': exportBackup(); break;
       case 'copy-device-id': copyDeviceId(); break;
       case 'unlock-pro': unlockPro(); break;
