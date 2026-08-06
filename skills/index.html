@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 管理现场 Skill 库 · 免费方法卡下载 · MASTER LINC</title>
+  <meta name="description" content="22 年管理现场 × AI 工具，沉淀成能直接带走的方法卡：AI 会议纪要四栏法、会前三问、7 天验证表、AI 写周报法、汇报一页纸等 12 张，全部免费下载，拿走就用。" />
+  <meta name="keywords" content="AI 管理,AI 工作流,管理者 AI 效率,AI 会议纪要,NotebookLM,周报,汇报,方法卡,免费下载,MASTER LINC" />
+  <meta name="author" content="MASTER LINC｜在路上的 AI 管理博士" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#050505" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://www.masterlinc.com/skills/" />
+  <link rel="stylesheet" href="/globals.css?v=20260807-1" />
+
+  <meta property="og:title" content="AI 管理现场 Skill 库 · 免费方法卡 · MASTER LINC" />
+  <meta property="og:description" content="12 张可下载的 AI 管理方法卡：会议、汇报、消息、决策、安全，全部免费，拿走就用。" />
+  <meta property="og:url" content="https://www.masterlinc.com/skills/" />
+  <meta property="og:site_name" content="MASTER LINC" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://www.masterlinc.com/og-master-linc.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <style>
+    /* ===== Skill 专区（/skills/） 视觉规范落地 ===== */
+    .skill-hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 96px 0 60px;
+      text-align: center;
+    }
+    .skill-hero h1 {
+      margin: 0;
+      font-size: clamp(40px, 5.5vw, 64px);
+      font-weight: 650;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+    }
+    .skill-sub {
+      max-width: 640px;
+      margin: 22px auto 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+    .skill-boundary {
+      max-width: 560px;
+      margin: 26px auto 0;
+      padding: 10px 14px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: #777774;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    /* 工具条：搜索 + chips，吸顶 */
+    .skill-toolbar {
+      position: sticky;
+      top: 76px;
+      z-index: 15;
+      padding: 14px 0 20px;
+      background: rgba(5, 5, 5, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    .skill-toolbar-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .skill-search-wrap { position: relative; }
+    .skill-search-wrap::before {
+      content: '⌕';
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #555552;
+      font-size: 16px;
+      pointer-events: none;
+    }
+    .skill-search {
+      width: 100%;
+      padding: 11px 16px 11px 38px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--white);
+      font: inherit;
+      font-size: 14px;
+    }
+    .skill-search::placeholder { color: #555552; }
+    .skill-search:focus { outline: none; border-color: var(--white); }
+
+    /* 网格 */
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      padding: 44px 0 90px;
+    }
+    .skill-grid:empty { display: none; }
+
+    /* 卡片 */
+    .skill-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      transition: transform 200ms ease, border-color 200ms ease;
+    }
+    .skill-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--line-strong);
+    }
+    .skill-card.hidden-card { display: none; }
+
+    /* 预览区：默认收起，点击展开（纯 CSS 骨架，无图片） */
+    .skill-preview {
+      position: relative;
+      min-height: 0;
+      aspect-ratio: 16 / 9;
+      background: var(--surface-2);
+      border: none;
+      border-bottom: 1px solid var(--line);
+      padding: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: inherit;
+      transition: background 150ms ease;
+    }
+    .skill-preview:hover { background: #1d1d1c; }
+    .skill-preview[hidden] { display: none; }
+    .skill-preview-hint {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      color: #555552;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .skill-preview-tip {
+      position: absolute;
+      right: 12px;
+      bottom: 10px;
+      color: #555552;
+      font-size: 11px;
+    }
+    .skill-preview:hover .skill-preview-tip { color: #a8a8a5; }
+    .skill-sk {
+      display: grid;
+      gap: 6px;
+      width: 100%;
+      max-width: 280px;
+      padding: 20px 18px;
+    }
+    .skill-sk[hidden] { display: none; }
+    .skill-sk.grid { grid-template-columns: repeat(2, 1fr); }
+    .skill-sk.cols { grid-template-columns: repeat(4, 1fr); }
+    .skill-sk.rows,
+    .skill-sk.flow { grid-template-columns: 1fr; }
+    .skill-sk-cell {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #0b0b0b;
+      color: #777774;
+      font-size: 11px;
+      line-height: 1.35;
+      padding: 8px 7px;
+      text-align: center;
+      min-height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .skill-sk-cell.hl { border-color: var(--line-strong); color: var(--muted); }
+    .skill-sk.flow .skill-sk-cell { text-align: left; justify-content: flex-start; padding-left: 12px; }
+
+    .skill-body { padding: 22px 22px 0; }
+
+    .skill-cat {
+      display: inline-block;
+      margin-bottom: 12px;
+      padding: 3px 10px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      color: var(--white);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .skill-card h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 650;
+      letter-spacing: -0.03em;
+      line-height: 1.25;
+    }
+    .skill-value {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.65;
+    }
+    .skill-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    .skill-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .skill-tool {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: #a8a8a5;
+      font-size: 11px;
+    }
+
+    .skill-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
+      padding: 18px 22px 20px;
+    }
+    .skill-dl {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: none;
+      border-radius: 10px;
+      background: var(--white);
+      color: var(--black);
+      font-size: 14px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .skill-dl:hover { opacity: 0.88; transform: translateY(-1px); }
+    .skill-dl:focus-visible { outline: 2px solid var(--white); outline-offset: 2px; }
+
+    .skill-hook {
+      color: #a8a8a5;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+    .skill-hook a {
+      color: var(--white);
+      border-bottom: 1px solid currentColor;
+      font-weight: 600;
+    }
+    .skill-hook a:hover { color: var(--muted); }
+
+    @media (max-width: 900px) {
+      .skill-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .skill-hero { padding: 64px 0 40px; text-align: left; }
+      .skill-toolbar { top: 66px; }
+      .skill-grid { grid-template-columns: 1fr; gap: 16px; padding: 28px 0 64px; }
+      .skill-body { padding: 20px 18px 0; }
+      .skill-actions { padding: 16px 18px 18px; }
+      .skill-dl { width: 100%; min-height: 48px; }
+    }
+
+    /* 分类 chips */
+    .skill-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .skill-chips::-webkit-scrollbar { display: none; }
+    .skill-chip {
+      flex-shrink: 0;
+      min-height: 36px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+    }
+    .skill-chip:hover { color: var(--white); border-color: var(--white); }
+    .skill-chip.active {
+      background: var(--white);
+      color: var(--black);
+      border-color: var(--white);
+    }
+
+    /* 空状态 */
+    .skill-empty {
+      display: none;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 70px 0 90px;
+      text-align: center;
+    }
+    .skill-empty.visible { display: block; }
+    .skill-empty h2 { margin: 0 0 10px; font-size: 24px; font-weight: 650; }
+    .skill-empty p { color: var(--muted); font-size: 14.5px; line-height: 1.7; }
+    .skill-empty ol { text-align: left; display: inline-block; margin: 12px 0 20px; padding-left: 20px; color: var(--muted); font-size: 14px; }
+    .skill-empty .hook-cta { margin-top: 8px; }
+
+    /* 全集包 CTA */
+    .skill-pack {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+      gap: 44px;
+      align-items: center;
+      margin-bottom: 90px;
+      padding: 40px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+    .skill-pack-head h2 { margin: 0 0 12px; font-size: clamp(28px, 3.2vw, 40px); font-weight: 650; letter-spacing: -0.04em; }
+    .skill-pack-head p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
+
+    @media (max-width: 900px) {
+      .skill-pack { grid-template-columns: 1fr; gap: 26px; padding: 28px 22px; }
+    }
+
+    /* 全集包邮箱表单（复用 selfcheck leadbox 语言） */
+    .skill-pack-form { display: flex; flex-direction: column; gap: 12px; }
+    .skill-pack-input {
+      width: 100%;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--black);
+      color: var(--white);
+      font: inherit;
+      font-size: 15px;
+    }
+    .skill-pack-input::placeholder { color: #555552; }
+    .skill-pack-input:focus { outline: none; border-color: var(--white); }
+    .skill-pack-submit {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      border: none;
+      border-radius: 10px;
+      background: var(--white);
+      color: var(--black);
+      font-size: 15px;
+      font-weight: 750;
+      cursor: pointer;
+      transition: opacity 150ms ease, transform 150ms ease;
+    }
+    .skill-pack-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .skill-pack-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .skill-pack-note { color: #777774; font-size: 12px; line-height: 1.6; }
+    .skill-pack-error { color: #ff9d8a; font-size: 13px; padding: 10px 12px; border: 1px solid rgba(255,120,90,.35); border-radius: 8px; background: rgba(255,120,90,.08); }
+    .skill-pack-success { text-align: center; padding: 12px 8px; }
+    .skill-pack-success-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--white); color: var(--black);
+      font-size: 18px; font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .skill-pack-success h3 { margin: 0 0 6px; font-size: 17px; font-weight: 750; }
+    .skill-pack-success p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+    /* 页底三入口（弱化表达） */
+    .skill-hook-zone {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px 32px;
+      padding: 26px 0 80px;
+      border-top: 1px solid var(--line);
+    }
+    .skill-hook-zone a {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .skill-hook-zone a:hover { color: var(--white); }
+    @media (max-width: 640px) {
+      .skill-hook-zone { flex-direction: column; align-items: center; gap: 12px; padding: 22px 0 56px; }
+      .skill-hook-zone a { text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到正文</a>
+
+  <nav class="nav" aria-label="主导航">
+    <a class="wordmark" href="/#top" aria-label="MASTER LINC 首页"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <div class="nav-links">
+      <a href="/#start">从这里开始</a>
+      <a href="/skills/" aria-current="page">Skill 库</a>
+      <a href="/#letters">现场笔记</a>
+      <a href="/#about">关于</a>
+      <button type="button" class="nav-cta" data-hook-cta aria-expanded="false" aria-controls="navConsultPanel">免费咨询</button>
+      <a class="lang-switch" href="/en/" lang="en">EN</a>
+    </div>
+    <div class="hook-panel hook-nav-panel" id="navConsultPanel" hidden>
+      <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+      <div class="hook-panel-text">
+        <strong>扫码加企业微信，免费咨询</strong>
+        <span>添加时备注「Skill 库」，我尽快回复。免费先聊，不推销。</span>
+        <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main">
+    <!-- 页头 -->
+    <header class="skill-hero shell">
+      <p class="kicker">FREE SKILL LIBRARY</p>
+      <h1>AI 管理现场 Skill 库</h1>
+      <p class="skill-sub">22 年管理现场 × AI 工具，沉淀成能直接带走的方法卡。全部免费，拿走就用，不注册、不套路。</p>
+      <p class="skill-boundary">说明：这里是免费入门版，每张卡能解当下的急；完整方法手册、全套模板与真实案例，在 ¥29 进阶版。</p>
+    </header>
+
+    <!-- 吸顶工具条：搜索 + 分类 chips -->
+    <div class="skill-toolbar">
+      <div class="skill-toolbar-inner shell">
+        <div class="skill-search-wrap">
+          <input class="skill-search" id="skillSearch" type="search" placeholder="搜方法、场景或工具名，比如「会议」「周报」「NotebookLM」" aria-label="搜索 Skill" autocomplete="off" />
+        </div>
+        <div class="skill-chips" id="skillChips" role="group" aria-label="按管理场景筛选">
+          <button type="button" class="skill-chip active" data-cat="全部">全部</button>
+          <button type="button" class="skill-chip" data-cat="会议">会议</button>
+          <button type="button" class="skill-chip" data-cat="汇报周报">汇报周报</button>
+          <button type="button" class="skill-chip" data-cat="消息协同">消息协同</button>
+          <button type="button" class="skill-chip" data-cat="决策">决策</button>
+          <button type="button" class="skill-chip" data-cat="工具安全">工具安全</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skill 卡片网格（JS 渲染） -->
+    <section class="skill-grid shell" id="skillGrid" aria-label="Skill 列表"></section>
+
+    <!-- 空状态 -->
+    <div class="skill-empty" id="skillEmpty">
+      <h2>没有找到匹配的 Skill。</h2>
+      <p>换个场景词试试：会议 / 周报 / 汇报 / 消息 / 决策；或者直接看最热门的 3 张卡（会议四栏法 / 会前三问 / 7 天验证表）。</p>
+      <ol>
+        <li>换个场景词试试：会议 / 周报 / 汇报 / 消息 / 决策</li>
+        <li>或者直接看最热门的 3 张卡（点击直达）</li>
+        <li>实在不确定要哪个？免费自检，10 分钟告诉你最该先改哪件</li>
+      </ol>
+      <a class="hook-cta" href="/products/selfcheck.html">免费自检，10 分钟找到最该改的一件 →</a>
+    </div>
+
+    <!-- 全集包：邮箱换 12 个 Skill 打包 -->
+    <section class="skill-pack shell" id="pack" aria-label="Skill 全集包">
+      <div class="skill-pack-head">
+        <p class="kicker">ALL-IN-ONE</p>
+        <h2>12 张卡，一次拿走</h2>
+        <p>把这 12 个 Skill 打包成一份 PDF，发到你邮箱。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。</p>
+      </div>
+      <div class="skill-pack-form-wrap">
+        <form class="skill-pack-form" id="packForm" novalidate>
+          <input class="skill-pack-input" type="email" id="packEmail" name="email" placeholder="输入邮箱，接收全集包（免费，随时可退订）" autocomplete="email" required />
+          <button class="skill-pack-submit" type="submit" id="packSubmit">免费领取全集包 →</button>
+          <p class="skill-pack-note">你的邮箱只用来发这份资料包，不会进广告名单，随时可退订。</p>
+        </form>
+        <div class="skill-pack-error" id="packError" role="alert" hidden></div>
+        <div class="skill-pack-success" id="packSuccess" hidden>
+          <div class="skill-pack-success-icon">✓</div>
+          <h3>已发送到你的邮箱</h3>
+          <p>已发送！去邮箱查收「AI 管理现场 · Skill 全集包」。没收到？先看看垃圾箱，或等 5 分钟再来一次。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 页底三入口（弱化表达） -->
+    <section class="skill-hook-zone shell" aria-label="还差一步">
+      <a href="/products/selfcheck.html">不确定先拿哪个？→ 免费自检，10 分钟知道答案</a>
+      <a href="/products/selfcheck.html">想要整套可复制的方法？→ ¥29 进阶版，完整模板 + 案例</a>
+      <a href="/#contact">想让自己场景落地？→ 免费 AI 管理咨询，先聊 5 分钟</a>
+    </section>
+  </main>
+
+  <footer class="footer shell">
+    <a class="wordmark" href="/#top" aria-label="返回顶部"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
+    <p>AI MANAGEMENT, IN PRACTICE</p>
+    <a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a>
+    <span>© 2026 MASTER LINC</span>
+  </footer>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // ===== 12 个 Skill 数据（素材方法内容 × 文案展示字段 合并） =====
+    var SKILLS = [
+      {
+        id: 'skill-01', name: 'AI 会议纪要·四栏法',
+        value: '把 1 小时录音变成一页能追责的决议清单。',
+        cat: '会议', tools: ['NotebookLM', 'Kimi'],
+        diff: '★☆☆', time: '15 分钟', format: 'PDF 方法卡 · 四栏骨架',
+        file: '/skills/files/skill-01-ai-meeting-notes-4columns.md',
+        dlName: 'AI会议纪要·四栏法（入门卡）.md', dlText: '免费下载 · 四栏法方法卡',
+        hook: { href: '/products/selfcheck.html', text: '想要带复查清单的完整四栏模板？完整版在 ¥29 进阶版 →' },
+        preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }
+      },
+      {
+        id: 'skill-02', name: '会前三问清单',
+        value: '开会前 15 分钟过三问，答不上来就别开。',
+        cat: '会议', tools: ['任意 AI'],
+        diff: '★☆☆', time: '3 分钟', format: '一页清单（可打印）',
+        file: '/skills/files/skill-02-pre-meeting-3-questions.md',
+        dlName: '会前三问清单.md', dlText: '免费下载 · 会前三问清单',
+        hook: { href: '/products/selfcheck.html', text: '想真正「把讨论变决定」？完整模板 + 复查清单在 ¥29 进阶版 →' },
+        preview: { title: '会前三问', style: 'rows', labels: ['这场会要定什么？', '谁必须来？', '谁只被通知？'] }
+      },
+      {
+        id: 'skill-03', name: '7 天验证表',
+        value: '每天 1 分钟，7 天后用数字证明 AI 有没有帮你减负。',
+        cat: '会议', tools: ['纸笔即可'],
+        diff: '★☆☆', time: '每天 1 分钟，连用 7 天', format: '打印模板',
+        file: '/skills/files/skill-03-7day-verification.md',
+        dlName: '7天验证表.md', dlText: '免费下载 · 7 天验证表',
+        hook: { href: '/products/selfcheck.html', text: '想要工具、清单、行动卡配齐的一套？免费自检后领取起步包 →' },
+        preview: { title: '7 天验证表', style: 'rows', labels: ['目标：从 N 分钟 → M 分钟', '每天 3 分钟 · 只填三格', '第 7 天 · 值得 / 换个做法'] }
+      },
+      {
+        id: 'skill-04', name: 'AI 写周报法（3 小时 → 20 分钟）',
+        value: '周报从 3 小时压到 20 分钟，判断还是你的。',
+        cat: '汇报周报', tools: ['DeepSeek', 'Kimi'],
+        diff: '★☆☆', time: '15 分钟', format: 'PDF 方法卡 · 提示词模板',
+        file: '/skills/files/skill-04-ai-weekly-report.md',
+        dlName: 'AI写周报法（3小时→20分钟）.md', dlText: '免费下载 · 周报 20 分钟法',
+        hook: { href: '/products/selfcheck.html', text: '想系统化省时间（周报、汇报一起改）？免费自检，看看最该先动哪一件 →' },
+        preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }
+      },
+      {
+        id: 'skill-05', name: 'AI 汇报一页纸法',
+        value: '3 屏数据压成一页：结论、依据、下一步。',
+        cat: '汇报周报', tools: ['任意 AI'],
+        diff: '★★☆', time: '15 分钟', format: 'PDF 方法卡 · 一页纸骨架',
+        file: '/skills/files/skill-05-ai-report-one-page.md',
+        dlName: 'AI汇报一页纸法.md', dlText: '免费下载 · 汇报一页纸法',
+        hook: { href: '/products/selfcheck.html', text: '拿不准该先改汇报还是先改会议？免费自检，10 分钟出答案 →' },
+        preview: { title: '一页纸结构', style: 'rows', labels: ['结论 · 顶部 1/3', '依据 · ≤5 条带出处', '下一步 · 谁 × 做什么 × 何时'] }
+      },
+      {
+        id: 'skill-06', name: 'AI 消息流分流法',
+        value: '四类消息自动分流，不再当人肉中转站。',
+        cat: '消息协同', tools: ['飞书 / 企微 AI', 'NotebookLM'],
+        diff: '★★☆', time: '20 分钟', format: 'PDF 方法卡 + 分流表',
+        file: '/skills/files/skill-06-ai-message-routing.md',
+        dlName: 'AI消息流分流法.md', dlText: '免费下载 · 消息分流表',
+        hook: { href: '/#contact', text: '想让这套分流真正跑进你和团队的日常？免费咨询，聊一次就懂 →' },
+        preview: { title: '四类分流', style: 'cols', labels: ['A 要拍板', 'B 要信息', 'C 仅通知', 'D 垃圾'] }
+      },
+      {
+        id: 'skill-07', name: '流程审计五步法（入门卡）',
+        value: '5 步判断一件工作该不该交给 AI。',
+        cat: '决策', tools: ['任意 AI'],
+        diff: '★★☆', time: '15 分钟', format: 'PDF 方法卡 · 五步骨架',
+        file: '/skills/files/skill-07-process-audit-5steps.md',
+        dlName: '流程审计五步法（入门卡）.md', dlText: '免费下载 · 审计五步法',
+        hook: { href: '/products/selfcheck.html', text: '五步只是骨架，完整机制 + 真实案例在 ¥29 进阶版 →' },
+        preview: { title: '五步骨架', style: 'flow', labels: ['输入', '中间判断', '输出', '审核', '返工点'] }
+      },
+      {
+        id: 'skill-08', name: 'AI 决策备忘法',
+        value: '拍板留痕：决定、依据、反方观点、复核日期。',
+        cat: '决策', tools: ['任意 AI'],
+        diff: '★☆☆', time: '10 分钟', format: '可复制模板',
+        file: '/skills/files/skill-08-ai-decision-memo.md',
+        dlName: 'AI决策备忘法.md', dlText: '免费下载 · 决策备忘模板',
+        hook: { href: '/#contact', text: '这一步做得对不对？免费咨询，先聊 5 分钟再决定要不要深挖 →' },
+        preview: { title: '四栏备忘', style: 'grid', labels: ['① 决定', '② 依据', '③ 反方观点', '④ 复核日期'] }
+      },
+      {
+        id: 'skill-09', name: '跨部门催进度话术卡',
+        value: '先给上下文再要结论，催进度不伤关系。',
+        cat: '消息协同', tools: ['任意 AI'],
+        diff: '★☆☆', time: '5 分钟', format: '话术清单',
+        file: '/skills/files/skill-09-cross-dept-followup.md',
+        dlName: '跨部门催进度话术卡.md', dlText: '免费下载 · 催进度话术卡',
+        hook: { href: '/#contact', text: '想让整个团队都用上这套沟通方式？免费咨询，聊一次就懂 →' },
+        preview: { title: '一句话公式', style: 'rows', labels: ['背景 · 1 句', '当前状态 · 1 句', '具体问题 · 1 个', '给个台阶 · 1 句'] }
+      },
+      {
+        id: 'skill-10', name: 'AI 敏感资料安全清单',
+        value: '不交文件，也能安全地用 AI 干活。',
+        cat: '工具安全', tools: ['任何工具适用'],
+        diff: '★☆☆', time: '10 分钟', format: '检查清单（一页）',
+        file: '/skills/files/skill-10-sensitive-data-checklist.md',
+        dlName: 'AI敏感资料安全清单.md', dlText: '免费下载 · 安全清单',
+        hook: { href: '/#contact', text: '想画出自己那条「安全流程」？免费咨询，我帮你看边界 →' },
+        preview: { title: '四件事', style: 'grid', labels: ['输入 · 最小必要', '步骤 · 一次一类', '输出 · 受控环境', '审核人 · 最后一眼'] }
+      },
+      {
+        id: 'skill-11', name: 'NotebookLM 会议纪要配置卡',
+        value: '三步配置好 AI 纪要：限四栏输出，不猜负责人。',
+        cat: '工具安全', tools: ['NotebookLM'],
+        diff: '★☆☆', time: '10 分钟', format: '步骤卡（三步）',
+        file: '/skills/files/skill-11-notebooklm-meeting-config.md',
+        dlName: 'NotebookLM会议纪要配置卡.md', dlText: '免费下载 · 配置步骤卡',
+        hook: { href: '/products/selfcheck.html', text: '想要和它配套的完整四栏模板 + 复查清单？¥29 进阶版 →' },
+        preview: { title: '三步配置', style: 'flow', labels: ['上传录音 + 历史纪要', '限定四栏输出', '人补负责人与日期'] }
+      },
+      {
+        id: 'skill-12', name: '管理者 AI 审计卡（一周版）',
+        value: '一周记录四类时间，找到 AI 该插手的地方。',
+        cat: '决策', tools: ['任意 AI'],
+        diff: '★★☆', time: '每天 5 分钟记录，周末 10 分钟复盘', format: '自评卡（一周版）',
+        file: '/skills/files/skill-12-manager-ai-audit-week.md',
+        dlName: '管理者AI审计卡（一周版）.md', dlText: '免费下载 · 一周审计卡',
+        hook: { href: '/products/selfcheck.html', text: '想深挖自己的场景、把一周变成整套打法？免费自检，10 分钟找到最该改的一件 →' },
+        preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }
+      }
+    ];
+
+    var CATS = ['全部', '会议', '汇报周报', '消息协同', '决策', '工具安全'];
+    var LEAD_ENDPOINT = '/api/lead';
+    var state = { cat: '全部', q: '' };
+
+    var grid = document.getElementById('skillGrid');
+    var emptyBox = document.getElementById('skillEmpty');
+    var searchInput = document.getElementById('skillSearch');
+    var chipsWrap = document.getElementById('skillChips');
+
+    // ===== 下载埋点：localStorage 记录 skill_downloads（{skillId, count, lastAt}）=====
+    // 可选轻量上报 /api/track：当前未实现，后续日志系统接入后放开
+    function trackDownload(skillId) {
+      try {
+        var KEY = 'skill_downloads';
+        var map = {};
+        try { map = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { map = {}; }
+        var rec = map[skillId] || { count: 0, lastAt: 0 };
+        rec.count = (rec.count || 0) + 1;
+        rec.lastAt = Date.now();
+        map[skillId] = rec;
+        localStorage.setItem(KEY, JSON.stringify(map));
+      } catch (e) { /* 隐私模式忽略 */ }
+      // if (navigator.sendBeacon) {
+      //   try { navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ type: 'skill_download', skillId: skillId })], { type: 'application/json' })); } catch (e) {}
+      // }
+    }
+
+    // ===== 渲染卡片 =====
+    function renderCards() {
+      var frag = document.createDocumentFragment();
+      SKILLS.forEach(function (s) {
+        var card = document.createElement('article');
+        card.className = 'skill-card';
+        card.id = s.id;
+
+        // 预览区（默认收起，点击展开骨架）
+        var prev = document.createElement('button');
+        prev.type = 'button';
+        prev.className = 'skill-preview';
+        prev.setAttribute('aria-expanded', 'false');
+        prev.setAttribute('aria-label', '展开 ' + s.name + ' 方法骨架预览');
+        var sk = document.createElement('div');
+        sk.className = 'skill-sk ' + s.preview.style;
+        sk.hidden = true;
+        s.preview.labels.forEach(function (l) {
+          var c = document.createElement('div');
+          c.className = 'skill-sk-cell';
+          c.textContent = l;
+          sk.appendChild(c);
+        });
+        var hint = document.createElement('span');
+        hint.className = 'skill-preview-hint';
+        hint.textContent = s.preview.title;
+        var tip = document.createElement('span');
+        tip.className = 'skill-preview-tip';
+        tip.textContent = '展开预览 ▾';
+        prev.appendChild(hint);
+        prev.appendChild(sk);
+        prev.appendChild(tip);
+        prev.addEventListener('click', function () {
+          var open = !sk.hidden;
+          sk.hidden = open;
+          tip.textContent = open ? '展开预览 ▾' : '收起预览 ▴';
+          prev.setAttribute('aria-expanded', open ? 'false' : 'true');
+        });
+
+        // 正文
+        var body = document.createElement('div');
+        body.className = 'skill-body';
+        body.innerHTML =
+          '<span class="skill-cat">' + s.cat + '</span>' +
+          '<h3>' + s.name + '</h3>' +
+          '<p class="skill-value">' + s.value + '</p>' +
+          '<p class="skill-meta">' + s.diff + ' · ' + s.time + ' · ' + s.format + '</p>' +
+          '<div class="skill-tools">' + s.tools.map(function (t) { return '<span class="skill-tool">' + t + '</span>'; }).join('') + '</div>';
+
+        // 操作区：下载 + 钩子
+        var actions = document.createElement('div');
+        actions.className = 'skill-actions';
+        var dl = document.createElement('a');
+        dl.className = 'skill-dl';
+        dl.href = s.file;
+        dl.download = s.dlName;
+        dl.setAttribute('data-skill-id', s.id);
+        dl.textContent = s.dlText + ' ↘';
+        dl.addEventListener('click', function () { trackDownload(s.id); });
+        var hook = document.createElement('p');
+        hook.className = 'skill-hook';
+        hook.innerHTML = '<a href="' + s.hook.href + '">' + s.hook.text + '</a>';
+
+        actions.appendChild(dl);
+        actions.appendChild(hook);
+        card.appendChild(prev);
+        card.appendChild(body);
+        card.appendChild(actions);
+        frag.appendChild(card);
+      });
+      grid.appendChild(frag);
+    }
+
+    // ===== 筛选 + 搜索（AND 叠加） =====
+    function applyFilter() {
+      var q = state.q.trim().toLowerCase();
+      var visible = 0;
+      SKILLS.forEach(function (s) {
+        var el = document.getElementById(s.id);
+        if (!el) return;
+        var catOk = state.cat === '全部' || s.cat === state.cat;
+        var qOk = !q || (s.name + ' ' + s.cat + ' ' + s.tools.join(' ') + ' ' + s.value + ' ' + s.format).toLowerCase().indexOf(q) !== -1;
+        var show = catOk && qOk;
+        el.classList.toggle('hidden-card', !show);
+        if (show) visible++;
+      });
+      emptyBox.classList.toggle('visible', visible === 0);
+    }
+
+    // chips 单选
+    chipsWrap.addEventListener('click', function (ev) {
+      var chip = ev.target.closest('.skill-chip');
+      if (!chip) return;
+      state.cat = chip.getAttribute('data-cat');
+      chipsWrap.querySelectorAll('.skill-chip').forEach(function (c) { c.classList.toggle('active', c === chip); });
+      applyFilter();
+    });
+
+    searchInput.addEventListener('input', function () {
+      state.q = this.value;
+      applyFilter();
+    });
+
+    // ===== 全集包邮箱表单（提交 /api/lead，source 带 skill-pack 前缀） =====
+    function detectSource() {
+      try {
+        var m = (window.location.search || '').match(/[?&](?:utm_source|source)=([^&]+)/);
+        if (m && m[1]) return decodeURIComponent(m[1]).slice(0, 60);
+        var ref = document.referrer;
+        if (ref) {
+          var host = ref.replace(/^https?:\/\//, '').split('/')[0];
+          if (host) return host.slice(0, 60);
+        }
+      } catch (e) { /* ignore */ }
+      return '直接访问';
+    }
+
+    function packSource() {
+      var base = detectSource();
+      return (base === '直接访问' ? 'skill-pack' : 'skill-pack|' + base).slice(0, 100);
+    }
+
+    var packForm = document.getElementById('packForm');
+    var packEmail = document.getElementById('packEmail');
+    var packSubmit = document.getElementById('packSubmit');
+    var packError = document.getElementById('packError');
+    var packSuccess = document.getElementById('packSuccess');
+
+    if (packForm) {
+      packForm.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var email = packEmail.value.trim();
+        packError.hidden = true;
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          packError.textContent = '请输入有效的邮箱地址。';
+          packError.hidden = false;
+          packEmail.focus();
+          return;
+        }
+
+        packSubmit.disabled = true;
+        packSubmit.textContent = '发送中…';
+
+        // 本地备份（即使网络异常也不丢线索）
+        try {
+          var key = 'masterlinc_lead_backup';
+          var list = JSON.parse(localStorage.getItem(key) || '[]');
+          list.push({ email: email, source: 'skill-pack', at: new Date().toISOString() });
+          localStorage.setItem(key, JSON.stringify(list.slice(-50)));
+        } catch (e) { /* ignore */ }
+
+        fetch(LEAD_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ email: email, question: '', source: packSource() })
+        }).then(function (res) {
+          return res.json();
+        }).then(function (data) {
+          if (data && data.ok === true) {
+            packForm.hidden = true;
+            packSuccess.hidden = false;
+          } else {
+            throw new Error(data && data.message ? data.message : '提交失败');
+          }
+        }).catch(function (err) {
+          packError.textContent = '提交失败：' + (err && err.message ? err.message : '网络异常') + '。请稍后重试，或把邮箱发到页面底部的邮箱。';
+          packError.hidden = false;
+          packSubmit.disabled = false;
+          packSubmit.textContent = '免费领取全集包 →';
+        });
+      });
+    }
+
+    // ===== 导航「免费咨询」展开二维码 =====
+    (function () {
+      var cta = document.querySelector('.nav-cta[data-hook-cta]');
+      var panel = document.getElementById('navConsultPanel');
+      if (!cta || !panel) return;
+      cta.addEventListener('click', function () {
+        var willShow = panel.hidden;
+        panel.hidden = !willShow;
+        cta.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+      });
+    })();
+
+    // ===== 初始化 =====
+    renderCards();
+    applyFilter();
+  })();
+  </script>
+
+  <!-- Vercel Web Analytics（在 Vercel 面板开启后自动统计真实全站访问；未开启时静默 404 不影响页面） -->
+  <script defer src="/_vercel/insights/script.js" onerror="this.remove()"></script>
+</body>
+</html>

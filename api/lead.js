@@ -83,12 +83,44 @@ const DELIVERABLES = [
   { file: '起步包-7天验证表.md', type: 'text/markdown', name: '起步包-7天验证表.md' },
 ];
 
+// v1.19.0 Skill 专区：全集包（/skills/ 提交 source 含 skill-pack 前缀时发送）
+// 附件 = skills/files/ 下的 12 张 Skill 方法卡（静态 md，Vercel 随仓库打包）
+const SKILL_PACK_FILES = [
+  { file: 'skill-01-ai-meeting-notes-4columns.md', name: 'AI会议纪要·四栏法（入门卡）.md' },
+  { file: 'skill-02-pre-meeting-3-questions.md', name: '会前三问清单.md' },
+  { file: 'skill-03-7day-verification.md', name: '7天验证表.md' },
+  { file: 'skill-04-ai-weekly-report.md', name: 'AI写周报法（3小时→20分钟）.md' },
+  { file: 'skill-05-ai-report-one-page.md', name: 'AI汇报一页纸法.md' },
+  { file: 'skill-06-ai-message-routing.md', name: 'AI消息流分流法.md' },
+  { file: 'skill-07-process-audit-5steps.md', name: '流程审计五步法（入门卡）.md' },
+  { file: 'skill-08-ai-decision-memo.md', name: 'AI决策备忘法.md' },
+  { file: 'skill-09-cross-dept-followup.md', name: '跨部门催进度话术卡.md' },
+  { file: 'skill-10-sensitive-data-checklist.md', name: 'AI敏感资料安全清单.md' },
+  { file: 'skill-11-notebooklm-meeting-config.md', name: 'NotebookLM会议纪要配置卡.md' },
+  { file: 'skill-12-manager-ai-audit-week.md', name: '管理者AI审计卡（一周版）.md' },
+];
+
 // 解析 deliverables 目录绝对路径（兼容 Vercel 打包后的 cwd 与 __dirname 两种布局）
 function deliverablesDir() {
   const candidates = [
     require('path').resolve(process.cwd(), 'deliverables'),
     require('path').resolve(__dirname, '..', 'deliverables'),
     require('path').resolve(__dirname, 'deliverables'),
+  ];
+  for (const dir of candidates) {
+    try {
+      if (require('fs').statSync(dir).isDirectory()) return dir;
+    } catch (e) { /* 继续尝试下一个 */ }
+  }
+  return candidates[0];
+}
+
+// 解析 skills/files 目录绝对路径（Skill 全集包附件）
+function skillsFilesDir() {
+  const candidates = [
+    require('path').resolve(process.cwd(), 'skills', 'files'),
+    require('path').resolve(__dirname, '..', 'skills', 'files'),
+    require('path').resolve(__dirname, 'skills', 'files'),
   ];
   for (const dir of candidates) {
     try {
@@ -109,6 +141,18 @@ function loadDeliverables() {
   const path = require('path');
   const dir = deliverablesDir();
   return DELIVERABLES.map((d) => {
+    const abs = path.join(dir, d.file);
+    const buf = fs.readFileSync(abs);
+    return { filename: d.name, body: toBase64Url(buf.toString('base64')), bytes: buf.length };
+  });
+}
+
+// 读取 Skill 全集包附件：{ filename, body(base64url), bytes }[]
+function loadSkillPackDeliverables() {
+  const fs = require('fs');
+  const path = require('path');
+  const dir = skillsFilesDir();
+  return SKILL_PACK_FILES.map((d) => {
     const abs = path.join(dir, d.file);
     const buf = fs.readFileSync(abs);
     return { filename: d.name, body: toBase64Url(buf.toString('base64')), bytes: buf.length };
@@ -195,6 +239,81 @@ async function sendMaterialsEmail(to) {
   }
 }
 
+// 组装 Skill 全集包邮件正文（凌客风格 · 12 张卡 + 1 个自检钩子）
+function buildSkillPackEmailText() {
+  return [
+    '凌：',
+    '',
+    '你在 masterlinc.com 领的「AI 管理现场 Skill 全集包」，给你发过来了，12 张都在附件里。',
+    '',
+    '里面有会议纪要四栏法、会前三问、7 天验证表、AI 写周报法、汇报一页纸、消息流分流、流程审计五步、决策备忘、催进度话术、安全清单、NotebookLM 配置卡、一周审计卡——不全是教你「用工具」，更多是教你「把哪件活交给工具」。',
+    '',
+    '我的建议：别一口气全看，先挑一个最疼的场景试 7 天。比如你每周被周报拖 3 小时，就只练「AI 写周报法」，拿 7 天验证表记数字。试完你觉得有用，再回来拿下一张。',
+    '',
+    '卡只是起点。拿不准该先改哪件，可以做一次免费自检（10 分钟，测出你最该先动的那件事）：',
+    '',
+    'masterlinc.com/products/selfcheck.html',
+    '',
+    '工具免费，判断值钱。',
+    '',
+    '——凌',
+    '在路上的 AI 管理博士',
+    'masterlinc.com',
+  ].join('\n');
+}
+
+/**
+ * 发送《Skill 全集包》邮件（飞书邮件 API；/skills/ 全集包邮箱换，source 含 skill-pack）
+ * @param {string} to 访客邮箱
+ * @returns {Promise<{sent: boolean, skipped?: boolean}>}
+ *  - 未配置发信令牌 → 跳过发送（skipped），不抛错
+ *  - 发送失败 → 抛错（由上层 catch，不影响飞书线索与前端 ok）
+ */
+async function sendSkillPackEmail(to) {
+  const userToken = await getUserMailToken();
+  if (!userToken) {
+    console.warn('[api/lead] FEISHU_MAIL_REFRESH_TOKEN / FEISHU_MAIL_USER_ACCESS_TOKEN 未配置，跳过 Skill 全集包邮件发送（飞书线索已保留）');
+    return { sent: false, skipped: true };
+  }
+
+  const mailboxId = process.env.FEISHU_MAIL_SENDER || 'me'; // 默认当前授权用户主邮箱
+  const attachments = loadSkillPackDeliverables();
+
+  const payload = {
+    subject: '你要的 12 张 Skill 卡，打包在这封邮件里',
+    to: [{ mail_address: to }],
+    body_plain_text: buildSkillPackEmailText(),
+    attachments,
+    dedupe_key: 'skill-pack-' + to + '-' + Date.now(), // 防重复发送（同用户并发时接口单用户串行）
+  };
+
+  // 10 秒超时，避免飞书慢响应拖住 Serverless（Vercel 免费函数最长 10s 量级）
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const url = `${FEISHU_BASE}/mail/v1/user_mailboxes/${encodeURIComponent(mailboxId)}/messages/send`;
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + userToken,
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+    const data = await res.json().catch(() => ({}));
+
+    if (!data || data.code !== 0) {
+      const msg = (data && data.msg) ? data.msg : 'HTTP ' + res.status;
+      throw new Error('飞书邮件发送失败: ' + msg);
+    }
+    return { sent: true, code: data.code, message_id: data.data && data.data.message_id };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ---------- handler ----------
 
 module.exports = async function handler(req, res) {
@@ -251,9 +370,11 @@ module.exports = async function handler(req, res) {
     await writeRecord(fields);
 
     // 飞书写入成功 → 尝试自动发送资料邮件（失败只记录，不影响线索和前端返回）
+    // source 以 skill-pack 开头 → 发《Skill 全集包》；否则维持自检页《入门包》逻辑
+    const isSkillPack = (source || '').indexOf('skill-pack') === 0;
     let emailSent = false;
     try {
-      const r = await sendMaterialsEmail(email);
+      const r = isSkillPack ? await sendSkillPackEmail(email) : await sendMaterialsEmail(email);
       emailSent = !!r.sent;
       if (r.skipped) {
         // 未配置发信：线索照常，前端看到成功，不会暴露内部状态
@@ -272,7 +393,10 @@ module.exports = async function handler(req, res) {
 
 // 导出内部函数供本地单测（Vercel 只调用 module.exports 本身，附加属性不影响）
 module.exports.sendMaterialsEmail = sendMaterialsEmail;
+module.exports.sendSkillPackEmail = sendSkillPackEmail;
 module.exports.loadDeliverables = loadDeliverables;
+module.exports.loadSkillPackDeliverables = loadSkillPackDeliverables;
 module.exports.buildEmailText = buildEmailText;
+module.exports.buildSkillPackEmailText = buildSkillPackEmailText;
 module.exports.toBase64Url = toBase64Url;
 module.exports.getUserMailToken = getUserMailToken;
