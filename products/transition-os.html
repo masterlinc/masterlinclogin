@@ -25,6 +25,13 @@
       --green: #46a758;
       --green-bg: rgba(70,167,88,0.12);
       --accent: #f4f3ef;
+      /* 看板 v1.7.0 新增：语义色与热力亮度阶（中性阶，色盲友好） */
+      --asset: #7C9CF5;
+      --evidence: #E8A33D;
+      --heat-0: #161616;
+      --heat-1: #2a2a28;
+      --heat-2: #8a8a85;
+      --heat-3: #f4f3ef;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { -webkit-text-size-adjust: 100%; }
@@ -239,6 +246,72 @@
     .about-line { font-size: 14px; color: var(--sub); line-height: 1.8; }
     .toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; font-weight: 650; padding: 10px 18px; border-radius: 999px; z-index: 200; opacity: 0; transition: opacity 200ms ease; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
     .toast.show { opacity: 1; }
+
+    /* ===== 看板 Dashboard（v1.7.0 新增，纯增量，只读） ===== */
+    .dash-inner { }
+    @media (min-width: 768px) { .dash-inner { max-width: 480px; margin: 0 auto; } }
+    /* 数字 300ms 淡入（只淡入不滚动） */
+    .num-in { animation: num-in 300ms ease-out; }
+    @keyframes num-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
+    /* 里程碑琥珀横幅（一次，240ms 淡入 + 4px 上移） */
+    .banner-milestone { border: 1px solid rgba(242,177,60,0.35); background: var(--yellow-bg); border-radius: 12px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #f0d9a8; line-height: 1.6; margin-bottom: 16px; animation: banner-in 240ms ease; }
+    @keyframes banner-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    /* 今日模式格（模式浅底 + 三重编码，卡片高度与其余三格一致） */
+    .dash-mode { display: flex; flex-direction: column; justify-content: center; }
+    .dash-mode .mode-top { gap: 8px; margin-bottom: 6px; }
+    .dash-mode .mode-name { font-size: 22px; }
+    /* 连续执行热力图（CSS Grid，52 周 × 7 天，中性亮度阶 + 模式微标） */
+    .heatmap-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px 10px; background: var(--card2); margin-top: 14px; position: relative; }
+    .heatmap-months { display: grid; grid-template-columns: repeat(52, 10px); gap: 3px; margin-bottom: 6px; }
+    .heatmap-months span { font-size: 12px; font-weight: 600; color: var(--dim); line-height: 1; white-space: nowrap; }
+    .heatmap { display: grid; grid-template-rows: repeat(7, 10px); grid-auto-flow: column; gap: 3px; }
+    .heat-cell { width: 10px; height: 10px; border-radius: 2px; position: relative; background: var(--heat-0); }
+    .heat-cell.hm-h1 { background: var(--heat-1); }
+    .heat-cell.hm-h2 { background: var(--heat-2); }
+    .heat-cell.hm-h3 { background: var(--heat-3); }
+    .heat-cell.today { outline: 1px solid rgba(244,243,239,0.35); outline-offset: -1px; }
+    .heat-cell.lit { animation: heat-lit 240ms ease; }
+    @keyframes heat-lit { from { opacity: 0; filter: brightness(0.25); } to { opacity: 1; filter: none; } }
+    .hm-dot { position: absolute; right: 1px; bottom: 1px; width: 3px; height: 3px; border-radius: 50%; display: block; box-sizing: border-box; }
+    .hm-dot.r { background: var(--red); }
+    .hm-dot.y { border: 1px solid var(--yellow); background: transparent; }
+    .hm-dot.g { background: var(--green); box-shadow: 0 0 0 1px var(--green); }
+    .heat-empty { position: absolute; inset: 0; z-index: 2; display: grid; place-items: center; text-align: center; font-size: 14px; color: var(--text); background: rgba(5,5,5,0.6); border-radius: 12px; padding: 16px; line-height: 1.7; }
+    .heat-empty .btn-row { justify-content: center; margin-top: 10px; }
+    .heat-legend { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--dim); margin-top: 10px; }
+    .heat-legend .legend-swatch { display: inline-flex; align-items: center; gap: 4px; }
+    .legend-swatch i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .legend-swatch.y i { border: 1px solid var(--yellow); background: transparent; }
+    .legend-swatch.g i { background: var(--green); box-shadow: 0 0 0 1px var(--green); }
+    /* 北极星漏斗阶梯：已到达级琥珀，未到达级灰骨架 */
+    .funnel-fill.ff-gold { background: var(--yellow); }
+    .funnel-fill.ff-skel { background: var(--line-soft); }
+    .funnel-num.muted { color: var(--dim); }
+    /* 母线紧凑进度（10 天刻度 + 当前天琥珀竖线） */
+    .dash-ml-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 16px 0 12px; }
+    .dash-ml-name { font-size: 16px; font-weight: 700; line-height: 1.3; }
+    .dash-ml-days { font-size: 32px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .dash-ml-days small { font-size: 14px; font-weight: 600; color: var(--sub); }
+    .ml-ticks { height: 14px; margin-top: 10px; position: relative; background-image: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(244,243,239,0.25) calc(10% - 1px) 10%); }
+    .ml-tick-now { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 1px; background: var(--yellow); }
+    .dash-ml-meta { font-size: 14px; color: var(--dim); margin-top: 10px; font-variant-numeric: tabular-nums; }
+    /* 资产 / 证据占比：donut + 图例 + 堆叠条 */
+    .split-row { display: grid; grid-template-columns: 96px 1fr; gap: 16px; align-items: center; }
+    .donut { width: 96px; height: 96px; border-radius: 50%; position: relative; }
+    .donut::after { content: ""; position: absolute; inset: 26px; border-radius: 50%; background: var(--card); }
+    .donut-center { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; z-index: 1; }
+    .donut-center b { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; display: block; line-height: 1.15; }
+    .donut-center span { font-size: 12px; color: var(--dim); }
+    .dash-legend { font-size: 14px; min-width: 0; }
+    .legend-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .legend-row .ld { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+    .legend-row b { font-variant-numeric: tabular-nums; margin-left: auto; }
+    .legend-sub { font-size: 12px; color: var(--dim); line-height: 1.7; margin-bottom: 8px; }
+    .stack-bar { display: flex; gap: 5px; height: 8px; border-radius: 99px; overflow: hidden; margin-top: 16px; }
+    .stack-bar .sb { border-radius: 99px; }
+    @media (prefers-reduced-motion: reduce) {
+      .num-in, .banner-milestone, .heat-cell.lit { animation: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -256,6 +329,7 @@
 
     <main>
       <h1 class="visually-hidden">转型操作系统 Transition OS — 每天 15-30 分钟，用碎片时间积累长期资产</h1>
+      <section class="view" id="view-dashboard"></section>
       <section class="view" id="view-today"></section>
       <section class="view" id="view-records"></section>
       <section class="view" id="view-mainline"></section>
@@ -266,6 +340,7 @@
 
   <nav class="tabbar" aria-label="主导航">
     <div class="tabbar-inner">
+      <button class="tab" data-route="dashboard"><span class="tab-ico">▣</span><span class="tab-label">看板</span></button>
       <button class="tab" data-route="today"><span class="tab-ico">☀</span><span class="tab-label">今日</span></button>
       <button class="tab" data-route="records"><span class="tab-ico">▤</span><span class="tab-label">记录</span></button>
       <button class="tab" data-route="mainline"><span class="tab-ico">➤</span><span class="tab-label">母线</span></button>
@@ -1315,8 +1390,238 @@
     });
   }
 
+  /* ================= 看板页（Dashboard · v1.7.0 新增，只读内存 db，不写 localStorage、不触发备份） ================= */
+  // 唯一允许写入 localStorage 的是里程碑去重标记 seenMilestones（视觉方案 4.3）
+  var MILESTONE_KEY = 'transition-os:milestones:v1';
+  function milestoneBanner() {
+    var seen = {};
+    try { seen = JSON.parse(localStorage.getItem(MILESTONE_KEY) || '{}') || {}; } catch (e) { seen = {}; }
+    var banner = null;
+    var st = streak();
+    var dMiles = [
+      { v: 90, t: '第 90 天 · 一个完整的 90 天周期' },
+      { v: 60, t: '第 60 天 · 已连续执行两个月' },
+      { v: 30, t: '第 30 天 · 连续执行满一个月' },
+      { v: 21, t: '第 21 天 · 三周整，已连续执行三周' },
+      { v: 7, t: '第 7 天 · 连续执行一整周' }
+    ];
+    for (var i = 0; i < dMiles.length && !banner; i++) {
+      if (st >= dMiles[i].v && !seen['d' + dMiles[i].v]) { banner = dMiles[i].t; seen['d' + dMiles[i].v] = 1; }
+    }
+    if (!banner && db.mainline) {
+      var elapsed = Math.max(0, Math.min(MAINLINE_DAYS, diffDays(db.mainline.startDate, todayStr)));
+      var mMiles = [
+        { v: 90, t: '母线已过 90 天 · 一个周期完成，该复盘换轨' },
+        { v: 60, t: '母线已过 60 天 · 还剩三分之一' },
+        { v: 30, t: '母线已过 30 天 · 还剩三分之二' }
+      ];
+      for (var j = 0; j < mMiles.length && !banner; j++) {
+        if (elapsed >= mMiles[j].v && !seen['m' + mMiles[j].v]) { banner = mMiles[j].t; seen['m' + mMiles[j].v] = 1; }
+      }
+    }
+    if (!banner) {
+      var aN = db.assets.length;
+      var aMiles = [
+        { v: 100, t: '第 100 项资产入账' },
+        { v: 50, t: '第 50 项资产入账' },
+        { v: 10, t: '第 10 项资产入账' }
+      ];
+      for (var k = 0; k < aMiles.length && !banner; k++) {
+        if (aN >= aMiles[k].v && !seen['a' + aMiles[k].v]) { banner = aMiles[k].t; seen['a' + aMiles[k].v] = 1; }
+      }
+    }
+    if (banner) { try { localStorage.setItem(MILESTONE_KEY, JSON.stringify(seen)); } catch (e) {} }
+    return banner;
+  }
+
+  function sundayOf(s) { var d = parseDate(s); d.setDate(d.getDate() - d.getDay()); return fmt(d); }
+
+  function dashHeatWeeks() {
+    var byDate = {};
+    db.dailySessions.forEach(function (s) {
+      var c = byDate[s.date] || (byDate[s.date] = { n: 0, mode: s.mode });
+      c.n++; c.mode = s.mode;
+    });
+    var weeks = [];
+    var start = sundayOf(todayStr);
+    for (var w = 51; w >= 0; w--) {
+      var ws = addDays(start, -w * 7);
+      var cells = [];
+      for (var i = 0; i < 7; i++) {
+        var d = addDays(ws, i);
+        var info = byDate[d];
+        cells.push({ date: d, n: info ? info.n : 0, mode: info ? info.mode : null });
+      }
+      weeks.push({ start: ws, cells: cells });
+    }
+    return weeks;
+  }
+
+  function dashKpis() {
+    var st = streak();
+    var s = sessionOf(todayStr);
+    var modeCard;
+    if (s && MODE_META[s.mode]) {
+      var mm = MODE_META[s.mode];
+      modeCard = '<div class="stat-card dash-mode mode-' + s.mode + '">' +
+        '<div class="mode-top"><span class="mode-dot"></span><span class="mode-name">' + mm.name + '</span></div>' +
+        '<div class="stat-label">今日模式 · 约 ' + mm.time + '</div></div>';
+    } else {
+      modeCard = '<div class="stat-card"><div class="stat-num" style="font-size:22px;">待判断</div>' +
+        '<div class="stat-label">今日模式 · <a class="link" data-action="goto-today">去判断 →</a></div></div>';
+    }
+    return '<div class="stat-grid">' +
+      '<div class="stat-card"><div class="stat-num num-in">' + st + '</div><div class="stat-label">连续执行（天）</div></div>' +
+      modeCard +
+      '<div class="stat-card"><div class="stat-num num-in" style="color:var(--asset);">' + db.assets.length + '</div><div class="stat-label">累计资产</div></div>' +
+      '<div class="stat-card"><div class="stat-num num-in" style="color:var(--evidence);">' + db.evidences.length + '</div><div class="stat-label">累计证据</div></div>' +
+      '</div>';
+  }
+
+  function dashHeatmap() {
+    var weeks = dashHeatWeeks();
+    var any = false;
+    weeks.forEach(function (w) { w.cells.forEach(function (c) { if (c.n > 0) any = true; }); });
+    var months = '', lastMonth = '';
+    weeks.forEach(function (w) {
+      var m = w.start.slice(0, 7);
+      if (m !== lastMonth) { months += '<span>' + parseInt(m.slice(5), 10) + '月</span>'; lastMonth = m; }
+      else months += '<span></span>';
+    });
+    var cells = '';
+    weeks.forEach(function (w) {
+      w.cells.forEach(function (c) {
+        var lvl = c.n >= 3 ? 3 : c.n;
+        var title = prettyDate(c.date) + (c.n ? ' · 执行 ' + c.n + ' 次' + (c.mode && MODE_META[c.mode] ? ' · ' + MODE_META[c.mode].name : '') : ' · 未执行');
+        var cls = 'heat-cell hm-h' + lvl;
+        if (c.date === todayStr) { cls += ' today'; if (lvl > 0) cls += ' lit'; }
+        cells += '<div class="' + cls + '" title="' + esc(title) + '">' + (lvl >= 1 && c.mode ? '<i class="hm-dot ' + c.mode.charAt(0) + '"></i>' : '') + '</div>';
+      });
+    });
+    var h = '<div class="card">';
+    h += '<div class="card-title">连续执行 · 热力图</div>';
+    h += '<p class="card-sub" style="margin-bottom:4px;">最近 52 周，一格一天。默认看最新，可横向滑动回看。</p>';
+    h += '<div class="heatmap-wrap">';
+    h += '<div class="heatmap-months" aria-hidden="true">' + months + '</div>';
+    h += '<div class="heatmap" role="img" aria-label="最近 52 周连续执行热力图，亮度代表执行次数，圆点代表当日模式">' + cells + '</div>';
+    if (!any) {
+      h += '<div class="heat-empty"><div>完成第一次执行，点亮第一格</div><div class="btn-row"><button class="btn-ghost btn btn-sm" data-action="goto-today">去今日页</button></div></div>';
+    }
+    h += '</div>';
+    h += '<div class="heat-legend"><span>亮度 = 执行强度</span><span class="legend-swatch"><i style="background:var(--red);"></i>红日</span><span class="legend-swatch y"><i></i>黄日</span><span class="legend-swatch g"><i></i>绿日</span><span>圆点 = 当日模式</span></div>';
+    h += '</div>';
+    return h;
+  }
+
+  function dashFunnel() {
+    var c = funnelCounts();
+    var keys = ['person', 'pain', 'service', 'payment', 'product'];
+    var max = 1;
+    keys.forEach(function (k) { if (c[k] > max) max = c[k]; });
+    var currentIdx = -1;
+    for (var i = keys.length - 1; i >= 0; i--) { if (c[keys[i]] > 0) { currentIdx = i; break; } }
+    var h = '<div class="card">';
+    h += '<div class="card-title">北极星 · 走到哪了</div>';
+    if (currentIdx >= 0) {
+      var cur = FUNNEL[currentIdx];
+      h += '<p class="card-sub" style="margin-bottom:14px;">当前：' + cur.name + ' ' + c[cur.key] + ' 条' + (currentIdx < 4 ? ' · 下一步：' + FUNNEL[currentIdx + 1].name : ' · 已到产品化，专注售卖与反馈循环') + '</p>';
+    } else {
+      h += '<p class="card-sub" style="margin-bottom:14px;">从一次真实互动开始点亮漏斗。</p>';
+    }
+    h += '<div class="funnel">';
+    FUNNEL.forEach(function (f, idx) {
+      var n = c[f.key];
+      var reached = currentIdx >= 0 && idx <= currentIdx && n > 0;
+      var width = reached ? Math.round(n / max * 100) : 8;
+      var fillCls = reached ? 'funnel-fill ff-gold' : 'funnel-fill ff-skel';
+      var numCls = reached ? 'funnel-num' : 'funnel-num muted';
+      h += '<div class="funnel-row"><div class="funnel-name">' + f.name + '</div>' +
+        '<div class="funnel-track"><div class="' + fillCls + '" style="width:' + width + '%;"></div></div>' +
+        '<span class="' + numCls + '">' + n + '</span></div>';
+    });
+    h += '</div>';
+    if (currentIdx < 0) h += '<div class="btn-row"><button class="btn-ghost btn btn-sm" data-action="goto-today">去今日页</button></div>';
+    h += '</div>';
+    return h;
+  }
+
+  function dashMainline() {
+    var h = '<div class="card">';
+    if (!db.mainline) {
+      h += '<div class="card-title">给自己定一条 90 天母线</div>';
+      h += '<p class="card-sub" style="margin-bottom:14px;">看板的进度基准从这里开始。</p>';
+      h += '<div class="btn-row"><button class="btn" data-action="goto-mainline">开始设定 →</button></div>';
+    } else {
+      var ml = db.mainline;
+      var elapsed = Math.max(0, Math.min(MAINLINE_DAYS, diffDays(ml.startDate, todayStr)));
+      var remain = Math.max(0, MAINLINE_DAYS - elapsed);
+      var pct = Math.round(elapsed / MAINLINE_DAYS * 100);
+      h += '<div class="card-title">母线进度</div>';
+      h += '<div class="dash-ml-head"><div class="dash-ml-name">' + esc(ml.name) + '</div><div class="dash-ml-days">' + remain + '<small> 天</small></div></div>';
+      h += '<div class="mainline-progress"><div class="mainline-progress-fill" style="width:' + pct + '%;"></div></div>';
+      h += '<div class="ml-ticks"><div class="ml-tick-now" style="left:calc(' + pct + '% - 1px);"></div></div>';
+      h += '<div class="dash-ml-meta">第 ' + Math.min(elapsed + 1, MAINLINE_DAYS) + ' / ' + MAINLINE_DAYS + ' 天 · ' + pct + '% · 已换 ' + (ml.switchedCount || 0) + ' 次</div>';
+    }
+    h += '</div>';
+    return h;
+  }
+
+  function dashRatio() {
+    var aN = db.assets.length, eN = db.evidences.length, total = aN + eN;
+    var h = '<div class="card">';
+    h += '<div class="card-title">资产 / 证据占比</div>';
+    if (total === 0) {
+      h += '<div class="empty" style="padding:24px 12px;"><div class="empty-ico">◈</div>资产和证据，都在这里沉淀。<div class="btn-row" style="justify-content:center;"><button class="btn-ghost btn btn-sm" data-action="goto-today">去做今日动作</button></div></div>';
+    } else {
+      var aPct = Math.round(aN / total * 100);
+      h += '<div class="split-row">';
+      h += '<div class="donut" style="background:conic-gradient(var(--asset) 0 ' + aPct + '%, var(--evidence) ' + aPct + '% 100%);"><div class="donut-center"><div><b>' + total + '</b><span>沉淀</span></div></div></div>';
+      h += '<div class="dash-legend">';
+      h += legendRow('var(--asset)', '资产', aN);
+      h += '<div class="legend-sub">' + subCounts('asset') + '</div>';
+      h += legendRow('var(--evidence)', '证据', eN);
+      h += '<div class="legend-sub">' + subCounts('evidence') + '</div>';
+      h += '</div></div>';
+      h += '<div class="stack-bar"><div class="sb" style="flex-grow:' + aN + ';background:var(--asset);"></div><div class="sb" style="flex-grow:' + eN + ';background:var(--evidence);"></div></div>';
+    }
+    h += '</div>';
+    return h;
+  }
+  function legendRow(color, label, n) {
+    return '<div class="legend-row"><span class="ld" style="background:' + color + ';"></span>' + label + '<b>' + n + '</b></div>';
+  }
+  function subCounts(kind) {
+    var map = {};
+    if (kind === 'asset') db.assets.forEach(function (a) { map[a.type] = (map[a.type] || 0) + 1; });
+    else db.evidences.forEach(function (e) { map[e.type] = (map[e.type] || 0) + 1; });
+    var defs = kind === 'asset' ? ASSET_TYPES : EVIDENCE_TYPES;
+    var parts = defs.map(function (t) { return map[t.v] ? t.n + ' ' + map[t.v] : null; }).filter(Boolean);
+    return parts.join(' · ') || '—';
+  }
+
+  function renderDashboard() {
+    var v = $id('view-dashboard');
+    var h = '';
+    var banner = milestoneBanner();
+    if (banner) h += '<div class="banner-milestone" role="note">' + banner + '</div>';
+    h += '<p class="kicker">看板 · Dashboard</p>';
+    h += '<h2 class="page-title">今天的状态，一眼看清</h2>';
+    h += '<p class="page-sub">连续执行 · 最近节奏 · 走到了哪。只呈现事实，不评判。</p>';
+    h += '<div class="dash-inner">';
+    h += dashKpis();
+    h += dashHeatmap();
+    h += dashFunnel();
+    h += dashMainline();
+    h += dashRatio();
+    h += '</div>';
+    v.innerHTML = h;
+    // 热力图默认滚动到最新（最右）
+    var wrap = v.querySelector('.heatmap-wrap');
+    if (wrap) wrap.scrollLeft = wrap.scrollWidth;
+  }
+
   /* ================= 路由与渲染 ================= */
-  var ROUTES = ['today', 'records', 'mainline', 'review', 'settings'];
+  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'settings'];
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, '');
     return ROUTES.indexOf(h) >= 0 ? h : 'today';
@@ -1332,7 +1637,8 @@
       else t.removeAttribute('aria-current');
     });
     $id('topDate').textContent = prettyDate(todayStr) + ' · ' + (db.mainline ? '母线 ' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + ' 天' : '未设母线');
-    if (route === 'today') renderToday();
+    if (route === 'dashboard') renderDashboard();
+    else if (route === 'today') renderToday();
     else if (route === 'records') renderRecords();
     else if (route === 'mainline') renderMainline();
     else if (route === 'review') renderReview();
@@ -1388,6 +1694,7 @@
       case 'cloud-backup-now': doBackup(); break;
       case 'cloud-restore': cloudRestore(); break;
       case 'reset-data': resetData(); break;
+      case 'goto-today': location.hash = '#/today'; break;
       case 'goto-settings': location.hash = '#/settings'; break;
       case 'goto-mainline': location.hash = '#/mainline'; break;
       case 'dismiss-backup': db.meta.backupDismissDate = todayStr; persist(); render(); break;
