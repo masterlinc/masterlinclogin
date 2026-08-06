@@ -231,8 +231,8 @@
     .seg button.active { background: var(--text); color: var(--bg); font-weight: 700; }
 
     /* 弹层 */
-    .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.66); display: flex; align-items: flex-end; justify-content: center; z-index: 100; animation: fadeIn 150ms ease; }
-    @media (min-width: 560px) { .modal-mask { align-items: center; } }
+    .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,0.66); display: flex; align-items: flex-end; justify-content: center; z-index: 100; animation: fadeIn 150ms ease; padding-bottom: 61px; padding-bottom: calc(61px + env(safe-area-inset-bottom, 0px)); }
+    @media (min-width: 560px) { .modal-mask { align-items: center; padding-bottom: 0; } }
     .modal { width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px 20px 0 0; padding: 22px; }
     @media (min-width: 560px) { .modal { border-radius: 20px; } }
     .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
