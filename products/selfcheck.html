@@ -110,7 +110,9 @@
     .leadbox { margin-top: 22px; border: 1px solid #2a2a28; border-radius: 16px; padding: 24px; background: #0b0b0b; }
     .leadbox-tag { display: inline-block; background: transparent; border: 1px solid #f4f3ef; color: #f4f3ef; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 999px; margin-bottom: 14px; }
     .leadbox h3 { font-size: 18px; font-weight: 750; margin-bottom: 8px; }
-    .leadbox .lead-intro { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 18px; }
+    .leadbox .lead-intro { font-size: 14px; color: #a8a8a5; line-height: 1.7; margin-bottom: 14px; }
+    .leadbox .lead-intro strong { color: #f4f3ef; font-weight: 650; }
+    .leadbox .lead-boundary { font-size: 12px; color: #888; line-height: 1.6; margin: 0 0 16px; padding: 10px 12px; border: 1px dashed #2a2a28; border-radius: 8px; background: #080808; }
     .lead-label { display: block; font-size: 13px; font-weight: 650; color: #d9d9d6; margin: 14px 0 6px; }
     .lead-label .req { color: #f4f3ef; }
     .lead-input { min-height: 0; height: auto; padding: 12px 14px; font-size: 15px; }
@@ -243,22 +245,23 @@
           <div class="hook no-print">
             <h3>自检只是第一步</h3>
             <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
-            <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">约一次 30 分钟诊断（免费先聊）→</button>
+            <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">30 分钟一对一诊断（¥299/次）· 先免费聊 5 分钟 →</button>
             <div class="hook-panel" id="diagPanel" hidden>
               <img class="hook-qr-img" src="/wechat-qr-card.png" alt="个人微信二维码" width="140" height="140" />
               <div class="hook-panel-text">
-                <strong>扫码加微信，约 30 分钟诊断</strong>
-                <span>添加时备注「自检诊断」，我来安排时间。免费先聊，不推销。</span>
+                <strong>扫码加微信，约 30 分钟一对一诊断</strong>
+                <span>添加时备注「自检诊断」。¥299/次，先免费聊 5 分钟再决定，不推销。</span>
                 <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
               </div>
             </div>
           </div>
 
-          <!-- 免费资料 · 线索捕获 -->
+          <!-- 免费入门包 · 线索捕获 -->
           <div class="leadbox no-print" id="leadbox">
             <span class="leadbox-tag">免费领取</span>
-            <h3>把这份自检结果带走，免费领配套资料包</h3>
-            <p class="lead-intro">留下邮箱，免费领取《管理者 AI 自检配套资料》：五步落地清单（PDF）+ 会议闭环四栏模板 + 3 个真实现场案例。不发广告，随时退订。</p>
+            <h3>把这份自检结果带走：免费领《自检结果入门包》</h3>
+            <p class="lead-intro">留下邮箱，免费领取《自检结果入门包》：<strong>① 你的自检结果行动卡</strong>（基于刚才的自检输出，个性化、可打印）+ <strong>② 会前三问清单</strong>（引导思考，不含完整模板）+ <strong>③ 7 天验证表</strong>（跟踪第一步落地）。不发广告，随时退订。</p>
+            <p class="lead-boundary">免费入门包解决「知道方向」；完整方法手册与会议四栏模板在下方 ¥29 完整工具包里。</p>
             <form id="leadForm" novalidate>
               <label class="lead-label" for="leadEmail">邮箱 <span class="req">*</span></label>
               <input class="check-input lead-input" type="email" id="leadEmail" name="email" placeholder="you@example.com" autocomplete="email" required />
@@ -270,33 +273,33 @@
               </label>
               <div class="lead-error" id="leadError" role="alert" hidden></div>
               <div class="btn-row">
-                <button class="btn" type="submit" id="leadSubmit">免费领取资料 →</button>
+                <button class="btn" type="submit" id="leadSubmit">免费领入门包 →</button>
               </div>
             </form>
             <div class="lead-success" id="leadSuccess" hidden>
               <div class="lead-success-icon">✓</div>
-              <h3>资料马上发到你的邮箱</h3>
-              <p>我们会在 <strong>24 小时内</strong>把《管理者 AI 自检配套资料》发到 <strong id="leadSuccessEmail"></strong>。若没收到，回复任意邮件即可联系我们。</p>
+              <h3>入门包马上发到你的邮箱</h3>
+              <p>我们会在 <strong>24 小时内</strong>把《自检结果入门包》（行动卡 + 会前三问 + 7 天验证表）发到 <strong id="leadSuccessEmail"></strong>。若没收到，回复任意邮件即可联系我们。</p>
             </div>
           </div>
 
           <div class="paybox no-print">
-            <span class="paybox-tag">进阶版 · ¥29</span>
-            <h3>完整版：把这一件「最该 AI 改的事」真正跑起来</h3>
-            <p class="pay-sub">免费工具给你方向，进阶版给你可直接拿去用的交付物。</p>
+            <span class="paybox-tag">完整工具包 · ¥29</span>
+            <h3>进阶版 ¥29：从入门到完整落地</h3>
+            <p class="pay-sub">免费入门包给方向，完整工具包给可直接用的全套交付物——三问帮你「想清楚」，四栏帮你「落得下」。</p>
             <ul>
-              <li><strong>方法手册 PDF</strong>：AI 会议纪要四栏机制 + 流程审计五步 + 3 个真实现场案例</li>
-              <li><strong>会议闭环四栏模板</strong>：飞书 / Obsidian 复制即用，防止「讨论变决定」</li>
+              <li><strong>方法手册 PDF</strong>：AI 会议纪要四栏机制 + 流程审计五步 + 3 个真实现场案例（含复盘）</li>
+              <li><strong>会议闭环四栏模板</strong>：飞书 / Obsidian 复制即用，防止「讨论变决定」（免费区只给三问，这里给完整闭环）</li>
               <li><strong>会后复查清单</strong>：5 分钟核对，确保每件事都有负责人和截止时间</li>
             </ul>
             <div class="pay-row">
-              <span class="pay-price">¥29 <small>一次买断 · 微信付款 · 秒发资料</small></span>
+              <span class="pay-price">¥29 <small>一次买断 · 微信付款 · 24 小时内人工核对发货</small></span>
             </div>
             <div class="pay-qr-row">
-              <div class="pay-qr-item"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「工具包」</span></div>
-              <div class="pay-qr-item"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「工具包」</span></div>
+              <div class="pay-qr-item"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「完整工具包」</span></div>
+              <div class="pay-qr-item"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「完整工具包」</span></div>
             </div>
-            <p class="pay-note">付款后把截图发给公众号/微信，自动获得下载链接。先诊断，再买工具——这比任何软件都值钱。</p>
+            <p class="pay-note">付款后把截图发给公众号/微信，24 小时内人工核对发货。免费入门包解决「知道方向」，完整工具包解决「拿到方法」——如果你要的是可直接用的全套交付物，这里才是完整的那一份。</p>
           </div>
         </div>
         <div class="btn-row no-print">
@@ -590,7 +593,7 @@
           errBox.textContent = '提交失败：' + (err && err.message ? err.message : '网络异常') + '。请稍后重试，或把邮箱和问题发到页面底部的邮箱。';
           errBox.hidden = false;
           btn.disabled = false;
-          btn.textContent = '免费领取资料 →';
+          btn.textContent = '免费领入门包 →';
         });
       });
     }
