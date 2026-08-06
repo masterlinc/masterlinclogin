@@ -353,6 +353,131 @@
     @media (prefers-reduced-motion: reduce) {
       .num-in, .banner-milestone, .heat-cell.lit { animation: none !important; }
     }
+
+    /* ===== 首次引导覆盖层 + 今日页欢迎/步骤条（v1.17.0 新增） ===== */
+    /* 首屏全屏覆盖层：z-index 200 > modal 100 > tabbar 50，不改路由、不可被 hash 绕过 */
+    #onboardOverlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+    }
+    .ob-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 4px; }
+    .ob-head .ob-brand { display: flex; align-items: center; gap: 10px; }
+    .ob-head .ob-brand-mark {
+      width: 34px; height: 34px; border-radius: 10px; background: var(--text); color: var(--bg);
+      display: inline-flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; flex-shrink: 0;
+    }
+    .ob-head .ob-brand-name { font-size: 15px; font-weight: 750; line-height: 1.2; }
+    .ob-head .ob-brand-sub { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); }
+    .ob-home-link { font-size: 13px; color: var(--dim); text-decoration: none; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; min-height: 36px; display: inline-flex; align-items: center; }
+    .ob-home-link:hover { color: var(--text); border-color: var(--line-soft); }
+    .ob-track-wrap { flex: 1; overflow: hidden; }
+    .ob-track { display: flex; height: 100%; transition: transform 0.3s ease; }
+    .ob-screen { flex: 0 0 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 18px 20px 30px; }
+    .ob-inner { max-width: 520px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+    .ob-kicker { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); margin-bottom: 8px; }
+    .ob-title { font-size: 26px; line-height: 1.3; font-weight: 800; letter-spacing: -0.01em; margin: 6px 0 12px; }
+    .ob-sub { font-size: 14px; color: var(--sub); line-height: 1.75; margin-bottom: 18px; }
+    .ob-sub b { color: var(--text); font-weight: 650; }
+    .ob-bigq { font-size: 30px; line-height: 1.35; font-weight: 800; letter-spacing: -0.015em; margin: 14px 0 6px; }
+    .ob-bigq small { display: block; font-size: 15px; font-weight: 600; color: var(--sub); margin-top: 8px; letter-spacing: 0; }
+    .ob-trust { margin-top: auto; padding-top: 26px; font-size: 13px; color: var(--dim); line-height: 1.8; }
+    .ob-trust span { display: block; }
+    .ob-browse-link {
+      display: inline-block; margin-top: 14px; font-size: 14px; color: var(--dim); text-decoration: underline;
+      text-underline-offset: 3px; cursor: pointer; padding: 6px 0; min-height: 36px; text-align: left;
+    }
+    .ob-browse-link:hover { color: var(--text); }
+    /* 第 2 屏：四步循环 + 母线 */
+    .ob-flow { display: flex; flex-direction: column; }
+    .ob-flow-step { display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line-soft); }
+    .ob-flow-step:first-child { border-top: none; padding-top: 2px; }
+    .ob-flow-num { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--card2); border: 1px solid var(--line-soft); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 750; color: var(--text); margin-top: 1px; }
+    .ob-flow-name { font-size: 15px; font-weight: 700; line-height: 1.4; }
+    .ob-flow-name .ob-flow-time { font-size: 12px; font-weight: 500; color: var(--dim); margin-left: 6px; }
+    .ob-flow-desc { font-size: 13px; color: var(--sub); line-height: 1.65; margin-top: 3px; }
+    .ob-flow-desc .ob-ex { display: block; color: var(--dim); font-size: 12px; margin-top: 3px; }
+    .ob-ml-card { margin-top: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--card2); padding: 16px; }
+    .ob-ml-title { font-size: 15px; font-weight: 750; margin-bottom: 8px; }
+    .ob-ml-line { font-size: 13px; color: var(--sub); line-height: 1.7; }
+    .ob-ml-line b { color: var(--text); }
+    .ob-ml-example { margin-top: 10px; font-size: 13px; color: var(--dim); background: var(--bg); border: 1px dashed var(--line); border-radius: 8px; padding: 9px 11px; line-height: 1.7; }
+    .ob-sum { margin-top: 20px; font-size: 14px; color: var(--text); font-weight: 650; line-height: 1.7; }
+    .ob-sum small { display: block; font-weight: 500; color: var(--dim); margin-top: 4px; }
+    /* 第 3 屏：表单 */
+    .ob-form { display: flex; flex-direction: column; }
+    .ob-label { font-size: 14px; color: var(--sub); margin: 4px 0 6px; display: block; }
+    .ob-hint { font-size: 12px; color: var(--dim); margin-top: 5px; line-height: 1.6; }
+    .ob-consent {
+      display: flex; gap: 10px; align-items: flex-start; margin: 14px 0 6px;
+      font-size: 13px; color: var(--sub); line-height: 1.65; cursor: pointer;
+    }
+    .ob-consent input { width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0; accent-color: var(--text); }
+    .ob-consent b { color: var(--text); font-weight: 650; }
+    .ob-legal { font-size: 12px; color: var(--dim); line-height: 1.75; background: var(--card2); border: 1px solid var(--line-soft); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+    .ob-foot {
+      flex-shrink: 0; padding: 14px 20px; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid var(--line-soft); background: rgba(5,5,5,0.92); backdrop-filter: blur(12px);
+    }
+    .ob-foot-inner { max-width: 520px; margin: 0 auto; }
+    .ob-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
+    .ob-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-soft); transition: background 150ms ease; }
+    .ob-dot.on { background: var(--text); }
+    .ob-btn-row { display: flex; gap: 10px; }
+    .ob-btn-row .btn { flex: 1; }
+    .ob-btn-row .btn-ghost { flex: 1; }
+    /* 今日页欢迎区 */
+    .today-welcome { margin-bottom: 16px; }
+    .tw-hello { font-size: 21px; line-height: 1.35; font-weight: 800; letter-spacing: -0.01em; }
+    .tw-hello .tw-name { color: var(--text); }
+    .tw-day { font-size: 13px; color: var(--dim); margin-top: 3px; }
+    .tw-order {
+      margin-top: 12px; font-size: 14px; color: var(--sub); line-height: 1.7;
+      background: var(--card2); border: 1px solid var(--line-soft); border-radius: 12px; padding: 12px 14px;
+    }
+    .tw-order b { color: var(--text); font-weight: 700; }
+    .tw-milestone {
+      margin-top: 12px; font-size: 14px; line-height: 1.7; color: #f0d9a8;
+      background: var(--yellow-bg); border: 1px solid rgba(242,177,60,0.3); border-radius: 12px; padding: 12px 14px;
+    }
+    /* 常驻迷你四步条 */
+    .mini-steps { border: 1px solid var(--line); border-radius: 12px; background: var(--card2); padding: 10px 12px; margin-bottom: 16px; }
+    .mini-steps-row { display: flex; align-items: center; }
+    .mini-step {
+      flex: 1; display: flex; align-items: center; gap: 5px; justify-content: center;
+      font-size: 13px; color: var(--dim); padding: 8px 4px; min-height: 40px; border-radius: 8px; white-space: nowrap;
+    }
+    .mini-step .ms-n { font-weight: 700; }
+    .mini-step.done { color: var(--green); }
+    .mini-step.done .ms-n { color: var(--green); }
+    .mini-step:hover { background: #161616; }
+    .mini-arrow { color: var(--line-soft); font-size: 12px; flex-shrink: 0; }
+    .mini-ml { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line-soft); margin-top: 6px; padding-top: 8px; font-size: 12px; color: var(--dim); }
+    .mini-ml b { color: var(--sub); font-weight: 650; }
+    .mini-ml .ml-on { color: var(--green); }
+    .mini-ml .ml-off { color: var(--yellow); }
+    /* 浏览模式提示条 */
+    .browse-tip {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+      border: 1px solid rgba(127,181,240,0.4); background: rgba(127,181,240,0.1); border-radius: 12px; padding: 11px 14px;
+      font-size: 13px; color: #bfd7f2; line-height: 1.5;
+    }
+    .browse-tip b { color: #e3eeff; }
+    .browse-tip .bt-x { margin-left: auto; color: var(--dim); font-size: 16px; min-width: 40px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    /* 老用户补填提示条 */
+    .profile-tip {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+      border: 1px solid rgba(70,167,88,0.4); background: var(--green-bg); border-radius: 12px; padding: 11px 14px;
+      font-size: 13px; color: #b8dfc0; line-height: 1.5;
+    }
+    .profile-tip b { color: #d9f3de; }
+    .profile-tip .pt-x { margin-left: auto; color: var(--dim); font-size: 16px; min-width: 40px; min-height: 40px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .profile-tip .btn-sm { flex-shrink: 0; }
+    @media (max-width: 480px) {
+      .ob-title { font-size: 23px; }
+      .ob-bigq { font-size: 26px; }
+      .ob-foot { padding: 12px 14px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+    }
   </style>
 </head>
 <body>
@@ -424,13 +549,15 @@
 
   function emptyDB() {
     return {
-      user: { id: uid(), name: 'masterlinc', stage: 'validate', plan: 'free', email: '', planNote: '', createdAt: nowISO() },
+      // v1.17.0：name 遗留硬编码改为 ''（消除 masterlinc 身份泄漏红线）；
+      // 新增 nickname/onboarded/onboardedAt/privacy（首次引导数据模型，见技术方案 §1）。
+      user: { id: uid(), name: '', stage: 'validate', plan: 'free', email: '', planNote: '', nickname: '', onboarded: false, onboardedAt: null, privacy: null, createdAt: nowISO() },
       mainline: null,
       dailySessions: [],
       assets: [],
       evidences: [],
       weeklyReviews: [],
-      meta: { lastExportAt: null, backupDismissDate: null, createdAt: nowISO() }
+      meta: { lastExportAt: null, backupDismissDate: null, profileTipDismissDate: null, shownWelcomeIds: [], createdAt: nowISO() }
     };
   }
   function load() {
@@ -448,6 +575,13 @@
     if (!d.user.plan) d.user.plan = 'free';           // 阶段一：plan 开关（老数据迁移默认 free）
     if (d.user.email == null) d.user.email = '';       // 阶段一：邮箱钩子（只存不验证）
     if (!d.user.planNote) d.user.planNote = '';        // 阶段一：解锁备注
+    // v1.17.0 首次引导数据迁移：老用户无新字段 → 补默认值（onboarded=false 触发一次性补填）
+    if (d.user.nickname == null) d.user.nickname = '';          // 昵称：'' = 未填；渲染时用「转型者」兜底
+    if (d.user.onboarded == null) d.user.onboarded = false;     // 引导完成标记：false → 下次打开走引导/补填
+    if (d.user.onboardedAt == null) d.user.onboardedAt = null;  // 引导完成时间 ISO
+    if (d.user.privacy == null) d.user.privacy = null;          // 个保法同意记录 { agreedAt, version }
+    if (d.meta.profileTipDismissDate == null) d.meta.profileTipDismissDate = null; // 老用户补填提示条关闭日期
+    if (!Array.isArray(d.meta.shownWelcomeIds)) d.meta.shownWelcomeIds = [];        // 里程碑欢迎语去重
     if (!Array.isArray(d.dailySessions)) d.dailySessions = [];
     if (!Array.isArray(d.assets)) d.assets = [];
     if (!Array.isArray(d.evidences)) d.evidences = [];
@@ -481,7 +615,7 @@
   function backupUserId() {
     return (db && db.user && db.user.id) ? db.user.id : 'masterlinc';
   }
-  var BACKUP_VERSION = '1.8.0';
+  var BACKUP_VERSION = '1.17.0';
   var BACKUP_DEBOUNCE_MS = 3000; // 3 秒内合并多次 persist 为一次上传
   var backupTimer = null;
   var backupInFlight = false;
@@ -727,6 +861,208 @@
     { key: 'product', name: '产品化', hint: '沉淀出产品形态' }
   ];
 
+  /* ================= 首次引导（v1.17.0） =================
+   * 状态机：onboarded=true → 永不弹；false 且无遗留数据 → 新用户完整 3 屏；
+   *         false 且有遗留数据 → 老用户轻量 1 屏补填（可跳过）。
+   * 形态：首屏全屏覆盖层（z-index 200 > modal 100 > tabbar 50），不改 ROUTES/render/hash。
+   */
+  var browseMode = false;      // 浏览模式：可看不可记，onboarded 仍 false
+  var onboardIndex = 0;        // 3 屏当前索引
+  var onboardEl = null;        // 覆盖层 DOM
+
+  function hasLegacyData() {
+    return !!(db.mainline || (db.dailySessions && db.dailySessions.length)
+      || (db.assets && db.assets.length) || (db.evidences && db.evidences.length));
+  }
+  function needsOnboarding() {
+    return !(db.user && db.user.onboarded === true);
+  }
+  function onboardingMode() {
+    return hasLegacyData() ? 'light' : 'full';
+  }
+  function displayNickname() {
+    var n = (db.user.nickname || '').trim();
+    return n || '转型者';
+  }
+
+  function mountOnboarding(force) {
+    if (!force && !needsOnboarding()) return;
+    if (onboardEl) { onboardEl.remove(); onboardEl = null; }
+    onboardIndex = 0;
+    var mode = onboardingMode();
+    var el = document.createElement('div');
+    el.id = 'onboardOverlay';
+    var screens = mode === 'full' ? (screenPromise() + screenFlow() + screenForm()) : lightScreen();
+    el.innerHTML =
+      '<div class="ob-head">' +
+      '<div class="ob-brand"><span class="ob-brand-mark">◤</span><div><div class="ob-brand-name">转型操作系统</div><div class="ob-brand-sub">Transition OS</div></div></div>' +
+      '<a class="ob-home-link" href="/#top">← 返回主页</a>' +
+      '</div>' +
+      '<div class="ob-track-wrap"><div class="ob-track">' + screens + '</div></div>' +
+      '<div class="ob-foot"><div class="ob-foot-inner">' +
+      '<div class="ob-dots">' + (mode === 'full'
+        ? '<span class="ob-dot on"></span><span class="ob-dot"></span><span class="ob-dot"></span>'
+        : '<span class="ob-dot on"></span>') + '</div>' +
+      '<div class="ob-btn-row">' +
+      (mode === 'full' ? '<button class="btn-ghost hide" data-action="onboard-prev" id="obPrev">上一步</button>' : '') +
+      '<button class="btn" data-action="onboard-next" id="obNext">下一步</button>' +
+      '<button class="btn hide" data-action="onboard-submit" id="obSubmit">开始我的转型 →</button>' +
+      (mode === 'light' ? '<button class="btn-ghost" data-action="onboard-skip" id="obSkip">暂时跳过</button>' : '') +
+      '</div></div></div>';
+    document.body.appendChild(el);
+    onboardEl = el;
+    syncOnboardUI();
+  }
+
+  function screenPromise() {
+    return '<div class="ob-screen"><div class="ob-inner">' +
+      '<p class="ob-kicker">转型系统 · 只回答一个问题</p>' +
+      '<div class="ob-bigq">「今天，我该为转型做什么？」<small>你不必每天想方向、想方法、想该学什么。<br>每天打开系统，它会告诉你。</small></div>' +
+      '<p class="ob-sub">每天 15-30 分钟，用碎片时间，积累属于你自己的长期资产。<br>这不是又一个打卡工具——它帮你把「想转型」变成每天一件具体的小事，90 天不换方向，只认资产与证据，不认自我感动。</p>' +
+      '<div class="ob-trust"><span>· 不需要真实姓名 · 不需要下载 · 数据属于你</span>' +
+      '<button class="ob-browse-link" data-action="onboard-browse">暂不填写，先看看系统长什么样 →</button></div>' +
+      '</div></div>';
+  }
+  function flowStep(n, name, time, desc, ex) {
+    return '<div class="ob-flow-step"><div class="ob-flow-num">' + n + '</div><div>' +
+      '<div class="ob-flow-name">' + name + '<span class="ob-flow-time">' + time + '</span></div>' +
+      '<div class="ob-flow-desc">' + desc + '<span class="ob-ex">' + ex + '</span></div></div></div>';
+  }
+  function screenFlow() {
+    return '<div class="ob-screen"><div class="ob-inner">' +
+      '<p class="ob-kicker">每天 15-30 分钟 · 四步循环</p>' +
+      '<h2 class="ob-title">系统每天只让你走四步</h2>' +
+      '<div class="ob-flow">' +
+      flowStep('1', '状态判断', '1 分钟', '今天什么日子？红/黄/绿 → 决定投入多少精力', '没睡够？红日，3 分钟也算数。') +
+      flowStep('2', '今日唯一动作', '5-20 分钟', '今天只做一件事。系统按你的阶段推荐，照做即可', '把那个痛点写成一张案例卡。') +
+      flowStep('3', '记录沉淀', '3-5 分钟', '做完的算资产还是证据？可复用=资产 · 真实信号=证据', '笔记=资产，用户原话=证据。') +
+      flowStep('4', '微复盘', '1 分钟', '1 行事实 + 明日预告。今天闭环，明天不纠结', '今天新增 1 项资产，明天继续。') +
+      '</div>' +
+      '<div class="ob-ml-card">' +
+      '<div class="ob-ml-title">一条 90 天母线，钉住你的方向</div>' +
+      '<div class="ob-ml-line">受众 + 问题 + 载体。90 天不换方向，每 7 天检查一次：<b>还在线上吗？</b>跑偏了系统提醒你，不让自嗨。</div>' +
+      '<div class="ob-ml-example">例：帮 35-50 岁管理者，把 AI 用到管理现场。</div>' +
+      '</div>' +
+      '<div class="ob-sum">90 天后：你有 X 项资产、Y 条证据、一个验证过的方向<small>——而不是 90 天打卡记录。</small></div>' +
+      '</div></div>';
+  }
+  function screenForm() {
+    return '<div class="ob-screen"><div class="ob-inner">' +
+      '<p class="ob-kicker">最后一步 · 30 秒</p>' +
+      '<h2 class="ob-title">欢迎来到你的转型系统</h2>' +
+      '<p class="ob-sub">接下来 90 天，系统会每天告诉你该做什么。<b>先花 30 秒，让系统认识你、记住你。</b></p>' +
+      '<div class="ob-form">' +
+      '<label class="ob-label" for="obNick">怎么称呼你？（昵称，非真名）</label>' +
+      '<input id="obNick" maxlength="20" placeholder="例：老周 / Ling / 转型中的王" autocomplete="off">' +
+      '<div class="ob-hint">只用于系统里怎么称呼你，不会对外显示。</div>' +
+      '<div style="height:14px;"></div>' +
+      '<label class="ob-label" for="obEmail">你的邮箱（用于防丢失 / 找回）</label>' +
+      '<input id="obEmail" type="email" placeholder="you@example.com" autocomplete="off">' +
+      '<div class="ob-hint">现在不验证、不发骚扰邮件。当你换手机 / 清缓存时，用它找回你的数据。</div>' +
+      '<label class="ob-consent"><input type="checkbox" id="obConsent">' +
+      '<span>我同意：邮箱仅用于「<b>防丢失与数据找回</b>」，不用于营销，不共享给第三方，可随时删除。详见下方声明。</span></label>' +
+      '<div class="ob-legal">📄 个人信息处理声明（摘要）：昵称用于系统内称呼；邮箱仅用于防丢失 / 数据找回 / 后续升级账号，不做任何营销用途。数据默认保存在本机浏览器；开启自动备份后，以匿名设备码标识上传云端，仅用于防丢失。我们不会将你的个人信息出售、共享或用于任何第三方分析。你可随时在设置中修改、删除，或「重置全部数据」彻底删除。依据《中华人民共和国个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利。联系：lincyang@foxmail.com。</div>' +
+      '</div>' +
+      '<button class="ob-browse-link" data-action="onboard-browse">暂不填写，先看看系统长什么样 →</button>' +
+      '</div></div>';
+  }
+  function lightScreen() {
+    var nick = (db.user.nickname || '').trim();
+    var email = (db.user.email || '').trim();
+    return '<div class="ob-screen"><div class="ob-inner">' +
+      '<p class="ob-kicker">完善资料 · 1 分钟</p>' +
+      '<h2 class="ob-title">补充昵称与邮箱</h2>' +
+      '<p class="ob-sub">你的数据都还在。<b>补一个昵称和邮箱，防丢失、有欢迎语，之后不再打扰。</b></p>' +
+      '<div class="ob-form">' +
+      '<label class="ob-label" for="obNick">怎么称呼你？（昵称，非真名）</label>' +
+      '<input id="obNick" maxlength="20" value="' + esc(nick) + '" placeholder="例：老周 / Ling / 转型中的王" autocomplete="off">' +
+      '<div class="ob-hint">只用于系统里怎么称呼你，不会对外显示。</div>' +
+      '<div style="height:14px;"></div>' +
+      '<label class="ob-label" for="obEmail">你的邮箱（用于防丢失 / 找回）</label>' +
+      '<input id="obEmail" type="email" value="' + esc(email) + '" placeholder="you@example.com" autocomplete="off">' +
+      '<div class="ob-hint">现在不验证、不发骚扰邮件。当你换手机 / 清缓存时，用它找回你的数据。</div>' +
+      '<label class="ob-consent"><input type="checkbox" id="obConsent">' +
+      '<span>我同意：邮箱仅用于「<b>防丢失与数据找回</b>」，不用于营销，不共享给第三方，可随时删除。</span></label>' +
+      '<div class="ob-legal">📄 个人信息处理声明（摘要）：与首次引导一致。你可随时在设置中修改、删除，或「重置全部数据」彻底删除。联系：lincyang@foxmail.com。</div>' +
+      '</div>' +
+      '</div></div>';
+  }
+
+  function syncOnboardUI() {
+    if (!onboardEl) return;
+    var mode = onboardingMode();
+    var total = mode === 'full' ? 3 : 1;
+    var track = onboardEl.querySelector('.ob-track');
+    if (track) track.style.transform = 'translateX(-' + (onboardIndex * 100) + '%)';
+    onboardEl.querySelectorAll('.ob-dot').forEach(function (d, i) { d.classList.toggle('on', i === onboardIndex); });
+    var prev = onboardEl.querySelector('#obPrev');
+    var next = onboardEl.querySelector('#obNext');
+    var submit = onboardEl.querySelector('#obSubmit');
+    if (prev) { if (onboardIndex === 0) prev.classList.add('hide'); else prev.classList.remove('hide'); }
+    if (next) { if (onboardIndex >= total - 1) next.classList.add('hide'); else next.classList.remove('hide'); }
+    if (submit) { if (onboardIndex >= total - 1) submit.classList.remove('hide'); else submit.classList.add('hide'); }
+  }
+  function goOnboardStep(n) {
+    var mode = onboardingMode();
+    var total = mode === 'full' ? 3 : 1;
+    onboardIndex = Math.max(0, Math.min(total - 1, n));
+    syncOnboardUI();
+  }
+  function onboardSubmit() {
+    var nick = $id('obNick') ? $id('obNick').value.trim() : '';
+    var email = $id('obEmail') ? $id('obEmail').value.trim() : '';
+    var consent = $id('obConsent') ? $id('obConsent').checked : false;
+    if (!nick) { toast('请先填写昵称（怎么称呼你）'); return; }
+    if (nick.length > 20) { toast('昵称最长 20 个字'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('请填写有效的邮箱地址'); return; }
+    if (!consent) { toast('请先勾选同意个保法声明'); return; }
+    db.user.nickname = nick;
+    db.user.email = email;
+    db.user.onboarded = true;
+    db.user.onboardedAt = nowISO();
+    db.user.privacy = { agreedAt: nowISO(), version: 1 };
+    persist();
+    closeOnboarding();
+    sendWelcomeEmail(nick, email); // 邮箱轻验证：不阻塞前端，失败静默
+    browseMode = false;
+    navigateTodayOnce(); // 方案：提交后落在今日页（欢迎语 + 迷你四步条）
+    toast('欢迎加入，' + nick + ' 🎉');
+  }
+  function onboardSkip() {
+    db.user.onboarded = true;
+    db.user.onboardedAt = nowISO();
+    persist();
+    closeOnboarding();
+    browseMode = false;
+    navigateTodayOnce();
+  }
+  function onboardBrowse() {
+    browseMode = true; // onboarded 仍 false：下次打开仍回填写页
+    closeOnboarding();
+    render();
+    toast('浏览模式：可看不可记，填写后开始积累');
+  }
+  function closeOnboarding() {
+    if (onboardEl) { onboardEl.remove(); onboardEl = null; }
+  }
+  // 提交/跳过引导后落到今日页：避免 hash 变化与手动 render 双渲染（里程碑只展示一次）
+  function navigateTodayOnce() {
+    var target = '#/today';
+    if (location.hash === target) render();
+    else location.hash = target; // hashchange 会自动 render
+  }
+  // 邮箱轻验证：提交后自动发欢迎信，复用飞书邮件链路；发送失败静默降级
+  function sendWelcomeEmail(nick, email) {
+    try {
+      fetch('/api/transition-welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, nickname: nick }),
+        keepalive: true
+      }).catch(function () {});
+    } catch (e) { /* 静默 */ }
+  }
+
   /* ================= 今日页 ================= */
   var qForm = { sleepUnder6h: false, meetingsOver4: false, lastGapOver3d: null, hardDeadline: false };
   var editingToday = false; // 「修改判断」编辑态：为 true 时渲染晨间 4 问表单，提交走更新分支
@@ -738,9 +1074,27 @@
     html += '<h2 class="page-title">' + prettyDate(todayStr) + '</h2>';
     html += '<p class="page-sub">先判断今天是什么日子，再做今天唯一一件事。</p>';
 
-    // 备份提醒
+    // v1.17.0：老用户补填提示条（跳过补填后显示，可关闭可再触发）
+    if (!browseMode && db.user.onboarded === true && !(db.user.nickname || '').trim() && db.meta.profileTipDismissDate !== todayStr) {
+      html += '<div class="profile-tip"><span>💡 <b>补充昵称与邮箱</b>，数据永不丢。</span>' +
+        '<button class="btn btn-sm" data-action="reopen-onboard">去补充</button>' +
+        '<button class="pt-x" data-action="dismiss-profile-tip" aria-label="关闭提醒">✕</button></div>';
+    }
+    // v1.17.0：浏览模式提示条
+    if (browseMode) {
+      html += '<div class="browse-tip"><span>👁 <b>浏览中</b> · 可看不可记。填写昵称和邮箱后开始积累。</span>' +
+        '<button class="bt-x" data-action="reopen-onboard" aria-label="去填写">去填写 →</button></div>';
+    }
+
+    // v1.17.0：欢迎语 + 常驻迷你四步条（只对完成/跳过引导后的用户显示；浏览模式昵称为空时兜底「转型者」）
+    if (!needsOnboarding() || browseMode) {
+      html += todayWelcomeHTML();
+      html += miniStepsHTML();
+    }
+
+    // 备份提醒（v1.17.0 文案修正：数据并非只在本机，云备份为防丢失）
     if (needBackupTip()) {
-      html += '<div class="notice" role="note">⚠ 你已连续 7 天未导出备份。数据只存在本浏览器里，<a data-action="goto-settings">去导出一次</a>（10 秒）<button class="notice-x" data-action="dismiss-backup" aria-label="关闭提醒">✕</button></div>';
+      html += '<div class="notice" role="note">⚠ 你已连续 7 天未导出备份。数据默认在本机，云端自动备份可防丢失。<a data-action="goto-settings">去设置确认一次</a>（10 秒）<button class="notice-x" data-action="dismiss-backup" aria-label="关闭提醒">✕</button></div>';
     }
     if (!db.mainline) {
       html += '<div class="notice" role="note">尚未设定 90 天母线。<a data-action="goto-mainline">现在设定 →</a></div>';
@@ -753,6 +1107,126 @@
       html += renderTodayCheckin();
     }
     v.innerHTML = html;
+  }
+
+  /* v1.17.0：今日页顶部欢迎语（时间段 + 昵称 + 天数 + 三态指令 + 里程碑） */
+  function localDateOf(iso) { return iso ? fmt(new Date(iso)) : ''; }
+  function greetingByTime() {
+    var h = new Date().getHours();
+    if (h >= 5 && h < 12) return '早上好';
+    if (h >= 12 && h < 18) return '下午好';
+    return '晚上好';
+  }
+  function activeDayCount() {
+    // 首次 session 起至今的活跃天数（不要求连续）；无 session 用 onboarding 时间；再兜底 1
+    var first = null;
+    db.dailySessions.forEach(function (s) { if (!first || s.date < first) first = s.date; });
+    if (!first && db.user.onboardedAt) first = localDateOf(db.user.onboardedAt);
+    if (!first) return 1;
+    return Math.max(1, diffDays(first, todayStr) + 1);
+  }
+  function todayOrderText() {
+    var s = sessionOf(todayStr);
+    var name = esc(displayNickname());
+    if (!s) {
+      // 中断后回来（上次执行 > 3 天前）：欢迎回来文案（方案 4.1）
+      var last = lastSessionDate();
+      if (last && diffDays(last, todayStr) > 3) {
+        return '欢迎回来，' + name + '。中断不是失败，只是暂停。今天从最小动作重新开始——先做<strong>状态判断</strong>，系统已经替你准备好了。';
+      }
+      return '→ 先做<strong>状态判断</strong>（1 分钟），系统会告诉你今天是红/黄/绿日，该投入多少精力。';
+    }
+    var completed = !!(s.output || (s.assetIds && s.assetIds.length) || (s.evidenceIds && s.evidenceIds.length));
+    if (completed) return '✓ 今日闭环已完成。明天见，' + name + '。你已积累 <strong>' + db.assets.length + '</strong> 项资产、<strong>' + db.evidences.length + '</strong> 条证据。';
+    var a = s.actionId ? actionById(s.actionId) : null;
+    var mm = MODE_META[s.mode];
+    if (a) return '→ 今天是 <strong>' + mm.name + '</strong>（' + mm.time + ' 预算）。去做：<strong>' + esc(a.title) + '</strong>。完成 = ' + esc(a.out) + '。';
+    return '→ 今天是 <strong>' + mm.name + '</strong>。去做今日唯一动作并记录。';
+  }
+  function todayWelcomeHTML() {
+    var name = esc(displayNickname());
+    var day = activeDayCount();
+    var mile = welcomeMilestone();
+    var h = '<div class="today-welcome">';
+    h += '<div class="tw-hello">' + greetingByTime() + '，<span class="tw-name">' + name + '</span></div>';
+    h += '<div class="tw-day">今天是你的第 ' + day + ' 天 · 系统只回答一个问题：今天该做什么</div>';
+    if (mile) h += '<div class="tw-milestone">' + mile + '</div>';
+    h += '<div class="tw-order">' + todayOrderText() + '</div>';
+    h += '</div>';
+    return h;
+  }
+  /* v1.17.0：里程碑欢迎语（每条只展示一次，存 meta.shownWelcomeIds） */
+  function welcomeMilestone() {
+    var seen = db.meta.shownWelcomeIds || (db.meta.shownWelcomeIds = []);
+    function hit(id, text) {
+      if (seen.indexOf(id) >= 0) return null;
+      seen.push(id);
+      persist();
+      return text;
+    }
+    var name = esc(displayNickname());
+    // 首日：首次填写完成当天（onboardedAt 今天）且是新用户（无遗留数据）
+    var firstDay = db.user.onboardedAt && localDateOf(db.user.onboardedAt) === todayStr && !hasLegacyData();
+    if (firstDay) {
+      var t = hit('w-first-day', '欢迎加入，' + name + '。转型不是从辞职那天开始的，是从你愿意每天留 15 分钟给自己开始的——你已经开始了。');
+      if (t) return t;
+    }
+    if (streak() >= 7) {
+      var t2 = hit('w-streak-7', name + '，你已经连续 7 天没有断线。转型最难的不是方法，是「没断线」——你在赢大多数人的那个环节。');
+      if (t2) return t2;
+    }
+    if (db.assets.length === 1) {
+      var t3 = hit('w-first-asset', '恭喜，' + name + '。你有了第一项资产。它不会因为你明天加班就消失——这就是积累和打卡的区别。');
+      if (t3) return t3;
+    }
+    if (db.evidences.length === 1) {
+      var t4 = hit('w-first-evidence', '你收到第一条真实信号了。它比 100 个赞都值钱——这是市场在跟你说话。');
+      if (t4) return t4;
+    }
+    if (db.mainline) {
+      var elapsed = Math.max(0, Math.min(MAINLINE_DAYS, diffDays(db.mainline.startDate, todayStr)));
+      if (elapsed >= 45) {
+        var t5 = hit('w-ml-half', name + '，90 天母线已走过一半。回头看看：' + db.assets.length + ' 项资产、' + db.evidences.length + ' 条证据、母线没跑偏。后半程，继续。');
+        if (t5) return t5;
+      }
+    }
+    return null;
+  }
+  /* v1.17.0：常驻迷你四步条（①状态②动作③记录④微复盘 + 母线行） */
+  function miniStepsHTML() {
+    var s = sessionOf(todayStr);
+    var checked = !!(s);
+    var actionDone = !!(s && (s.output || (s.assetIds && s.assetIds.length) || (s.evidenceIds && s.evidenceIds.length)));
+    var recDone = !!(s && ((s.assetIds && s.assetIds.length) || (s.evidenceIds && s.evidenceIds.length)));
+    var steps = [
+      { n: '①', label: '状态判断', done: checked },
+      { n: '②', label: '唯一动作', done: actionDone },
+      { n: '③', label: '记录沉淀', done: recDone },
+      { n: '④', label: '微复盘', done: actionDone }
+    ];
+    var h = '<div class="mini-steps"><div class="mini-steps-row">';
+    steps.forEach(function (st, i) {
+      if (i) h += '<span class="mini-arrow">▸</span>';
+      h += '<button class="mini-step' + (st.done ? ' done' : '') + '" data-action="mini-step" data-step="' + (i + 1) + '">' +
+        '<span class="ms-n">' + (st.done ? '✓' : st.n) + '</span><span>' + st.label + '</span></button>';
+    });
+    h += '</div>';
+    // 母线行：母线名 + 第 N/90 天 + 周检查状态
+    h += '<div class="mini-ml"><span>母线：<b>' + (db.mainline ? esc(db.mainline.name) : '未设定') + '</b></span>';
+    if (db.mainline) {
+      var elapsed = Math.max(0, Math.min(MAINLINE_DAYS, diffDays(db.mainline.startDate, todayStr)));
+      var remain = Math.max(0, MAINLINE_DAYS - elapsed);
+      var monday = mondayOf(todayStr);
+      var wr = db.weeklyReviews.filter(function (r) { return r.weekStart === monday; })[0] || null;
+      var on = wr && wr.mainlineCheck ? wr.mainlineCheck.filter(function (i) { return i.onMainline; }).length : 0;
+      var total = wr && wr.mainlineCheck ? wr.mainlineCheck.length : 0;
+      h += '<span class="' + (wr ? 'ml-on' : 'ml-off') + '">第 ' + Math.min(elapsed + 1, MAINLINE_DAYS) + '/' + MAINLINE_DAYS + ' 天' +
+        (wr ? (total ? ' · 一致性 ' + Math.round(on / total * 100) + '%' : ' · 本周已检查') : ' · 待周检查') + '</span>';
+    } else {
+      h += '<span class="ml-off"><a class="link" data-action="goto-mainline">设定母线 →</a></span>';
+    }
+    h += '</div></div>';
+    return h;
   }
 
   function needBackupTip() {
@@ -1338,7 +1812,7 @@
     var h = '';
     h += '<p class="kicker">设置 · Settings</p>';
     h += '<h2 class="page-title">数据与偏好</h2>';
-    h += '<p class="page-sub">数据只存在本浏览器（localStorage）。请定期导出备份——这是你的资产。</p>';
+    h += '<p class="page-sub">数据默认只保存在本机浏览器；开启自动备份后，昵称与邮箱会随匿名备份上传云端（仅防丢失）。请定期导出备份——这是你的资产。</p>';
 
     h += '<div class="card"><div class="card-title">转型阶段</div>';
     h += '<p class="card-sub" style="margin-bottom:12px;">影响「今日唯一动作」的推荐范围。</p>';
@@ -1348,20 +1822,24 @@
     });
     h += '</select></div></div>';
 
-    // 阶段一：账号与身份（设备 ID 匿名 + 邮箱钩子 + plan 开关）
+    // 阶段一：账号与身份（设备 ID 匿名 + 昵称/邮箱 + 个保法同意记录）
     h += '<div class="card"><div class="card-title">账号与身份</div>';
-    h += '<p class="card-sub" style="margin-bottom:12px;">当前为设备匿名模式：数据绑定本设备，各设备数据独立。绑定邮箱可防止数据丢失，为后续升级账号做准备。</p>';
+    h += '<p class="card-sub" style="margin-bottom:12px;">当前为设备匿名模式：数据绑定本设备，各设备数据独立。昵称仅用于系统内称呼；绑定邮箱可防止数据丢失，为后续升级账号做准备。</p>';
+    h += '<div class="field"><label class="field-label" for="nicknameInput">昵称（用于系统内称呼）</label>';
+    h += '<input id="nicknameInput" maxlength="20" value="' + esc(db.user.nickname || '') + '" placeholder="例：老周 / Ling / 转型中的王" autocomplete="off">';
+    h += '<p class="privacy-note">昵称仅用于系统内称呼，不会对外显示；如不填，欢迎语显示「转型者」。</p></div>';
+    h += '<div class="field"><label class="field-label" for="emailInput">绑定邮箱（用于防丢失 / 找回）</label>';
+    h += '<input id="emailInput" type="email" value="' + esc(db.user.email || '') + '" placeholder="you@example.com" autocomplete="off">';
+    h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。' +
+      (db.user.privacy && db.user.privacy.agreedAt ? '<br>✅ 已同意隐私声明：' + db.user.privacy.agreedAt.slice(0, 10) : '') + '</p></div>';
     h += '<div class="field"><label class="field-label">设备码（你的数据标识）</label>';
     h += '<div class="device-row"><code id="deviceIdText">' + esc(db.user.id) + '</code><button class="btn btn-sm" data-action="copy-device-id">复制</button></div></div>';
-    h += '<div class="field"><label class="field-label" for="emailInput">绑定邮箱（可选，只存不验证）</label>';
-    h += '<input id="emailInput" type="email" value="' + esc(db.user.email || '') + '" placeholder="you@example.com" autocomplete="off">';
-    h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。</p></div>';
     h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
     h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">🔒 你的数据属于你</div>';
-    h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失，不做任何其他用途。</p>';
+    h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅设备码标识）安全保存到云端，仅用于防丢失，不做任何其他用途。昵称与邮箱会随匿名备份上传（防丢失用途）。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">你可以随时：导出数据报告（查看 / 带走全部产出）、导出 JSON 备份（完整备份用于恢复）、从云端恢复、重置全部数据（彻底清除本设备数据）。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">我们不会把你的数据用于营销、分析或共享给任何第三方。</p>';
-    h += '<p class="privacy-note" style="margin-top:6px;">依据《个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利——本页的导出与重置功能即对应「数据可携带权」与「删除权」。</p>';
+    h += '<p class="privacy-note" style="margin-top:6px;">依据《个人信息保护法》，你享有查阅、复制、更正、删除个人信息的权利——本页的导出与重置功能即对应「数据可携带权」与「删除权」；如需删除云端历史备份，请发邮件至 <a href="mailto:lincyang@foxmail.com?subject=' + encodeURIComponent('转型系统云端数据删除申请') + '" style="color:var(--sub);text-decoration:underline;">lincyang@foxmail.com</a>（主题「转型系统云端数据删除申请」），我们将在 7 个工作日内处理。</p>';
     h += '</div>';
     h += '</div>';
 
@@ -1403,7 +1881,7 @@
     h += '</div>';
 
     h += '<div class="card"><div class="card-title">关于</div>';
-    h += '<div class="about-line">转型操作系统 Transition OS v1.8.0（阶段一·轻量用户体系）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
+    h += '<div class="about-line">转型操作系统 Transition OS v1.17.0（首次引导 + 欢迎页）<br>每天 15-30 分钟，用碎片时间积累长期资产。<br>已记录：' + db.dailySessions.length + ' 天 · ' + db.assets.length + ' 项资产 · ' + db.evidences.length + ' 条证据</div>';
     h += '</div>';
     v.innerHTML = h;
   }
@@ -1629,7 +2107,7 @@
     var mask = openModal('<p class="muted" style="font-size:14px;margin-bottom:10px;">输入「重置」两个字确认清空全部数据（不可恢复，请先导出备份）。</p><div class="field"><label class="field-label" for="resetInput">确认输入</label><input id="resetInput" placeholder="重置"></div><div class="btn-row"><button class="btn" id="resetDo">确认清空</button><button class="btn-ghost" data-action="modal-close">取消</button></div>');
     modalTitle('重置全部数据');
     $id('resetDo').addEventListener('click', function () {
-      if ($id('resetInput').value.trim() === '重置') { db = emptyDB(); persist(); closeModal(); render(); toast('已重置'); }
+      if ($id('resetInput').value.trim() === '重置') { db = emptyDB(); persist(); closeModal(); render(); mountOnboarding(); toast('已重置'); }
       else toast('请输入「重置」确认');
     });
   }
@@ -1848,6 +2326,10 @@
     var h = '';
     var banner = milestoneBanner();
     if (banner) h += '<div class="banner-milestone" role="note">' + banner + '</div>';
+    // v1.17.0：看板轻问候（方案 4.5；浏览模式昵称空则兜底「转型者」）
+    if (!needsOnboarding() || browseMode) {
+      h += '<p class="muted" style="font-size:14px;margin:0 0 12px;">' + esc(displayNickname()) + '，你已连续坚持 <b style="color:var(--text);">' + streak() + '</b> 天</p>';
+    }
     h += '<p class="kicker">看板 · Dashboard</p>';
     h += '<h2 class="page-title">今天的状态，一眼看清</h2>';
     h += '<p class="page-sub">连续执行 · 最近节奏 · 走到了哪。只呈现事实，不评判。</p>';
@@ -1896,8 +2378,33 @@
   }
 
   /* ================= 事件分发 ================= */
+  // v1.17.0 浏览模式：可看不可记。写操作（记录/确认/母线/删除/导出/备份/重置）在浏览模式下被拦截，引导回填写页。
+  var BROWSE_BLOCKED = ['confirm-checkin', 'complete-action', 'open-record', 'rec-save',
+    'save-mainline', 'change-mainline', 'finish-mainline-check', 'redo-mainline-check', 'ml-mark',
+    'del-record', 'export-report', 'export-backup', 'import-backup', 'cloud-restore', 'cloud-backup-now',
+    'reset-data'];
   function handleAction(act, el) {
+    if (browseMode && BROWSE_BLOCKED.indexOf(act) >= 0) {
+      toast('先完成昵称和邮箱，才能开始记录');
+      mountOnboarding(true);
+      return;
+    }
     switch (act) {
+      case 'onboard-prev': goOnboardStep(onboardIndex - 1); break;
+      case 'onboard-next': goOnboardStep(onboardIndex + 1); break;
+      case 'onboard-submit': onboardSubmit(); break;
+      case 'onboard-skip': onboardSkip(); break;
+      case 'onboard-browse': onboardBrowse(); break;
+      case 'reopen-onboard': mountOnboarding(true); break;
+      case 'dismiss-profile-tip': db.meta.profileTipDismissDate = todayStr; persist(); render(); break;
+      case 'mini-step': {
+        var step = parseInt(el.getAttribute('data-step'), 10);
+        var ss = sessionOf(todayStr);
+        if (step === 1 || step === 2) { location.hash = '#/today'; window.scrollTo({ top: 0, behavior: 'smooth' }); }
+        else if (step === 3) { if (ss) openRecordModal(ss.id, ss.actionId ? actionById(ss.actionId).cat : 'content'); else openRecordModal(null, 'content'); }
+        else { location.hash = '#/review'; }
+        break;
+      }
       case 'q-set': {
         var k = el.getAttribute('data-key'), val = el.getAttribute('data-val') === 'true';
         qForm[k] = val;
@@ -2038,11 +2545,19 @@
   });
   document.addEventListener('change', function (e) {
     if (e.target.id === 'stageSelect') { db.user.stage = e.target.value; persist(); toast('阶段已更新为' + STAGE_CN[db.user.stage]); render(); }
+    if (e.target.id === 'nicknameInput') {
+      var nv = e.target.value.trim();
+      db.user.nickname = nv;
+      persist();
+      toast(nv ? '昵称已更新' : '昵称已清除（将显示「转型者」）');
+      render();
+    }
     if (e.target.id === 'emailInput') {
       var v = e.target.value.trim();
       db.user.email = v;
+      if (v && db.user.privacy == null) db.user.privacy = { agreedAt: nowISO(), version: 1 }; // 填邮箱 = 同意（方案 5.2）
       persist();
-      toast(v ? '邮箱已绑定（仅本机保存，用于防丢失）' : '邮箱已清除');
+      toast(v ? '邮箱已保存，随匿名备份上传云端，仅用于防丢失' : '邮箱已清除');
       render();
     }
     if (e.target.id === 'cloudBackupToggle') {
@@ -2056,6 +2571,7 @@
 
   window.addEventListener('hashchange', render);
   render();
+  mountOnboarding(); // v1.17.0：启动时判定首次引导（新用户完整 3 屏 / 老用户轻量补填）
 })();
 </script>
 </body>
