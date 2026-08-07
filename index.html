@@ -303,6 +303,9 @@
   })();
   </script>
 
+  <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
+  <script src="/lib/track.js" defer onerror="this.remove()"></script>
+
   <!-- Vercel Web Analytics（在 Vercel 面板开启后自动统计真实全站访问；未开启时静默 404 不影响页面） -->
   <script defer src="/_vercel/insights/script.js" onerror="this.remove()"></script>
 </body>

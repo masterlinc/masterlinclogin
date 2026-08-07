@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI 管理现场 Skill 库 · 免费方法卡下载 · MASTER LINC</title>
-  <meta name="description" content="22 年管理现场 × AI 工具，沉淀成能直接带走的方法卡：AI 会议纪要四栏法、会前三问、7 天验证表、AI 写周报法、汇报一页纸等 12 张，全部免费下载，拿走就用。" />
+  <meta name="description" content="22 年管理现场 × AI 工具，沉淀成能直接带走的方法卡：AI 会议纪要四栏法、AI 写周报法、管理者 AI 效率审计 3 张精品方法卡，全部免费下载，拿走就用。" />
   <meta name="keywords" content="AI 管理,AI 工作流,管理者 AI 效率,AI 会议纪要,NotebookLM,周报,汇报,方法卡,免费下载,MASTER LINC" />
   <meta name="author" content="MASTER LINC｜在路上的 AI 管理博士" />
   <meta name="robots" content="index, follow" />
@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="/globals.css?v=20260807-1" />
 
   <meta property="og:title" content="AI 管理现场 Skill 库 · 免费方法卡 · MASTER LINC" />
-  <meta property="og:description" content="12 张可下载的 AI 管理方法卡：会议、汇报、消息、决策、安全，全部免费，拿走就用。" />
+  <meta property="og:description" content="3 张精品 AI 管理方法卡：会议纪要四栏法、写周报法、管理者效率审计，全部免费，拿走就用。" />
   <meta property="og:url" content="https://www.masterlinc.com/skills/" />
   <meta property="og:site_name" content="MASTER LINC" />
   <meta property="og:locale" content="zh_CN" />
@@ -454,14 +454,7 @@
         <div class="skill-search-wrap">
           <input class="skill-search" id="skillSearch" type="search" placeholder="搜方法、场景或工具名，比如「会议」「周报」「NotebookLM」" aria-label="搜索 Skill" autocomplete="off" />
         </div>
-        <div class="skill-chips" id="skillChips" role="group" aria-label="按管理场景筛选">
-          <button type="button" class="skill-chip active" data-cat="全部">全部</button>
-          <button type="button" class="skill-chip" data-cat="会议">会议</button>
-          <button type="button" class="skill-chip" data-cat="汇报周报">汇报周报</button>
-          <button type="button" class="skill-chip" data-cat="消息协同">消息协同</button>
-          <button type="button" class="skill-chip" data-cat="决策">决策</button>
-          <button type="button" class="skill-chip" data-cat="工具安全">工具安全</button>
-        </div>
+        <div class="skill-chips" id="skillChips" role="group" aria-label="按管理场景筛选"></div>
       </div>
     </div>
 
@@ -471,21 +464,21 @@
     <!-- 空状态 -->
     <div class="skill-empty" id="skillEmpty">
       <h2>没有找到匹配的 Skill。</h2>
-      <p>换个场景词试试：会议 / 周报 / 汇报 / 消息 / 决策；或者直接看最热门的 3 张卡（会议四栏法 / 会前三问 / 7 天验证表）。</p>
+      <p>换个场景词试试：会议 / 周报 / 决策；或者直接看这 3 张精品卡。</p>
       <ol>
-        <li>换个场景词试试：会议 / 周报 / 汇报 / 消息 / 决策</li>
-        <li>或者直接看最热门的 3 张卡（点击直达）</li>
+        <li>换个场景词试试：会议 / 周报 / 决策</li>
+        <li>或者直接看精品卡（点击直达）</li>
         <li>实在不确定要哪个？免费自检，10 分钟告诉你最该先改哪件</li>
       </ol>
       <a class="hook-cta" href="/products/selfcheck.html">免费自检，10 分钟找到最该改的一件 →</a>
     </div>
 
-    <!-- 全集包：邮箱换 12 个 Skill 打包 -->
+    <!-- 全集包：邮箱换 3 个精品 Skill 打包 -->
     <section class="skill-pack shell" id="pack" aria-label="Skill 全集包">
       <div class="skill-pack-head">
         <p class="kicker">ALL-IN-ONE</p>
-        <h2>12 张卡，一次拿走</h2>
-        <p>把这 12 个 Skill 打包成一份 PDF，发到你邮箱。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。</p>
+        <h2>3 张精品卡，一次拿走</h2>
+        <p>把这 3 个精品 Skill 打包成一份 PDF，发到你邮箱。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。</p>
       </div>
       <div class="skill-pack-form-wrap">
         <form class="skill-pack-form" id="packForm" novalidate>
@@ -530,131 +523,43 @@
   (function () {
     'use strict';
 
-    // ===== 12 个 Skill 数据（素材方法内容 × 文案展示字段 合并） =====
+    // ===== 3 个精品 Skill 数据（配置表 /api/skills 上线后由其接管，内置数组仅作离线兜底） =====
     var SKILLS = [
       {
         id: 'skill-01', name: 'AI 会议纪要·四栏法',
-        value: '把 1 小时录音变成一页能追责的决议清单。',
+        value: '把 1 小时录音变成一页「决定 / 待验证 / 负责人 / 原话」四栏决议——分对了类，责任才落得下来。',
         cat: '会议', tools: ['NotebookLM', 'Kimi'],
-        diff: '★☆☆', time: '15 分钟', format: 'PDF 方法卡 · 四栏骨架',
+        diff: '★★☆', time: '首次配置 20 分钟 · 每场会 15 分钟', format: 'PDF 方法卡 · 方法 + 骨架 + 完整示例',
         file: '/skills/files/skill-01-ai-meeting-notes-4columns.md',
-        dlName: 'AI会议纪要·四栏法（入门卡）.md', dlText: '免费下载 · 四栏法方法卡',
-        hook: { href: '/products/selfcheck.html', text: '想要带复查清单的完整四栏模板？完整版在 ¥29 进阶版 →' },
+        dlName: 'AI会议纪要·四栏法（精品卡）.md', dlText: '免费下载 · 四栏法精品卡',
+        hook: { href: '/products/selfcheck.html', text: '想要可复制的空白模板 + 会后复查清单 + 更多行业案例？¥29 进阶版 →' },
         preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }
       },
       {
-        id: 'skill-02', name: '会前三问清单',
-        value: '开会前 15 分钟过三问，答不上来就别开。',
-        cat: '会议', tools: ['任意 AI'],
-        diff: '★☆☆', time: '3 分钟', format: '一页清单（可打印）',
-        file: '/skills/files/skill-02-pre-meeting-3-questions.md',
-        dlName: '会前三问清单.md', dlText: '免费下载 · 会前三问清单',
-        hook: { href: '/products/selfcheck.html', text: '想真正「把讨论变决定」？完整模板 + 复查清单在 ¥29 进阶版 →' },
-        preview: { title: '会前三问', style: 'rows', labels: ['这场会要定什么？', '谁必须来？', '谁只被通知？'] }
-      },
-      {
-        id: 'skill-03', name: '7 天验证表',
-        value: '每天 1 分钟，7 天后用数字证明 AI 有没有帮你减负。',
-        cat: '会议', tools: ['纸笔即可'],
-        diff: '★☆☆', time: '每天 1 分钟，连用 7 天', format: '打印模板',
-        file: '/skills/files/skill-03-7day-verification.md',
-        dlName: '7天验证表.md', dlText: '免费下载 · 7 天验证表',
-        hook: { href: '/products/selfcheck.html', text: '想要工具、清单、行动卡配齐的一套？免费自检后领取起步包 →' },
-        preview: { title: '7 天验证表', style: 'rows', labels: ['目标：从 N 分钟 → M 分钟', '每天 3 分钟 · 只填三格', '第 7 天 · 值得 / 换个做法'] }
-      },
-      {
         id: 'skill-04', name: 'AI 写周报法（3 小时 → 20 分钟）',
-        value: '周报从 3 小时压到 20 分钟，判断还是你的。',
+        value: '周报从 3 小时压到 20 分钟——素材随手记、AI 出初稿、人只改判断。',
         cat: '汇报周报', tools: ['DeepSeek', 'Kimi'],
-        diff: '★☆☆', time: '15 分钟', format: 'PDF 方法卡 · 提示词模板',
+        diff: '★★☆', time: '首次搭建 30 分钟 · 每周 20 分钟成稿', format: 'PDF 方法卡 · 含 3 套提示词变体 + 常见坑',
         file: '/skills/files/skill-04-ai-weekly-report.md',
-        dlName: 'AI写周报法（3小时→20分钟）.md', dlText: '免费下载 · 周报 20 分钟法',
+        dlName: 'AI写周报法（精品卡）.md', dlText: '免费下载 · 周报法精品卡',
         hook: { href: '/products/selfcheck.html', text: '想系统化省时间（周报、汇报一起改）？免费自检，看看最该先动哪一件 →' },
         preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }
       },
       {
-        id: 'skill-05', name: 'AI 汇报一页纸法',
-        value: '3 屏数据压成一页：结论、依据、下一步。',
-        cat: '汇报周报', tools: ['任意 AI'],
-        diff: '★★☆', time: '15 分钟', format: 'PDF 方法卡 · 一页纸骨架',
-        file: '/skills/files/skill-05-ai-report-one-page.md',
-        dlName: 'AI汇报一页纸法.md', dlText: '免费下载 · 汇报一页纸法',
-        hook: { href: '/products/selfcheck.html', text: '拿不准该先改汇报还是先改会议？免费自检，10 分钟出答案 →' },
-        preview: { title: '一页纸结构', style: 'rows', labels: ['结论 · 顶部 1/3', '依据 · ≤5 条带出处', '下一步 · 谁 × 做什么 × 何时'] }
-      },
-      {
-        id: 'skill-06', name: 'AI 消息流分流法',
-        value: '四类消息自动分流，不再当人肉中转站。',
-        cat: '消息协同', tools: ['飞书 / 企微 AI', 'NotebookLM'],
-        diff: '★★☆', time: '20 分钟', format: 'PDF 方法卡 + 分流表',
-        file: '/skills/files/skill-06-ai-message-routing.md',
-        dlName: 'AI消息流分流法.md', dlText: '免费下载 · 消息分流表',
-        hook: { href: '/#contact', text: '想让这套分流真正跑进你和团队的日常？免费咨询，聊一次就懂 →' },
-        preview: { title: '四类分流', style: 'cols', labels: ['A 要拍板', 'B 要信息', 'C 仅通知', 'D 垃圾'] }
-      },
-      {
-        id: 'skill-07', name: '流程审计五步法（入门卡）',
-        value: '5 步判断一件工作该不该交给 AI。',
-        cat: '决策', tools: ['任意 AI'],
-        diff: '★★☆', time: '15 分钟', format: 'PDF 方法卡 · 五步骨架',
-        file: '/skills/files/skill-07-process-audit-5steps.md',
-        dlName: '流程审计五步法（入门卡）.md', dlText: '免费下载 · 审计五步法',
-        hook: { href: '/products/selfcheck.html', text: '五步只是骨架，完整机制 + 真实案例在 ¥29 进阶版 →' },
-        preview: { title: '五步骨架', style: 'flow', labels: ['输入', '中间判断', '输出', '审核', '返工点'] }
-      },
-      {
-        id: 'skill-08', name: 'AI 决策备忘法',
-        value: '拍板留痕：决定、依据、反方观点、复核日期。',
-        cat: '决策', tools: ['任意 AI'],
-        diff: '★☆☆', time: '10 分钟', format: '可复制模板',
-        file: '/skills/files/skill-08-ai-decision-memo.md',
-        dlName: 'AI决策备忘法.md', dlText: '免费下载 · 决策备忘模板',
-        hook: { href: '/#contact', text: '这一步做得对不对？免费咨询，先聊 5 分钟再决定要不要深挖 →' },
-        preview: { title: '四栏备忘', style: 'grid', labels: ['① 决定', '② 依据', '③ 反方观点', '④ 复核日期'] }
-      },
-      {
-        id: 'skill-09', name: '跨部门催进度话术卡',
-        value: '先给上下文再要结论，催进度不伤关系。',
-        cat: '消息协同', tools: ['任意 AI'],
-        diff: '★☆☆', time: '5 分钟', format: '话术清单',
-        file: '/skills/files/skill-09-cross-dept-followup.md',
-        dlName: '跨部门催进度话术卡.md', dlText: '免费下载 · 催进度话术卡',
-        hook: { href: '/#contact', text: '想让整个团队都用上这套沟通方式？免费咨询，聊一次就懂 →' },
-        preview: { title: '一句话公式', style: 'rows', labels: ['背景 · 1 句', '当前状态 · 1 句', '具体问题 · 1 个', '给个台阶 · 1 句'] }
-      },
-      {
-        id: 'skill-10', name: 'AI 敏感资料安全清单',
-        value: '不交文件，也能安全地用 AI 干活。',
-        cat: '工具安全', tools: ['任何工具适用'],
-        diff: '★☆☆', time: '10 分钟', format: '检查清单（一页）',
-        file: '/skills/files/skill-10-sensitive-data-checklist.md',
-        dlName: 'AI敏感资料安全清单.md', dlText: '免费下载 · 安全清单',
-        hook: { href: '/#contact', text: '想画出自己那条「安全流程」？免费咨询，我帮你看边界 →' },
-        preview: { title: '四件事', style: 'grid', labels: ['输入 · 最小必要', '步骤 · 一次一类', '输出 · 受控环境', '审核人 · 最后一眼'] }
-      },
-      {
-        id: 'skill-11', name: 'NotebookLM 会议纪要配置卡',
-        value: '三步配置好 AI 纪要：限四栏输出，不猜负责人。',
-        cat: '工具安全', tools: ['NotebookLM'],
-        diff: '★☆☆', time: '10 分钟', format: '步骤卡（三步）',
-        file: '/skills/files/skill-11-notebooklm-meeting-config.md',
-        dlName: 'NotebookLM会议纪要配置卡.md', dlText: '免费下载 · 配置步骤卡',
-        hook: { href: '/products/selfcheck.html', text: '想要和它配套的完整四栏模板 + 复查清单？¥29 进阶版 →' },
-        preview: { title: '三步配置', style: 'flow', labels: ['上传录音 + 历史纪要', '限定四栏输出', '人补负责人与日期'] }
-      },
-      {
-        id: 'skill-12', name: '管理者 AI 审计卡（一周版）',
-        value: '一周记录四类时间，找到 AI 该插手的地方。',
-        cat: '决策', tools: ['任意 AI'],
-        diff: '★★☆', time: '每天 5 分钟记录，周末 10 分钟复盘', format: '自评卡（一周版）',
+        id: 'skill-12', name: '管理者 AI 效率审计',
+        value: '记录一周工作，按四类拆开算出可释放时间，找到 AI 最该插手的 TOP 3。',
+        cat: '决策', tools: ['DeepSeek', 'Kimi', 'GPT'],
+        diff: '★★★', time: '记录一周 · 周末审计 30 分钟', format: 'PDF 方法卡 · 完整审计框架',
         file: '/skills/files/skill-12-manager-ai-audit-week.md',
-        dlName: '管理者AI审计卡（一周版）.md', dlText: '免费下载 · 一周审计卡',
+        dlName: '管理者AI效率审计（精品卡）.md', dlText: '免费下载 · 效率审计精品卡',
         hook: { href: '/products/selfcheck.html', text: '想深挖自己的场景、把一周变成整套打法？免费自检，10 分钟找到最该改的一件 →' },
         preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }
       }
     ];
 
-    var CATS = ['全部', '会议', '汇报周报', '消息协同', '决策', '工具安全'];
+    // 分类 chips 动态生成（兼容 /api/skills 全量配置）
+    var CATS = [];
+    SKILLS.forEach(function (s) { if (CATS.indexOf(s.cat) === -1) CATS.push(s.cat); });
     var LEAD_ENDPOINT = '/api/lead';
     var state = { cat: '全部', q: '' };
 
@@ -663,10 +568,12 @@
     var searchInput = document.getElementById('skillSearch');
     var chipsWrap = document.getElementById('skillChips');
 
-    // ===== 下载埋点：localStorage 记录 skill_downloads（{skillId, count, lastAt}）=====
+    // ===== 下载埋点：localStorage 去重（兜底）+ 上报 skill_download 到 /api/track =====
     // 去重口径（数据方案 §1.3）：同设备同 Skill 只计 1 次——首次下载 count=1，
-    // 重复点击仅更新 lastAt，不再累加（避免闸门 G1「某 Skill 下载 ≥50（去重）」统计虚高）。
+    // 重复点击仅更新 lastAt，不再累加；服务端统计按 uid+skillId 聚合去重，localStorage 仅作离线兜底。
     function trackDownload(skillId) {
+      var skill = null;
+      SKILLS.forEach(function (s) { if (s.id === skillId) skill = s; });
       try {
         var KEY = 'skill_downloads';
         var map = {};
@@ -677,14 +584,25 @@
         map[skillId] = rec;
         localStorage.setItem(KEY, JSON.stringify(map));
       } catch (e) { /* 隐私模式忽略 */ }
-      // if (navigator.sendBeacon) {
-      //   try { navigator.sendBeacon('/api/track', new Blob([JSON.stringify({ type: 'skill_download', skillId: skillId })], { type: 'application/json' })); } catch (e) {}
-      // }
+      // 上报匿名下载事件（失败静默，不阻塞下载）
+      try {
+        if (window.track) {
+          window.track('skill_download', {
+            skillId: skillId,
+            skillName: skill ? skill.name : '',
+            category: skill ? skill.cat : '',
+            level: skill ? skill.diff : '',
+            fileType: skill ? (skill.file || '').split('.').pop() : 'md',
+            dlFrom: 'card'
+          });
+        }
+      } catch (e) { /* ignore */ }
     }
 
-    // ===== 渲染卡片 =====
+    // ===== 渲染卡片（可重复调用：重新渲染 = 清空 grid 后重建） =====
     function renderCards() {
       var frag = document.createDocumentFragment();
+      grid.innerHTML = '';
       SKILLS.forEach(function (s) {
         var card = document.createElement('article');
         card.className = 'skill-card';
@@ -772,6 +690,20 @@
     }
 
     // chips 单选
+    function buildChips() {
+      var cats = ['全部'];
+      SKILLS.forEach(function (s) { if (cats.indexOf(s.cat) === -1) cats.push(s.cat); });
+      chipsWrap.innerHTML = '';
+      cats.forEach(function (c) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'skill-chip' + (c === state.cat ? ' active' : '');
+        b.setAttribute('data-cat', c);
+        b.textContent = c;
+        chipsWrap.appendChild(b);
+      });
+    }
+    buildChips();
     chipsWrap.addEventListener('click', function (ev) {
       var chip = ev.target.closest('.skill-chip');
       if (!chip) return;
@@ -846,6 +778,13 @@
           return res.json();
         }).then(function (data) {
           if (data && data.ok === true) {
+            // 上报全集包线索/提交事件（不传邮箱原文；邮箱已走 /api/lead 通道）
+            try {
+              if (window.track) {
+                window.track('lead_submit', { hasEmail: true, source: 'skill-pack' });
+                window.track('skill_pack_submit', { source: 'skill-pack', wantCategory: question || '' });
+              }
+            } catch (e) { /* ignore */ }
             packForm.hidden = true;
             packSuccess.hidden = false;
           } else {
@@ -858,6 +797,79 @@
           packSubmit.textContent = '免费领取全集包 →';
         });
       });
+    }
+
+    // ===== 数据源：/api/skills 优先，失败降级到内置 3 个精品 =====
+    // 服务端返回结构约定：{ skills: [{ skillId, 名称/name, 描述/value, 分类/cat, 文件URL/file, 下载文件名/dlName, 状态/status, 排序/sort, ... }] }
+    // 这里做字段归一化，兼容中英文键名；只渲染在线（online/on）且有文件 URL 的卡片。
+    function normalizeRemoteSkill(raw) {
+      if (!raw) return null;
+      var pick = function (keys, def) {
+        for (var i = 0; i < keys.length; i++) {
+          var k = keys[i];
+          if (raw[k] !== undefined && raw[k] !== null && raw[k] !== '') return raw[k];
+        }
+        return def;
+      };
+      var tools = pick(['tools', '工具', 'tool'], '');
+      if (typeof tools === 'string') tools = tools.split(/[,，]/).map(function (t) { return t.trim(); }).filter(Boolean);
+      var id = String(pick(['skillId', 'skill_id', 'id'], ''));
+      if (!id) return null;
+      return {
+        id: id,
+        name: String(pick(['name', '名称', 'skillName'], id)),
+        value: String(pick(['value', '描述', '一句话价值', 'desc'], '')),
+        cat: String(pick(['cat', '分类', 'category'], '其他')),
+        tools: tools.length ? tools : ['任意 AI'],
+        diff: String(pick(['diff', '难度', 'level'], '')),
+        time: String(pick(['time', '时长', 'duration'], '')),
+        format: String(pick(['format', '格式', 'fileType'], '')),
+        file: String(pick(['file', '文件URL', '文件路径', 'fileUrl'], '')),
+        dlName: String(pick(['dlName', '下载文件名', 'downloadName'], '')),
+        dlText: String(pick(['dlText', '下载按钮文案', 'downloadText'], '')),
+        status: pick(['status', '上线状态', 'state'], 'on'),
+        sort: pick(['sort', '排序', 'order'], 999),
+        hook: {
+          href: String(pick(['hookHref', '钩子链接'], '/products/selfcheck.html')),
+          text: String(pick(['hookText', '钩子文案'], '免费自检，看看最该先动哪一件 →'))
+        },
+        preview: { title: '方法骨架', style: 'grid', labels: ['①', '②', '③', '④'] }
+      };
+    }
+
+    function loadFromApi() {
+      var endpoint = '/api/skills';
+      fetch(endpoint, { method: 'GET', headers: { 'Accept': 'application/json' } })
+        .then(function (res) {
+          if (!res.ok) throw new Error('status ' + res.status);
+          return res.json();
+        })
+        .then(function (data) {
+          var list = (data && (data.skills || data.data)) || [];
+          if (!Array.isArray(list) || !list.length) throw new Error('empty');
+          var normalized = list.map(normalizeRemoteSkill).filter(Boolean);
+          // 只保留上线 + 有文件 URL 的卡
+          normalized = normalized.filter(function (s) {
+            var st = String(s.status === undefined ? 'on' : s.status);
+            return /^(on|online|上线|1|true)$/i.test(st) && s.file;
+          });
+          // 排序：sort 升序，缺失放末尾
+          normalized.sort(function (a, b) {
+            var sa = Number(a.sort === undefined ? 999 : a.sort), sb = Number(b.sort === undefined ? 999 : b.sort);
+            return (isNaN(sa) ? 999 : sa) - (isNaN(sb) ? 999 : sb);
+          });
+          if (!normalized.length) throw new Error('no online skills');
+          SKILLS = normalized;
+          CATS = [];
+          SKILLS.forEach(function (s) { if (CATS.indexOf(s.cat) === -1) CATS.push(s.cat); });
+          state.cat = '全部';
+          renderCards();
+          buildChips();
+          applyFilter();
+        })
+        .catch(function () {
+          // 失败静默：保留内置 3 个精品
+        });
     }
 
     // ===== 导航「免费咨询」展开二维码 =====
@@ -874,9 +886,14 @@
 
     // ===== 初始化 =====
     renderCards();
+    buildChips();
     applyFilter();
+    loadFromApi();
   })();
   </script>
+
+  <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
+  <script src="/lib/track.js" defer onerror="this.remove()"></script>
 
   <!-- Vercel Web Analytics（在 Vercel 面板开启后自动统计真实全站访问；未开启时静默 404 不影响页面） -->
   <script defer src="/_vercel/insights/script.js" onerror="this.remove()"></script>

@@ -3095,5 +3095,7 @@
   mountOnboarding(); // v1.17.0：启动时判定首次引导（新用户完整 3 屏 / 老用户轻量补填）
 })();
 </script>
+  <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
+  <script src="/lib/track.js" defer onerror="this.remove()"></script>
 </body>
 </html>

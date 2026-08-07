@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#050505" />
+  <title>运营驾驶舱 · MASTER LINC</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <style>
+    /* ===== 深色风格（与 globals.css 同体系） ===== */
+    :root {
+      --black: #050505;
+      --surface: #101010;
+      --surface-2: #171717;
+      --white: #f4f3ef;
+      --muted: #a3a3a0;
+      --line: rgba(244, 243, 239, 0.14);
+      --line-strong: rgba(244, 243, 239, 0.30);
+      --accent: #f4f3ef;
+      --accent-bg: rgba(244, 243, 239, 0.06);
+      --ok: #8fc98f;
+      --warn: #e0b36a;
+      --err: #ff9d8a;
+      --max: 1200px;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--black); }
+    body {
+      margin: 0; background: var(--black); color: var(--white);
+      font-family: Inter, "SF Pro Display", "Helvetica Neue", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+      font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+    input, select, textarea { font: inherit; color: var(--white); }
+    ::selection { background: var(--white); color: var(--black); }
+    [hidden] { display: none !important; }
+
+    /* ===== 布局 ===== */
+    .app { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 232px; flex: 0 0 232px; background: var(--surface);
+      border-right: 1px solid var(--line); padding: 20px 14px;
+      display: flex; flex-direction: column; gap: 4px; position: sticky; top: 0; height: 100vh;
+    }
+    .brand { font-size: 14px; font-weight: 800; letter-spacing: 0.14em; padding: 4px 10px 18px; line-height: 1.4; }
+    .brand small { display: block; font-weight: 500; letter-spacing: 0.08em; color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px;
+      color: var(--muted); font-size: 14px; transition: background 140ms ease, color 140ms ease;
+    }
+    .nav-item:hover { color: var(--white); background: var(--accent-bg); }
+    .nav-item.active { color: var(--white); background: var(--accent-bg); font-weight: 600; }
+    .nav-item .ico { width: 18px; text-align: center; opacity: 0.85; }
+    .sidebar-spacer { flex: 1; }
+    .logout-btn { color: var(--muted); font-size: 13px; text-align: left; padding: 10px 12px; border-radius: 8px; }
+    .logout-btn:hover { color: var(--err); background: rgba(255,120,90,.06); }
+
+    .main { flex: 1; min-width: 0; padding: 28px 32px 64px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .topbar h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
+    .topbar .date { color: var(--muted); font-size: 13px; }
+    .mobile-hamburger { display: none; }
+
+    /* ===== 通用组件 ===== */
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; margin-bottom: 18px; }
+    .card h3 { margin: 0 0 14px; font-size: 15px; font-weight: 650; letter-spacing: -0.01em; }
+    .card h3 .sub { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 8px; }
+    .grid { display: grid; gap: 14px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-2 { grid-template-columns: repeat(2, 1fr); }
+    .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+    .stat-card .label { color: var(--muted); font-size: 12.5px; }
+    .stat-card .num { font-size: 34px; font-weight: 750; letter-spacing: -0.03em; line-height: 1.15; margin-top: 4px; }
+    .stat-card .hint { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; border: 1px solid var(--line-strong); }
+    .pill.on { color: var(--ok); border-color: rgba(143,201,143,.4); background: rgba(143,201,143,.08); }
+    .pill.off { color: var(--muted); border-color: var(--line); }
+    .pill.pack { color: var(--warn); border-color: rgba(224,179,106,.4); background: rgba(224,179,106,.08); }
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+      background: var(--white); color: var(--black); font-weight: 600; font-size: 13.5px; transition: opacity 140ms ease;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn.ghost { background: transparent; color: var(--white); border: 1px solid var(--line-strong); }
+    .btn.ghost:hover { background: var(--accent-bg); }
+    .btn.danger { background: transparent; color: var(--err); border: 1px solid rgba(255,120,90,.35); }
+    .btn.sm { padding: 5px 12px; font-size: 12.5px; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .field { display: block; margin-bottom: 12px; }
+    .field label { display: block; color: var(--muted); font-size: 12.5px; margin-bottom: 5px; }
+    .field input, .field select, .field textarea {
+      width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
+      padding: 9px 12px; outline: none; transition: border-color 140ms ease;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--line-strong); }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 640px; }
+    th { text-align: left; color: var(--muted); font-weight: 500; font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--line-strong); white-space: nowrap; }
+    td { padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    td.num, th.num { text-align: right; }
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+    .err-text { color: var(--err); font-size: 13px; }
+    .ok-text { color: var(--ok); font-size: 13px; }
+    .bar { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+    .bar > i { display: block; height: 100%; background: var(--white); border-radius: 999px; }
+    .empty { color: var(--muted); text-align: center; padding: 40px 12px; font-size: 14px; }
+    .pager { display: flex; align-items: center; gap: 10px; margin-top: 14px; color: var(--muted); font-size: 13px; }
+    .pager .btn { padding: 4px 12px; font-size: 12.5px; }
+    .toast {
+      position: fixed; right: 20px; bottom: 20px; z-index: 99; background: var(--surface-2);
+      border: 1px solid var(--line-strong); border-radius: 10px; padding: 12px 18px; font-size: 13.5px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5); opacity: 0; transform: translateY(8px); transition: all 180ms ease; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.err { border-color: rgba(255,120,90,.4); color: var(--err); }
+    .toast.ok { border-color: rgba(143,201,143,.4); color: var(--ok); }
+    .modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+    .modal { background: var(--surface); border: 1px solid var(--line-strong); border-radius: 14px; width: min(680px, 100%); max-height: 88vh; overflow: auto; padding: 22px 24px; }
+    .modal h3 { margin: 0 0 16px; }
+    .modal .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .json-preview { background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+    .json-preview.open { white-space: pre-wrap; max-width: 520px; }
+    .trend-chart { display: flex; align-items: flex-end; gap: 6px; height: 140px; padding-top: 8px; }
+    .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+    .trend-col .c { width: 100%; max-width: 34px; background: var(--accent-bg); border-radius: 4px 4px 0 0; position: relative; }
+    .trend-col .c i { position: absolute; inset: 0; background: var(--white); border-radius: 4px 4px 0 0; opacity: 0; }
+    .trend-col.pv .c { background: rgba(244,243,239,.14); }
+    .trend-col.pv .c i { background: var(--white); opacity: 1; }
+    .trend-col.uv .c { background: transparent; }
+    .trend-col.uv .c i { background: rgba(163,163,160,.55); opacity: 1; }
+    .trend-col .l { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
+    .trend-legend { display: flex; gap: 16px; margin-bottom: 10px; font-size: 12px; color: var(--muted); }
+    .trend-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+    .trend-legend .pv-dot { background: var(--white); }
+    .trend-legend .uv-dot { background: rgba(163,163,160,.55); }
+    .filters { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
+    .filters select, .filters input {
+      background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px; outline: none; font-size: 13px;
+    }
+    .filters input { min-width: 200px; }
+
+    /* ===== 登录页 ===== */
+    .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { width: min(400px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 36px 32px; }
+    .login-box .brand { padding: 0 0 20px; text-align: center; }
+    .login-box h2 { margin: 0 0 6px; font-size: 20px; text-align: center; }
+    .login-box .sub { color: var(--muted); font-size: 13px; text-align: center; margin-bottom: 24px; }
+    .login-box .field input { padding: 12px 14px; font-size: 15px; }
+    .login-box .btn { width: 100%; justify-content: center; padding: 12px; font-size: 15px; }
+    .login-box .hint { color: var(--muted); font-size: 12px; text-align: center; margin-top: 16px; }
+    .login-error { color: var(--err); font-size: 13.5px; text-align: center; margin-top: 12px; min-height: 20px; }
+
+    /* ===== 375px 移动端：可读 ===== */
+    @media (max-width: 900px) {
+      .app { flex-direction: column; }
+      .sidebar {
+        position: fixed; z-index: 40; left: 0; top: 0; bottom: 0; width: 240px; height: 100vh;
+        transform: translateX(-100%); transition: transform 200ms ease; box-shadow: 0 0 40px rgba(0,0,0,.5);
+      }
+      .sidebar.open { transform: translateX(0); }
+      .main { padding: 18px 16px 48px; }
+      .mobile-hamburger {
+        display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px;
+        border: 1px solid var(--line); border-radius: 8px; font-size: 18px;
+      }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .modal .row { grid-template-columns: 1fr; }
+      .topbar h1 { font-size: 20px; }
+      table { min-width: 560px; }
+    }
+    @media (max-width: 480px) {
+      .stat-card .num { font-size: 28px; }
+      .main { padding: 14px 12px 40px; }
+      .card { padding: 14px 14px; }
+      .filters input { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录视图 -->
+  <div id="loginView" class="login-screen" hidden>
+    <div class="login-box">
+      <div class="brand">运营驾驶舱<small>MASTER LINC · 一人专用</small></div>
+      <h2>登录后台</h2>
+      <p class="sub">输入管理口令继续</p>
+      <form id="loginForm" novalidate>
+        <div class="field">
+          <label for="loginPassword">管理口令</label>
+          <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••••••" required />
+        </div>
+        <button class="btn" type="submit" id="loginBtn">进入驾驶舱 →</button>
+        <div class="login-error" id="loginError"></div>
+      </form>
+      <p class="hint">本页面仅限 masterlinc 使用，数据不对外公开。</p>
+    </div>
+  </div>
+
+  <!-- 主应用 -->
+  <div id="appView" class="app" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">运营驾驶舱<small>MASTER LINC · 2026</small></div>
+      <a class="nav-item" data-route="#/dashboard" href="#/dashboard"><span class="ico">◧</span> 仪表盘总览</a>
+      <a class="nav-item" data-route="#/skills" href="#/skills"><span class="ico">✎</span> Skill 管理</a>
+      <a class="nav-item" data-route="#/traffic" href="#/traffic"><span class="ico">◫</span> 访问数据</a>
+      <a class="nav-item" data-route="#/logs" href="#/logs"><span class="ico">≣</span> 行为日志</a>
+      <a class="nav-item" data-route="#/leads" href="#/leads"><span class="ico">✉</span> 邮箱线索</a>
+      <a class="nav-item" data-route="#/downloads" href="#/downloads"><span class="ico">↧</span> 下载统计</a>
+      <div class="sidebar-spacer"></div>
+      <button class="logout-btn" id="logoutBtn">↩ 退出登录</button>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <button class="mobile-hamburger" id="hamburger" aria-label="打开菜单">☰</button>
+        <h1 id="pageTitle">仪表盘总览</h1>
+        <span class="date" id="todayLabel"></span>
+      </div>
+      <div id="content"></div>
+    </main>
+  </div>
+
+  <div class="modal-mask" id="modalMask" hidden>
+    <div class="modal" id="modalBox"></div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* =====================================================
+     * 运营驾驶舱 · 前端（单文件零框架）
+     * 后端接口（凌程提供）：/api/admin/login、/api/admin/*
+     * 本地验证：localhost/127.0.0.1 或 ?mock=1 时自动用内置 Mock
+     * ===================================================== */
+
+    var TOKEN_KEY = 'masterlinc_admin_token';
+    var MOCK = /^(localhost|127\.0\.0\.1)$/.test(location.hostname) || /[?&]mock=1/.test(location.search);
+
+    /* ---------- 工具 ---------- */
+    function $(id) { return document.getElementById(id); }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    // 生成安全的内联 onclick 字符串参数（单引号包裹，适合放在双引号 HTML 属性内）
+    function qstr(s) { return "'" + String(s == null ? '' : s).replace(/'/g, "\\'") + "'"; }
+    function fmtTime(ts) {
+      if (!ts) return '-';
+      var d = new Date(ts);
+      function p(n) { return n < 10 ? '0' + n : '' + n; }
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+    }
+    function maskEmail(em) {
+      if (!em) return '-';
+      var at = em.indexOf('@');
+      if (at <= 1) return em;
+      return em.slice(0, 2) + '**' + em.slice(at);
+    }
+    function toast(msg, type) {
+      var t = $('toast');
+      t.textContent = msg;
+      t.className = 'toast show' + (type ? ' ' + type : '');
+      clearTimeout(t._tm);
+      t._tm = setTimeout(function () { t.className = 'toast'; }, 2600);
+    }
+    function todayStr() {
+      var d = new Date(), p = function (n) { return n < 10 ? '0' + n : '' + n; };
+      return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    }
+
+    /* ---------- Mock 数据（本地验证用，生产由后端接管） ---------- */
+    function mkMock() {
+      var now = Date.now();
+      var d = function (off) { return new Date(now - off * 86400000).toISOString().slice(0, 10); };
+      var days = [];
+      var pvBase = 90, uvBase = 60;
+      for (var i = 13; i >= 0; i--) {
+        var w = Math.sin(i * 1.7) * 30 + 100;
+        var pv = Math.round(pvBase * (0.55 + 0.45 * Math.sin(i * 1.3 + 2)) + 20 + w);
+        days.push({ date: d(i), pv: Math.max(10, pv), uv: Math.max(6, Math.round(pv * 0.62)) });
+      }
+      days[days.length - 1].pv = 128; days[days.length - 1].uv = 87; // 今日
+      return {
+        login: { password: 'proma2026' },
+        skills: [
+          { id: 'skill-01', name: 'AI 会议纪要·四栏法', cat: '会议', status: 'on', sort: 1, file: '/skills/files/skill-01-ai-meeting-notes-4columns.md', dlName: 'AI会议纪要·四栏法（精品卡）.md', dlText: '免费下载 · 四栏法精品卡', value: '把 1 小时录音变成一页「决定 / 待验证 / 负责人 / 原话」四栏决议。', tools: ['NotebookLM', 'Kimi'], diff: '★★☆', time: '首次配置 20 分钟 · 每场会 15 分钟', format: 'PDF 方法卡 · 方法 + 骨架 + 完整示例', hook: { href: '/products/selfcheck.html', text: '想要完整模板 + 复查清单？¥29 进阶版 →' }, preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }, download: 34 },
+          { id: 'skill-04', name: 'AI 写周报法（3 小时 → 20 分钟）', cat: '汇报周报', status: 'on', sort: 2, file: '/skills/files/skill-04-ai-weekly-report.md', dlName: 'AI写周报法（精品卡）.md', dlText: '免费下载 · 周报法精品卡', value: '周报从 3 小时压到 20 分钟——素材随手记、AI 出初稿、人只改判断。', tools: ['DeepSeek', 'Kimi'], diff: '★★☆', time: '首次搭建 30 分钟 · 每周 20 分钟成稿', format: 'PDF 方法卡 · 含 3 套提示词变体 + 常见坑', hook: { href: '/products/selfcheck.html', text: '想系统化省时间？免费自检 →' }, preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }, download: 21 },
+          { id: 'skill-12', name: '管理者 AI 效率审计', cat: '决策', status: 'on', sort: 3, file: '/skills/files/skill-12-manager-ai-audit-week.md', dlName: '管理者AI效率审计（精品卡）.md', dlText: '免费下载 · 效率审计精品卡', value: '记录一周工作，按四类拆开算出可释放时间，找到 AI 最该插手的 TOP 3。', tools: ['DeepSeek', 'Kimi', 'GPT'], diff: '★★★', time: '记录一周 · 周末审计 30 分钟', format: 'PDF 方法卡 · 完整审计框架', hook: { href: '/products/selfcheck.html', text: '想深挖场景？免费自检 →' }, preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }, download: 12 }
+        ],
+        leads: [
+          { recordId: 'rec-lead-1', time: now - 3.2e6, email: 'xiaohong@foxmail.com', source: 'skill-pack', question: '汇报周报', consent: '是' },
+          { recordId: 'rec-lead-2', time: now - 8.6e6, email: 'zhangmin@gmail.com', source: '直接访问', question: '会议纪要', consent: '是' },
+          { recordId: 'rec-lead-3', time: now - 26e6, email: 'liwei@163.com', source: 'skill-pack', question: '决策', consent: '是' },
+          { recordId: 'rec-lead-4', time: now - 49e6, email: 'wangfang@qq.com', source: '小红书', question: 'AI 效率审计', consent: '是' },
+          { recordId: 'rec-lead-5', time: now - 75e6, email: 'chenhao@outlook.com', source: '直接访问', question: '周报', consent: '是' },
+          { recordId: 'rec-lead-6', time: now - 130e6, email: 'suyan@gmail.com', source: 'skill-pack', question: '消息协同', consent: '是' },
+          { recordId: 'rec-lead-7', time: now - 190e6, email: 'hulimin@foxmail.com', source: '直接访问', question: '不确定', consent: '是' },
+          { recordId: 'rec-lead-8', time: now - 260e6, email: 'tangyue@163.com', source: '小红书', question: '会议纪要', consent: '是' }
+        ],
+        events: [
+          { recordId: 'rec-ev-1', time: now - 1.2e6, ev: 'skill_download', page: 'skills', uid: 'a1b2c3d4', ref: '', extra: { skillId: 'skill-01', skillName: 'AI 会议纪要·四栏法' }, v: 1 },
+          { recordId: 'rec-ev-2', time: now - 2.5e6, ev: 'page_view', page: 'home', uid: 'e5f6a7b8', ref: '', extra: { path: '/' }, v: 1 },
+          { recordId: 'rec-ev-3', time: now - 3.1e6, ev: 'skill_download', page: 'skills', uid: 'a1b2c3d4', ref: '', extra: { skillId: 'skill-04', skillName: 'AI 写周报法' }, v: 1 },
+          { recordId: 'rec-ev-4', time: now - 4.4e6, ev: 'lead_submit', page: 'skills', uid: 'c9d8e7f6', ref: '', extra: { hasEmail: true, source: 'skill-pack' }, v: 1 },
+          { recordId: 'rec-ev-5', time: now - 5.2e6, ev: 'skill_pack_submit', page: 'skills', uid: 'c9d8e7f6', ref: '', extra: { source: 'skill-pack' }, v: 1 },
+          { recordId: 'rec-ev-6', time: now - 6.8e6, ev: 'page_view', page: 'selfcheck', uid: 'b2c3d4e5', ref: '', extra: { path: '/products/selfcheck.html' }, v: 1 },
+          { recordId: 'rec-ev-7', time: now - 8.0e6, ev: 'skill_download', page: 'skills', uid: 'd3e4f5a6', ref: '', extra: { skillId: 'skill-12', skillName: '管理者 AI 效率审计' }, v: 1 },
+          { recordId: 'rec-ev-8', time: now - 9.5e6, ev: 'page_view', page: 'skills', uid: 'a1b2c3d4', ref: '', extra: { path: '/skills/' }, v: 1 },
+          { recordId: 'rec-ev-9', time: now - 11e6, ev: 'lead_submit', page: 'home', uid: 'f4a5b6c7', ref: '', extra: { hasEmail: true, source: '直接访问' }, v: 1 },
+          { recordId: 'rec-ev-10', time: now - 13e6, ev: 'page_view', page: 'products', uid: 'b2c3d4e5', ref: '', extra: { path: '/products/transition-os.html' }, v: 1 }
+        ],
+        traffic: {
+          pv: 780, uv: 486, days: 7,
+          daily: days,
+          pages: [
+            { path: '/', count: 341 },
+            { path: '/skills/', count: 267 },
+            { path: '/products/selfcheck.html', count: 96 },
+            { path: '/products/transition-os.html', count: 54 },
+            { path: '/products/index.html', count: 22 }
+          ],
+          sources: [
+            { source: '直接访问', count: 412 },
+            { source: '小红书', count: 138 },
+            { source: '百度', count: 86 },
+            { source: '微信公众号', count: 64 }
+          ]
+        }
+      };
+    }
+
+    /* ---------- API 封装 ---------- */
+    var mockDB = mkMock();
+    function api(method, path, body) {
+      var token = getToken();
+      if (MOCK) {
+        return new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            try { resolve(mockRoute(method, path, body)); } catch (e) { reject(e); }
+          }, 180);
+        });
+      }
+      return fetch(path, {
+        method: method,
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'Authorization': 'Bearer ' + (token || '') },
+        body: body ? JSON.stringify(body) : undefined
+      }).then(function (res) {
+        if (res.status === 401) { clearToken(); showLogin(); throw new Error('unauthorized'); }
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          if (!res.ok) throw new Error(data && data.message ? data.message : 'HTTP ' + res.status);
+          return data;
+        });
+      });
+    }
+
+    /* Mock 路由：与后端约定响应结构保持一致 */
+    function mockRoute(method, path, body) {
+      var u = path.split('?')[0], q = {};
+      var qs = path.split('?')[1] || '';
+      qs.split('&').forEach(function (kv) { if (!kv) return; var p = kv.split('='); q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ''); });
+      if (u === '/api/admin/login') {
+        if (method === 'POST' && body && body.password === mockDB.login.password) {
+          return { ok: true, token: 'mock-token-' + Date.now(), expiresAt: Date.now() + 7 * 86400000, expiresIn: 7 * 24 * 60 * 60 };
+        }
+        var err = new Error('口令不正确');
+        err.status = 401; throw err;
+      }
+      if (u === '/api/admin/skills') {
+        if (method === 'GET') {
+          return { ok: true, skills: mockDB.skills.slice() };
+        }
+        if (method === 'POST') { // upsert（新增或更新）
+          var s = body || {};
+          var id = String(s.skillId || s.id || '').trim();
+          if (!id) { var e1 = new Error('缺少 skillId'); e1.status = 400; throw e1; }
+          var found = null;
+          mockDB.skills.forEach(function (x) { if (x.id === id) found = x; });
+          var norm = {
+            id: id, name: s.name || '', value: s.value || '', cat: s.cat || '其他',
+            tools: Array.isArray(s.tools) ? s.tools : String(s.tools || '').split(/[,，]/).map(function (t) { return t.trim(); }).filter(Boolean),
+            diff: s.diff || '', time: s.time || '', format: s.format || '',
+            file: s.file || '', dlName: s.dlName || '', dlText: s.dlText || '',
+            hook: (s.hook && s.hook.href) ? s.hook : { href: s.hookHref || '/products/selfcheck.html', text: s.hookText || '' },
+            preview: s.preview || { title: '方法骨架', style: 'grid', labels: ['①', '②', '③', '④'] },
+            status: /^(off|offline|下线|0|false)$/i.test(String(s.status)) ? 'off' : 'on',
+            sort: parseInt(s.sort, 10) || 0
+          };
+          if (found) { norm.download = found.download || 0; mockDB.skills = mockDB.skills.map(function (x) { return x.id === id ? norm : x; }); }
+          else { norm.download = 0; mockDB.skills.push(norm); }
+          return { ok: true, action: found ? 'update' : 'create', skill: norm };
+        }
+      }
+      // PATCH /api/admin/skills/:id — 部分更新（上下线/排序等）
+      var patchM = u.match(/^\/api\/admin\/skills\/([^/]+)$/);
+      if (patchM && method === 'PATCH') {
+        var pid = decodeURIComponent(patchM[1]);
+        var target = null;
+        mockDB.skills.forEach(function (x) { if (x.id === pid) target = x; });
+        if (!target) { var e2 = new Error('Skill 不存在'); e2.status = 404; throw e2; }
+        Object.keys(body || {}).forEach(function (k) { if (body[k] !== undefined) target[k] = body[k]; });
+        return { ok: true, skill: target };
+      }
+      if (u === '/api/admin/leads') {
+        var list = mockDB.leads.slice();
+        if (q.source) list = list.filter(function (l) { return l.source.indexOf(q.source) !== -1; });
+        if (q.q) list = list.filter(function (l) { return (l.email + l.question).toLowerCase().indexOf(q.q.toLowerCase()) !== -1; });
+        list.sort(function (a, b) { return b.time - a.time; });
+        if (q.export === 'csv') return { csv: true, rows: list };
+        var lpage = Math.max(1, parseInt(q.page, 10) || 1);
+        var lsize = Math.min(100, parseInt(q.pageSize, 10) || 20);
+        var ltotal = list.length;
+        return { ok: true, total: ltotal, page: lpage, pageSize: lsize, items: list.slice((lpage - 1) * lsize, lpage * lsize) };
+      }
+      if (u === '/api/admin/events') {
+        var evs = mockDB.events.slice();
+        if (q.ev && q.ev !== '全部') evs = evs.filter(function (e) { return e.ev === q.ev; });
+        evs.sort(function (a, b) { return b.time - a.time; });
+        var epage = Math.max(1, parseInt(q.page, 10) || 1);
+        var esize = Math.min(100, parseInt(q.pageSize, 10) || 50);
+        var etotal = evs.length;
+        return { ok: true, total: etotal, page: epage, pageSize: esize, items: evs.slice((epage - 1) * esize, epage * esize) };
+      }
+      if (u === '/api/admin/traffic') {
+        var days = parseInt(q.days, 10) || 7;
+        var t = mockDB.traffic;
+        var dd = (t.daily || []).slice(-days);
+        var agg = dd.reduce(function (a, b) { a.pv += b.pv || 0; a.uv += b.uv || 0; return a; }, { pv: 0, uv: 0 });
+        return { ok: true, days: days, pv: agg.pv, uv: agg.uv, daily: dd, pages: t.pages || [], sources: t.sources || [], generatedAt: Date.now() };
+      }
+      if (u === '/api/admin/downloads') {
+        var ds = mockDB.skills.map(function (s) {
+          return { skillId: s.id, skillName: s.name, category: s.cat, count: s.download || 0, lastAt: Date.now() - 36e5 * ((s.sort || 1) * 3) };
+        });
+        var dtotal = ds.reduce(function (a, b) { return a + b.count; }, 0);
+        return { ok: true, days: parseInt(q.days, 10) || 7, total: dtotal, skills: ds, generatedAt: Date.now() };
+      }
+      throw new Error('Mock 无此端点: ' + path);
+    }
+
+    /* ---------- Token 管理（7 天） ---------- */
+    function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ''; } catch (e) { return ''; } }
+    function setToken(t) { try { localStorage.setItem(TOKEN_KEY, t); } catch (e) {} }
+    function clearToken() { try { localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+    function isLoggedIn() { return !!getToken(); }
+
+    /* ---------- 视图切换 ---------- */
+    var loginView = $('loginView'), appView = $('appView');
+    function showLogin() { loginView.hidden = false; appView.hidden = true; $('sidebar').classList.remove('open'); }
+    function showApp() { loginView.hidden = true; appView.hidden = false; $('sidebar').classList.remove('open'); }
+
+    function logout() { clearToken(); showLogin(); location.hash = ''; }
+
+    /* =====================================================
+     * 路由 + 登录 + 仪表盘
+     * ===================================================== */
+    var ROUTES = {
+      '#/dashboard': { title: '仪表盘总览', render: renderDashboard },
+      '#/skills': { title: 'Skill 管理', render: renderSkills },
+      '#/traffic': { title: '访问数据', render: renderTraffic },
+      '#/logs': { title: '行为日志', render: renderLogs },
+      '#/leads': { title: '邮箱线索', render: renderLeads },
+      '#/downloads': { title: '下载统计', render: renderDownloads }
+    };
+
+    function currentRoute() {
+      var h = location.hash || '';
+      return ROUTES[h] ? h : '#/dashboard';
+    }
+
+    function router() {
+      if (!isLoggedIn()) { showLogin(); return; }
+      var route = currentRoute();
+      showApp();
+      document.querySelectorAll('.nav-item').forEach(function (el) {
+        el.classList.toggle('active', el.getAttribute('data-route') === route);
+      });
+      $('pageTitle').textContent = ROUTES[route].title;
+      var content = $('content');
+      content.innerHTML = '<div class="muted" style="padding:40px;text-align:center;">加载中…</div>';
+      try {
+        ROUTES[route].render(content);
+      } catch (e) {
+        content.innerHTML = '<div class="card"><div class="err-text">渲染失败：' + esc(e.message) + '</div></div>';
+      }
+    }
+
+    // 登录
+    $('loginForm').addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var pwd = $('loginPassword').value;
+      var btn = $('loginBtn');
+      btn.disabled = true; btn.textContent = '验证中…';
+      $('loginError').textContent = '';
+      api('POST', '/api/admin/login', { password: pwd }).then(function (data) {
+        if (data && data.token) {
+          setToken(data.token);
+          $('loginPassword').value = '';
+          location.hash = '#/dashboard';
+          router();
+        } else { throw new Error('登录响应异常'); }
+      }).catch(function (err) {
+        var msg = err && err.status === 401 ? '口令错误，请重试。' : (err && err.message ? err.message : '登录失败，请检查网络。');
+        $('loginError').textContent = msg;
+      }).finally(function () {
+        btn.disabled = false; btn.textContent = '进入驾驶舱 →';
+      });
+    });
+
+    $('logoutBtn').addEventListener('click', logout);
+    $('hamburger').addEventListener('click', function () { $('sidebar').classList.toggle('open'); });
+    $('modalMask').addEventListener('click', function (ev) { if (ev.target === $('modalMask')) closeModal(); });
+    window.addEventListener('hashchange', router);
+
+    /* ---------- 仪表盘 ---------- */
+    function renderDashboard(el) {
+      Promise.all([
+        api('GET', '/api/admin/traffic?days=1'),
+        api('GET', '/api/admin/downloads'),
+        api('GET', '/api/admin/leads'),
+        api('GET', '/api/admin/skills')
+      ]).then(function (res) {
+        var traffic = res[0], dl = res[1], leads = res[2], skills = res[3];
+        var daily = (traffic.daily || []);
+        var today = daily.length ? daily[daily.length - 1] : {};
+        var leadsList = leads.items || leads.data || [];
+        var skillList = skills.skills || skills.data || [];
+        var html = '';
+        html += '<div class="grid grid-4" style="margin-bottom:18px;">';
+        html += statCard('今日 PV', today.pv != null ? today.pv : (traffic.pv || '-'), 'page_view 数');
+        html += statCard('今日 UV', today.uv != null ? today.uv : (traffic.uv || '-'), '按匿名 ID 去重');
+        html += statCard('总下载（去重）', dl.total != null ? dl.total : '-', 'uid+skillId 口径');
+        html += statCard('邮箱线索', leads.total != null ? leads.total : leadsList.length, '全部来源');
+        html += '</div>';
+        html += '<div class="grid grid-2">';
+        // 近 7 日趋势
+        html += '<div class="card"><h3>近 7 日 PV/UV 趋势</h3>' + trendChart((traffic.daily || []).slice(-7), true) + '</div>';
+        // Skill 下载 Top5
+        html += '<div class="card"><h3>Skill 下载 Top</h3>' + topDownloadsHtml((dl.skills || []).slice(0, 5)) + '</div>';
+        html += '</div>';
+        // 最新线索
+        html += '<div class="card"><h3>最新线索 <span class="sub">查看全部 → <a href="#/leads">邮箱线索</a></span></h3>';
+        if (!leadsList.length) { html += '<div class="empty">暂无线索</div>'; }
+        else {
+          html += '<div class="table-wrap"><table><thead><tr><th>时间</th><th>邮箱</th><th>来源</th><th>最想解决</th><th>数据同意</th></tr></thead><tbody>';
+          leadsList.slice(0, 5).forEach(function (l) {
+            html += '<tr><td class="small muted">' + fmtTime(l.time || l.at || l.createdAt) + '</td><td>' + maskEmail(l.email) + '</td><td>' + sourcePill(l.source) + '</td><td>' + esc(l.question || l.problem || l.want || '') + '</td><td>' + esc(l.consent || '是') + '</td></tr>';
+          });
+          html += '</tbody></table></div>';
+        }
+        html += '</div>';
+        el.innerHTML = html;
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">数据加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+
+    function statCard(label, num, hint) {
+      return '<div class="stat-card"><div class="label">' + label + '</div><div class="num">' + esc(num) + '</div><div class="hint">' + hint + '</div></div>';
+    }
+
+    function topDownloadsHtml(list) {
+      if (!list.length) return '<div class="empty">暂无下载数据</div>';
+      var max = Math.max.apply(null, list.map(function (x) { return x.unique != null ? x.unique : x.count; }));
+      var html = '';
+      list.forEach(function (s, i) {
+        var v = s.unique != null ? s.unique : s.count;
+        var w = max ? Math.round(v / max * 100) : 0;
+        html += '<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>' + (i + 1) + '. ' + esc(s.skillName || s.name || s.skillId) + '</span><span class="muted">' + v + '</span></div><div class="bar"><i style="width:' + w + '%;"></i></div></div>';
+      });
+      return html;
+    }
+
+    function sourcePill(src) {
+      var s = String(src || '直接访问');
+      if (s.indexOf('skill-pack') === 0) return '<span class="pill pack">' + esc(s) + '</span>';
+      return esc(s);
+    }
+
+    /* =====================================================
+     * 通用图表 + Skill 管理 + 访问数据
+     * ===================================================== */
+    function trendChart(days, withLegend) {
+      if (!days || !days.length) return '<div class="empty">暂无数据</div>';
+      var max = 1;
+      days.forEach(function (d) { max = Math.max(max, d.pv || 0, d.uv || 0); });
+      var html = withLegend ? '<div class="trend-legend"><span><i class="pv-dot"></i>PV</span><span><i class="uv-dot"></i>UV</span></div>' : '';
+      html += '<div class="trend-chart">';
+      days.forEach(function (d) {
+        var ph = Math.round((d.pv || 0) / max * 100);
+        var uh = Math.round((d.uv || 0) / max * 100);
+        var label = String(d.date || '').slice(5);
+        html += '<div class="trend-col"><div class="l">' + label + '</div><div style="display:flex;gap:3px;align-items:flex-end;width:100%;justify-content:center;flex:1;">';
+        html += '<div class="c pv" style="height:' + Math.max(4, ph) + '%;"><i></i></div>';
+        html += '<div class="c uv" style="height:' + Math.max(4, uh) + '%;"><i></i></div>';
+        html += '</div></div>';
+      });
+      html += '</div>';
+      return html;
+    }
+
+    function barRow(label, val, max, sub) {
+      var w = max ? Math.round(val / max * 100) : 0;
+      return '<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>' + esc(label) + (sub ? ' <span class="muted small">' + esc(sub) + '</span>' : '') + '</span><span class="muted">' + val + '</span></div><div class="bar"><i style="width:' + w + '%;"></i></div></div>';
+    }
+
+    /* ---------- Skill 管理 ---------- */
+    var skillEditorOpen = false;
+    function renderSkills(el) {
+      api('GET', '/api/admin/skills').then(function (data) {
+        var list = data.skills || data.data || [];
+        var html = '';
+        html += '<div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><button class="btn" onclick="window.__adminNewSkill()">+ 新建 Skill</button></div>';
+        if (!list.length) { html += '<div class="card"><div class="empty">暂无 Skill 配置，点击「+ 新建 Skill」创建。</div></div>'; }
+        else {
+          html += '<div class="card"><div class="table-wrap"><table><thead><tr><th>名称 / ID</th><th>分类</th><th>下载</th><th>排序</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+          list.slice().sort(function (a, b) { return (a.sort || 999) - (b.sort || 999); }).forEach(function (s) {
+            var id = s.skillId || s.id;
+            var on = /^(on|online|上线|1|true)$/i.test(String(s.status === undefined ? 'on' : s.status));
+            html += '<tr>';
+            html += '<td><div>' + esc(s.name) + '</div><div class="small muted">' + esc(id) + '</div></td>';
+            html += '<td>' + esc(s.cat || s.category || '-') + '</td>';
+            html += '<td class="num">' + (s.download != null ? s.download : '-') + '</td>';
+            html += '<td class="num">' + esc(s.sort || '-') + '</td>';
+            html += '<td>' + (on ? '<span class="pill on">● 在线</span>' : '<span class="pill off">○ 已下架</span>') + '</td>';
+            html += '<td style="white-space:nowrap;">';
+            html += '<button class="btn ghost sm" onclick="window.__adminEditSkill(' + qstr(id) + ')">编辑</button> ';
+            html += '<button class="btn ghost sm" onclick="window.__adminToggleSkill(' + qstr(id) + ', ' + (on ? 'false' : 'true') + ')">' + (on ? '下架' : '上架') + '</button>';
+            html += '</td></tr>';
+          });
+          html += '</tbody></table></div></div>';
+        }
+        el.innerHTML = html;
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+
+    function skillForm(s, isNew) {
+      s = s || {};
+      var id = s.skillId || s.id || '';
+      return '<h3>' + (isNew ? '新建 Skill' : '编辑 Skill：' + esc(id)) + '</h3>' +
+        '<div class="row">' +
+        '<div class="field"><label>Skill ID（slug，唯一，上线后不改）</label><input id="sf-id" value="' + esc(id) + '" ' + (isNew ? '' : 'readonly') + ' placeholder="skill-01" /></div>' +
+        '<div class="field"><label>名称</label><input id="sf-name" value="' + esc(s.name || '') + '" placeholder="AI 会议纪要·四栏法" /></div>' +
+        '<div class="field"><label>分类</label><select id="sf-cat">' + ['会议', '汇报周报', '消息协同', '决策', '工具安全'].map(function (c) { return '<option value="' + c + '"' + (s.cat === c ? ' selected' : '') + '>' + c + '</option>'; }).join('') + '</select></div>' +
+        '<div class="field"><label>排序（数字小在前）</label><input id="sf-sort" type="number" value="' + esc(s.sort != null ? s.sort : '') + '" /></div>' +
+        '<div class="field"><label>难度（如 ★★★）</label><input id="sf-diff" value="' + esc(s.diff || '') + '" /></div>' +
+        '<div class="field"><label>时长（如 15 分钟）</label><input id="sf-time" value="' + esc(s.time || '') + '" /></div>' +
+        '<div class="field"><label>格式（如 PDF 方法卡）</label><input id="sf-format" value="' + esc(s.format || '') + '" /></div>' +
+        '<div class="field"><label>工具（逗号分隔）</label><input id="sf-tools" value="' + esc((s.tools || []).join(', ')) + '" /></div>' +
+        '</div>' +
+        '<div class="field"><label>一句话价值（value）</label><textarea id="sf-value" rows="2">' + esc(s.value || '') + '</textarea></div>' +
+        '<div class="field"><label>文件 URL（静态文件路径，如 /skills/files/skill-01-xxx.md）</label><input id="sf-file" value="' + esc(s.file || '') + '" placeholder="/skills/files/xxx.md" /></div>' +
+        '<div class="row">' +
+        '<div class="field"><label>下载文件名（dlName）</label><input id="sf-dlname" value="' + esc(s.dlName || '') + '" /></div>' +
+        '<div class="field"><label>下载按钮文案（dlText）</label><input id="sf-dltext" value="' + esc(s.dlText || '') + '" /></div>' +
+        '</div>' +
+        '<div class="row">' +
+        '<div class="field"><label>钩子链接（hook.href）</label><input id="sf-hookhref" value="' + esc((s.hook && s.hook.href) || s.hookHref || '/products/selfcheck.html') + '" /></div>' +
+        '<div class="field"><label>钩子文案（hook.text）</label><input id="sf-hooktext" value="' + esc((s.hook && s.hook.text) || s.hookText || '') + '" /></div>' +
+        '</div>' +
+        '<div class="field"><label>状态</label><select id="sf-status">' +
+        '<option value="on"' + (/^(on|online|上线|1|true)$/i.test(String(s.status === undefined ? 'on' : s.status)) ? ' selected' : '') + '>在线</option>' +
+        '<option value="off"' + (/^(off|offline|下线|0|false)$/i.test(String(s.status === '' ? 'off' : s.status)) ? ' selected' : '') + '>下架</option>' +
+        '</select></div>' +
+        '<div class="modal-actions">' +
+        '<button class="btn ghost" onclick="window.__adminCloseModal()">取消</button>' +
+        '<button class="btn" onclick="window.__adminSaveSkill(' + (isNew ? 'true' : 'false') + ')">保存</button>' +
+        '</div>';
+    }
+
+    function openModal(html) {
+      $('modalBox').innerHTML = html;
+      $('modalMask').hidden = false;
+    }
+    function closeModal() { $('modalMask').hidden = true; $('modalBox').innerHTML = ''; }
+
+    function collectSkillForm() {
+      var s = {};
+      s.skillId = $('sf-id').value.trim();
+      s.name = $('sf-name').value.trim();
+      s.cat = $('sf-cat').value;
+      s.sort = parseInt($('sf-sort').value, 10) || 0;
+      s.diff = $('sf-diff').value.trim();
+      s.time = $('sf-time').value.trim();
+      s.format = $('sf-format').value.trim();
+      s.tools = $('sf-tools').value.split(/[,，]/).map(function (t) { return t.trim(); }).filter(Boolean);
+      s.value = $('sf-value').value.trim();
+      s.file = $('sf-file').value.trim();
+      s.dlName = $('sf-dlname').value.trim();
+      s.dlText = $('sf-dltext').value.trim();
+      s.hook = { href: $('sf-hookhref').value.trim(), text: $('sf-hooktext').value.trim() };
+      s.status = $('sf-status').value;
+      return s;
+    }
+
+    window.__adminNewSkill = function () { openModal(skillForm({}, true)); };
+    window.__adminEditSkill = function (id) {
+      api('GET', '/api/admin/skills').then(function (data) {
+        var list = data.skills || data.data || [];
+        var s = null;
+        list.forEach(function (x) { if ((x.skillId || x.id) === id) s = x; });
+        if (!s) { toast('未找到该 Skill', 'err'); return; }
+        openModal(skillForm(s, false));
+      }).catch(function () { toast('加载失败', 'err'); });
+    };
+    window.__adminToggleSkill = function (id, toOn) {
+      api('PATCH', '/api/admin/skills/' + encodeURIComponent(id), { status: toOn ? 'on' : 'off' }).then(function () {
+        toast(toOn ? '已上架' : '已下架', 'ok');
+        router();
+      }).catch(function (err) { toast(err.message || '操作失败', 'err'); });
+    };
+    window.__adminSaveSkill = function () {
+      var s = collectSkillForm();
+      if (!s.skillId || !s.name) { toast('Skill ID 和名称必填', 'err'); return; }
+      api('POST', '/api/admin/skills', s).then(function () {
+        closeModal(); toast('已保存', 'ok');
+        router();
+      }).catch(function (err) { toast(err.message || '保存失败', 'err'); });
+    };
+    window.__adminCloseModal = closeModal;
+
+    /* ---------- 访问数据 ---------- */
+    function renderTraffic(el) {
+      api('GET', '/api/admin/traffic?days=14').then(function (data) {
+        var daily = data.daily || [];
+        var pages = data.pages || [];
+        var sources = data.sources || [];
+        var today = daily.length ? daily[daily.length - 1] : {};
+        var html = '';
+        html += '<div class="grid grid-4" style="margin-bottom:18px;">';
+        html += statCard('PV（今日）', today.pv != null ? today.pv : (data.pv != null ? data.pv : '-'), '全站');
+        html += statCard('UV（今日）', today.uv != null ? today.uv : (data.uv != null ? data.uv : '-'), '按匿名 ID');
+        html += statCard('来源渠道', sources.length, 'Top 列表');
+        html += statCard('热门页面', pages.length, 'Top 列表');
+        html += '</div>';
+        html += '<div class="card"><h3>近 14 日 PV/UV 趋势</h3>' + trendChart(daily.slice(-14), true) + '</div>';
+        html += '<div class="grid grid-2">';
+        html += '<div class="card"><h3>来源 Top</h3>';
+        if (!sources.length) html += '<div class="empty">暂无数据</div>';
+        else { var sm = Math.max.apply(null, sources.map(function (s) { return s.count; })); html += sources.map(function (s) { return barRow(s.source || s.name, s.count, sm); }).join(''); }
+        html += '</div>';
+        html += '<div class="card"><h3>热门页面 Top</h3>';
+        if (!pages.length) html += '<div class="empty">暂无数据</div>';
+        else { var pm = Math.max.apply(null, pages.map(function (p) { return p.count; })); html += '<div class="table-wrap"><table><thead><tr><th>页面</th><th class="num">PV</th></tr></thead><tbody>' + pages.map(function (p) { return '<tr><td>' + esc(p.path || p.page) + '</td><td class="num">' + (p.count != null ? p.count : p.pv) + '</td></tr>'; }).join('') + '</tbody></table></div>'; }
+        html += '</div>';
+        html += '</div>';
+        html += '<div class="card small muted">数据源说明：自建埋点（全站 page_view 事件）为主，Vercel Analytics 面板可作旁路对照。</div>';
+        el.innerHTML = html;
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+
+    /* =====================================================
+     * 行为日志 + 邮箱线索 + 下载统计
+     * ===================================================== */
+    var logsState = { ev: '全部', page: 1 };
+    function renderLogs(el) {
+      var q = '/api/admin/events?page=' + logsState.page + '&pageSize=20&ev=' + encodeURIComponent(logsState.ev);
+      api('GET', q).then(function (data) {
+        var events = data.items || data.events || [];
+        var total = data.total || 0;
+        var per = data.pageSize || 20;
+        var pages = Math.max(1, Math.ceil(total / per));
+        var html = '';
+        html += '<div class="card"><div class="filters">';
+        html += '<label class="muted small">事件类型</label><select id="logEvFilter">';
+        ['全部', 'page_view', 'skill_download', 'lead_submit', 'skill_pack_submit'].forEach(function (e) {
+          html += '<option value="' + e + '"' + (logsState.ev === e ? ' selected' : '') + '>' + e + '</option>';
+        });
+        html += '</select>';
+        html += '<button class="btn ghost sm" onclick="window.__adminApplyLogFilter()">查询</button>';
+        html += '</div>';
+        html += '<div class="table-wrap"><table><thead><tr><th>时间</th><th>事件</th><th>页面</th><th>匿名 ID（前 8 位）</th><th>详情（点击展开）</th></tr></thead><tbody>';
+        if (!events.length) html += '<tr><td colspan="5"><div class="empty">暂无事件</div></td></tr>';
+        events.forEach(function (e) {
+          var uid = String(e.uid || '');
+          var extraJson = JSON.stringify(e.extra || {});
+          html += '<tr>';
+          html += '<td class="small muted" style="white-space:nowrap;">' + fmtTime(e.time || e.t || e.createdAt) + '</td>';
+          html += '<td><span class="pill">' + esc(e.ev || e.type) + '</span></td>';
+          html += '<td>' + esc(e.page || e.path || '-') + '</td>';
+          html += '<td class="small">' + esc(uid.slice(0, 8) || '-') + '</td>';
+          html += '<td><div class="json-preview" onclick="this.classList.toggle(\'open\')" title="点击展开/收起">' + esc(extraJson) + '</div></td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        html += pager(total, pages, logsState.page, 'window.__adminLogPage');
+        html += '</div>';
+        el.innerHTML = html;
+        var sel = $('logEvFilter');
+        if (sel) sel.addEventListener('change', function () { logsState.ev = this.value; logsState.page = 1; });
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+    window.__adminApplyLogFilter = function () { logsState.page = 1; router(); };
+    window.__adminLogPage = function (p) { logsState.page = p; router(); };
+
+    /* ---------- 邮箱线索 ---------- */
+    var leadsState = { from: '全部', q: '', page: 1 };
+    var FOLLOW_KEY = 'masterlinc_lead_followed'; // 本地跟进标记（Obsidian 为主，这里仅本机辅助）
+    function leadFollowMap() { try { return JSON.parse(localStorage.getItem(FOLLOW_KEY) || '{}'); } catch (e) { return {}; } }
+    function renderLeads(el) {
+      var q = '/api/admin/leads?page=' + leadsState.page + '&pageSize=20&source=' + encodeURIComponent(leadsState.from === '全部' ? '' : leadsState.from) + '&q=' + encodeURIComponent(leadsState.q);
+      api('GET', q).then(function (data) {
+        var list = data.items || data.data || [];
+        var total = data.total != null ? data.total : list.length;
+        var follows = leadFollowMap();
+        var html = '';
+        html += '<div class="card"><div class="filters">';
+        html += '<label class="muted small">来源</label><select id="leadFromFilter">';
+        ['全部', 'skill-pack', '直接访问', '小红书', '百度', '微信公众号'].forEach(function (f) {
+          html += '<option value="' + f + '"' + (leadsState.from === f ? ' selected' : '') + '>' + f + '</option>';
+        });
+        html += '</select>';
+        html += '<input id="leadSearch" placeholder="搜索邮箱 / 问题" value="' + esc(leadsState.q) + '" />';
+        html += '<button class="btn ghost sm" onclick="window.__adminApplyLeadFilter()">筛选</button>';
+        html += '<button class="btn sm" onclick="window.__adminExportLeads()">导出 CSV</button>';
+        html += '<span class="muted small">共 ' + total + ' 条</span>';
+        html += '</div>';
+        html += '<div class="table-wrap"><table><thead><tr><th>时间</th><th>邮箱</th><th>来源</th><th>最想解决</th><th>数据同意</th><th>跟进状态</th><th></th></tr></thead><tbody>';
+        if (!list.length) html += '<tr><td colspan="7"><div class="empty">暂无线索</div></td></tr>';
+        list.forEach(function (l) {
+          var rid = String(l.recordId || l.email || '');
+          var followed = !!follows[rid];
+          html += '<tr>';
+          html += '<td class="small muted" style="white-space:nowrap;">' + fmtTime(l.time || l.at || l.createdAt) + '</td>';
+          html += '<td>' + maskEmail(l.email) + '</td>';
+          html += '<td>' + sourcePill(l.source) + '</td>';
+          html += '<td>' + esc(l.question || l.problem || l.want || '') + '</td>';
+          html += '<td>' + esc(l.consent || '是') + '</td>';
+          html += '<td>' + (followed ? '<span class="pill on">✓ 已跟进</span>' : '<span class="pill off">○ 待跟进</span>') + '</td>';
+          html += '<td><button class="btn ghost sm" onclick="window.__adminToggleFollow(' + qstr(rid) + ', ' + (followed ? 'false' : 'true') + ')">' + (followed ? '撤销' : '标记') + '</button></td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        html += '<div class="small muted" style="margin-top:10px;">跟进动作以 Obsidian 线索记录为准（每日自动同步）；此处标记仅本机辅助记忆，不写入后台。导出 CSV 含邮箱原文，仅供 masterlinc 跟进服务使用。</div>';
+        html += '</div>';
+        el.innerHTML = html;
+        var sel = $('leadFromFilter');
+        if (sel) sel.addEventListener('change', function () { leadsState.from = this.value; leadsState.page = 1; });
+        var inp = $('leadSearch');
+        if (inp) inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') window.__adminApplyLeadFilter(); });
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+    window.__adminToggleFollow = function (rid, mark) {
+      try {
+        var m = leadFollowMap();
+        if (mark) m[rid] = Date.now(); else delete m[rid];
+        localStorage.setItem(FOLLOW_KEY, JSON.stringify(m));
+      } catch (e) {}
+      toast(mark ? '已标记跟进' : '已撤销标记', 'ok');
+      router();
+    };
+    window.__adminApplyLeadFilter = function () {
+      leadsState.from = $('leadFromFilter') ? $('leadFromFilter').value : leadsState.from;
+      leadsState.q = $('leadSearch') ? $('leadSearch').value.trim() : leadsState.q;
+      leadsState.page = 1;
+      router();
+    };
+    window.__adminExportLeads = function () {
+      var q = '/api/admin/leads?export=csv&source=' + encodeURIComponent(leadsState.from === '全部' ? '' : leadsState.from) + '&q=' + encodeURIComponent(leadsState.q);
+      if (MOCK) {
+        try {
+          var rows = mockDB.leads;
+          var csv = '\ufeff时间,邮箱,来源,最想解决,数据使用同意\n';
+          rows.forEach(function (l) {
+            csv += [new Date(l.time).toLocaleString('zh-CN'), l.email, l.source, (l.question || ''), (l.consent || '是')].map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          downloadCSV(csv, 'leads-' + todayStr() + '.csv');
+        } catch (e) { toast('导出失败', 'err'); }
+        return;
+      }
+      var token = getToken();
+      fetch(q, { headers: { 'Authorization': 'Bearer ' + token } }).then(function (res) {
+        if (res.status === 401) { clearToken(); showLogin(); throw new Error('unauthorized'); }
+        return res.text();
+      }).then(function (text) { downloadCSV(text, 'leads-' + todayStr() + '.csv'); }).catch(function (e) { if (e.message !== 'unauthorized') toast('导出失败', 'err'); });
+    };
+    function downloadCSV(text, name) {
+      var blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 200);
+    }
+
+    /* ---------- 下载统计 ---------- */
+    function renderDownloads(el) {
+      api('GET', '/api/admin/downloads').then(function (data) {
+        var skills = data.skills || [];
+        var total = data.total || 0;
+        var packLeads = 0;
+        try { packLeads = mockDB.leads.filter(function (l) { return String(l.source || '').indexOf('skill-pack') === 0; }).length; } catch (e) {}
+        var html = '';
+        html += '<div class="grid grid-4" style="margin-bottom:18px;">';
+        html += statCard('去重下载总数', total, 'uid+skillId');
+        html += statCard('Skill 数', skills.length, '在线+离线');
+        html += statCard('全集包线索', MOCK ? packLeads : '-', 'skill-pack 来源');
+        html += statCard('统计范围', data.days ? '近 ' + data.days + ' 天' : '-', '默认 7 天');
+        html += '</div>';
+        if (!skills.length) { html += '<div class="card"><div class="empty">暂无下载数据</div></div>'; }
+        else {
+          var max = Math.max.apply(null, skills.map(function (s) { return s.count || 0; }));
+          html += '<div class="card"><h3>按 Skill 聚合（去重口径：同设备同 Skill 只计 1）</h3>';
+          html += '<div class="table-wrap"><table><thead><tr><th>Skill</th><th>分类</th><th class="num">去重数</th><th class="num">占比</th><th>趋势（去重数条形）</th></tr></thead><tbody>';
+          skills.slice().sort(function (a, b) { return (b.count || 0) - (a.count || 0); }).forEach(function (s) {
+            var v = s.count || 0;
+            var w = max ? Math.round(v / max * 100) : 0;
+            html += '<tr>';
+            html += '<td>' + esc(s.skillName || s.name || s.skillId) + '<div class="small muted">' + esc(s.skillId || '') + '</div></td>';
+            html += '<td>' + esc(s.category || s.cat || '-') + '</td>';
+            html += '<td class="num">' + v + '</td>';
+            html += '<td class="num small muted">' + (total ? Math.round(v / total * 100) + '%' : '-') + '</td>';
+            html += '<td><div class="bar" style="min-width:120px;"><i style="width:' + w + '%;"></i></div></td>';
+            html += '</tr>';
+          });
+          html += '</tbody></table></div>';
+          html += '</div>';
+        }
+        html += '<div class="card small muted">口径：按匿名 uid + skillId 首次聚合去重；点击重复下载不累加。与前台 localStorage 去重口径一致。</div>';
+        el.innerHTML = html;
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+
+    function pager(total, pages, cur, fn) {
+      if (!total) return '';
+      return '<div class="pager"><span>共 ' + total + ' 条 · 第 ' + cur + '/' + pages + ' 页</span>' +
+        '<button class="btn ghost sm" onclick="' + fn + '(' + (cur - 1) + ')" ' + (cur <= 1 ? 'disabled' : '') + '>上一页</button>' +
+        '<button class="btn ghost sm" onclick="' + fn + '(' + (cur + 1) + ')" ' + (cur >= pages ? 'disabled' : '') + '>下一页</button></div>';
+    }
+
+    /* =====================================================
+     * 初始化
+     * ===================================================== */
+    $('todayLabel').textContent = '今天：' + todayStr();
+    if (!isLoggedIn()) showLogin(); else router();
+    window.addEventListener('hashchange', router);
+
+
+
+  })();
+
+  </script>
+</body>
+</html>
