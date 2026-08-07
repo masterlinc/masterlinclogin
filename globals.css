@@ -85,8 +85,20 @@ img { display: block; width: 100%; }
   font-size: 13px;
 }
 
-.nav-links a { transition: color 180ms ease; }
+.nav-links a { transition: color 180ms ease, text-decoration-color 180ms ease; }
 .nav-links a:hover { color: var(--white); }
+.nav-links a[aria-current="page"] {
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--white);
+}
+.nav-links a[aria-current="page"]:hover {
+  color: var(--white);
+  text-decoration-color: var(--white);
+}
 
 .nav-cta {
   padding: 8px 0;
