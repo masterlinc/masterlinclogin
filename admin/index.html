@@ -214,6 +214,7 @@
       <a class="nav-item" data-route="#/traffic" href="#/traffic"><span class="ico">◫</span> 访问数据</a>
       <a class="nav-item" data-route="#/logs" href="#/logs"><span class="ico">≣</span> 行为日志</a>
       <a class="nav-item" data-route="#/leads" href="#/leads"><span class="ico">✉</span> 邮箱线索</a>
+      <a class="nav-item" data-route="#/feedback" href="#/feedback"><span class="ico">💬</span> 用户反馈</a>
       <a class="nav-item" data-route="#/downloads" href="#/downloads"><span class="ico">↧</span> 下载统计</a>
       <div class="sidebar-spacer"></div>
       <button class="logout-btn" id="logoutBtn">↩ 退出登录</button>
@@ -307,6 +308,12 @@
           { recordId: 'rec-lead-6', time: now - 130e6, email: 'suyan@gmail.com', source: 'skill-pack', question: '消息协同', consent: '是' },
           { recordId: 'rec-lead-7', time: now - 190e6, email: 'hulimin@foxmail.com', source: '直接访问', question: '不确定', consent: '是' },
           { recordId: 'rec-lead-8', time: now - 260e6, email: 'tangyue@163.com', source: '小红书', question: '会议纪要', consent: '是' }
+        ],
+        feedback: [
+          { recordId: 'rec-fb-1', time: now - 2.2e6, type: '用得不顺', content: '设置页找「备份与恢复」入口翻了好几次，位置不太明显，建议放到设置第一屏。', email: 'xiaohong@foxmail.com', version: 'v1.22.0', page: 'products/transition-os.html', deviceId: 'a1b2c3d4', status: '新', note: '' },
+          { recordId: 'rec-fb-2', time: now - 8.6e6, type: '有 bug', content: '手机端输入日期时键盘会挡住保存按钮，要点掉键盘才能点保存。', email: '', version: 'v1.22.0', page: 'products/transition-os.html', deviceId: 'e5f6a7b8', status: '已读', note: '' },
+          { recordId: 'rec-fb-3', time: now - 26e6, type: '想要新功能', content: '希望周报能一键导出 PDF，现在只有 CSV。', email: 'liwei@163.com', version: 'v1.21.0', page: 'products/transition-os.html', deviceId: 'c9d8e7f6', status: '已修', note: 'v1.23.0 已支持导出 PDF 报告' },
+          { recordId: 'rec-fb-4', time: now - 49e6, type: '其他', content: '提个建议：首页的「今日状态」能加一个备注栏吗？想记一下今天为什么是这个状态。', email: 'wangfang@qq.com', version: '', page: '/', deviceId: 'b2c3d4e5', status: '已回复', note: '已邮件回访，建议进改进池' }
         ],
         events: [
           { recordId: 'rec-ev-1', time: now - 1.2e6, ev: 'skill_download', page: 'skills', uid: 'a1b2c3d4', ref: '', extra: { skillId: 'skill-01', skillName: 'AI 会议纪要·四栏法' }, v: 1 },
@@ -431,6 +438,30 @@
         var ltotal = list.length;
         return { ok: true, total: ltotal, page: lpage, pageSize: lsize, items: list.slice((lpage - 1) * lsize, lpage * lsize) };
       }
+      if (u === '/api/admin/feedback') {
+        if (method === 'GET') {
+          var fbs = mockDB.feedback.slice();
+          if (q.type && q.type !== '全部') fbs = fbs.filter(function (f) { return f.type === q.type; });
+          if (q.status && q.status !== '全部') fbs = fbs.filter(function (f) { return f.status === q.status; });
+          if (q.q) fbs = fbs.filter(function (f) { return (f.content + f.email).toLowerCase().indexOf(q.q.toLowerCase()) !== -1; });
+          fbs.sort(function (a, b) { return b.time - a.time; });
+          if (q.export === 'csv') return { csv: true, rows: fbs };
+          var fbpage = Math.max(1, parseInt(q.page, 10) || 1);
+          var fbsize = Math.min(100, parseInt(q.pageSize, 10) || 20);
+          var fbtotal = fbs.length;
+          return { ok: true, total: fbtotal, page: fbpage, pageSize: fbsize, items: fbs.slice((fbpage - 1) * fbsize, fbpage * fbsize) };
+        }
+      }
+      var fbPatchM = u.match(/^\/api\/admin\/feedback\/([^/]+)$/);
+      if (fbPatchM && method === 'PATCH') {
+        var fid = decodeURIComponent(fbPatchM[1]);
+        var ft = null;
+        mockDB.feedback.forEach(function (x) { if (x.recordId === fid) ft = x; });
+        if (!ft) { var e3 = new Error('反馈不存在'); e3.status = 404; throw e3; }
+        if (body && body.status !== undefined) ft.status = body.status;
+        if (body && body.note !== undefined) ft.note = body.note;
+        return { ok: true, recordId: fid, status: ft.status, note: ft.note };
+      }
       if (u === '/api/admin/events') {
         var evs = mockDB.events.slice();
         if (q.ev && q.ev !== '全部') evs = evs.filter(function (e) { return e.ev === q.ev; });
@@ -479,6 +510,7 @@
       '#/traffic': { title: '访问数据', render: renderTraffic },
       '#/logs': { title: '行为日志', render: renderLogs },
       '#/leads': { title: '邮箱线索', render: renderLeads },
+      '#/feedback': { title: '用户反馈', render: renderFeedback },
       '#/downloads': { title: '下载统计', render: renderDownloads }
     };
 
@@ -539,19 +571,28 @@
         api('GET', '/api/admin/traffic?days=1'),
         api('GET', '/api/admin/downloads'),
         api('GET', '/api/admin/leads'),
-        api('GET', '/api/admin/skills')
+        api('GET', '/api/admin/skills'),
+        api('GET', '/api/admin/feedback')
       ]).then(function (res) {
-        var traffic = res[0], dl = res[1], leads = res[2], skills = res[3];
+        var traffic = res[0], dl = res[1], leads = res[2], skills = res[3], fb = res[4];
         var daily = (traffic.daily || []);
         var today = daily.length ? daily[daily.length - 1] : {};
         var leadsList = leads.items || leads.data || [];
         var skillList = skills.skills || skills.data || [];
+        var fbItems = fb.items || fb.data || [];
+        var weekAgo = Date.now() - 7 * 86400000;
+        var weekNew = fbItems.filter(function (f) { return f.time >= weekAgo; }).length;
         var html = '';
         html += '<div class="grid grid-4" style="margin-bottom:18px;">';
         html += statCard('今日 PV', today.pv != null ? today.pv : (traffic.pv || '-'), 'page_view 数');
         html += statCard('今日 UV', today.uv != null ? today.uv : (traffic.uv || '-'), '按匿名 ID 去重');
         html += statCard('总下载（去重）', dl.total != null ? dl.total : '-', 'uid+skillId 口径');
         html += statCard('邮箱线索', leads.total != null ? leads.total : leadsList.length, '全部来源');
+        html += '</div>';
+        // 本周新增反馈（负向信号，红色高亮：及时看，别让用户白说）
+        html += '<div class="card" style="border-color:rgba(255,120,90,.4);"><h3>本周新增反馈 <span class="sub">负向信号 · 及时看，别让用户白说</span></h3>';
+        html += '<div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:34px;font-weight:750;letter-spacing:-.03em;color:var(--err);">' + weekNew + '</span><span class="muted small">条（近 7 天）· 累计 ' + (fb.total != null ? fb.total : '-') + ' 条</span></div>';
+        html += '<div class="small" style="margin-top:8px;"><a href="#/feedback" style="text-decoration:underline;">去处理反馈 →</a> <span class="muted">状态：新 = 还没看；已修 / 已回复 = 闭环。</span></div>';
         html += '</div>';
         html += '<div class="grid grid-2">';
         // 近 7 日趋势
@@ -908,6 +949,135 @@
         return res.text();
       }).then(function (text) { downloadCSV(text, 'leads-' + todayStr() + '.csv'); }).catch(function (e) { if (e.message !== 'unauthorized') toast('导出失败', 'err'); });
     };
+    /* ---------- 用户反馈 ---------- */
+    var feedbackState = { type: '全部', status: '全部', q: '', page: 1 };
+    var FB_TYPES = ['用得不顺', '有 bug', '想要新功能', '其他'];
+    var FB_STATUSES = ['新', '已读', '已修', '已回复'];
+    function fbTypePill(t) {
+      var map = { '用得不顺': '', '有 bug': '', '想要新功能': 'pack', '其他': '' };
+      var cls = map[t] ? 'pill ' + map[t] : 'pill';
+      return '<span class="' + cls + '">' + esc(t || '-') + '</span>';
+    }
+    function fbStatusPill(s) {
+      if (s === '新') return '<span class="pill" style="color:var(--err);border-color:rgba(255,120,90,.45);background:rgba(255,120,90,.08);">🆕 ' + esc(s) + '</span>';
+      if (s === '已修') return '<span class="pill on">✓ ' + esc(s) + '</span>';
+      if (s === '已回复') return '<span class="pill pack">↩ ' + esc(s) + '</span>';
+      return '<span class="pill off">○ ' + esc(s || '新') + '</span>';
+    }
+    function renderFeedback(el) {
+      var q = '/api/admin/feedback?page=' + feedbackState.page + '&pageSize=20'
+        + '&type=' + encodeURIComponent(feedbackState.type === '全部' ? '' : feedbackState.type)
+        + '&status=' + encodeURIComponent(feedbackState.status === '全部' ? '' : feedbackState.status)
+        + '&q=' + encodeURIComponent(feedbackState.q);
+      api('GET', q).then(function (data) {
+        var list = data.items || data.data || [];
+        var total = data.total != null ? data.total : list.length;
+        var per = data.pageSize || 20;
+        var pages = Math.max(1, Math.ceil(total / per));
+        var html = '';
+        html += '<div class="card"><div class="filters">';
+        html += '<label class="muted small">类型</label><select id="fbTypeFilter">';
+        ['全部'].concat(FB_TYPES).forEach(function (t) {
+          html += '<option value="' + t + '"' + (feedbackState.type === t ? ' selected' : '') + '>' + t + '</option>';
+        });
+        html += '</select>';
+        html += '<label class="muted small">状态</label><select id="fbStatusFilter">';
+        ['全部'].concat(FB_STATUSES).forEach(function (s) {
+          html += '<option value="' + s + '"' + (feedbackState.status === s ? ' selected' : '') + '>' + s + '</option>';
+        });
+        html += '</select>';
+        html += '<input id="fbSearch" placeholder="搜索描述 / 邮箱" value="' + esc(feedbackState.q) + '" />';
+        html += '<button class="btn ghost sm" onclick="window.__adminApplyFeedbackFilter()">筛选</button>';
+        html += '<button class="btn sm" onclick="window.__adminExportFeedback()">导出 CSV</button>';
+        html += '<span class="muted small">共 ' + total + ' 条</span>';
+        html += '</div>';
+        html += '<div class="table-wrap"><table><thead><tr><th>时间</th><th>类型</th><th>反馈内容</th><th>邮箱</th><th>版本</th><th>状态</th><th>操作</th></tr></thead><tbody>';
+        if (!list.length) html += '<tr><td colspan="7"><div class="empty">暂无反馈 —— 把「用得不顺」说出来的用户，是最宝贵的信号。</div></td></tr>';
+        list.forEach(function (f) {
+          var rid = String(f.recordId || '');
+          html += '<tr>';
+          html += '<td class="small muted" style="white-space:nowrap;">' + fmtTime(f.time) + '</td>';
+          html += '<td>' + fbTypePill(f.type) + '</td>';
+          html += '<td style="max-width:340px;">' + esc(f.content) + '</td>';
+          html += '<td class="small">' + (f.email ? maskEmail(f.email) : '<span class="muted">匿名</span>') + '</td>';
+          html += '<td class="small muted">' + esc(f.version || '-') + '</td>';
+          html += '<td>' + fbStatusPill(f.status) + '</td>';
+          html += '<td style="white-space:nowrap;">' + fbOpsHtml(rid, f.status, f.note) + '</td>';
+          html += '</tr>';
+        });
+        html += '</tbody></table></div>';
+        html += pager(total, pages, feedbackState.page, 'window.__adminFeedbackPage');
+        html += '<div class="small muted" style="margin-top:10px;">闭环铁律：每条反馈必须落一个终态（已修/已回复），不许停在「新」超过 2 周。同类反馈 ≥2 次 = 重复痛点，进改进池优先级↑。导出 CSV 含邮箱原文，仅供回访使用。</div>';
+        html += '</div>';
+        el.innerHTML = html;
+        var st = $('fbTypeFilter');
+        if (st) st.addEventListener('change', function () { feedbackState.type = this.value; feedbackState.page = 1; });
+        var ss = $('fbStatusFilter');
+        if (ss) ss.addEventListener('change', function () { feedbackState.status = this.value; feedbackState.page = 1; });
+        var inp = $('fbSearch');
+        if (inp) inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') window.__adminApplyFeedbackFilter(); });
+      }).catch(function (err) {
+        if (err && err.message === 'unauthorized') return;
+        el.innerHTML = '<div class="card"><div class="err-text">加载失败：' + esc(err.message) + '</div></div>';
+      });
+    }
+    function fbOpsHtml(rid, status, note) {
+      var html = '';
+      FB_STATUSES.forEach(function (s) {
+        if (s === status) return;
+        html += '<button class="btn ghost sm" onclick="window.__adminSetFeedbackStatus(' + qstr(rid) + ', ' + qstr(s) + ')">' + s + '</button> ';
+      });
+      html += '<button class="btn ghost sm" onclick="window.__adminEditFeedbackNote(' + qstr(rid) + ', ' + qstr(note || '') + ')">备注</button>';
+      return html;
+    }
+    window.__adminSetFeedbackStatus = function (rid, status) {
+      api('PATCH', '/api/admin/feedback/' + encodeURIComponent(rid), { status: status }).then(function () {
+        toast('已标记：' + status, 'ok');
+        router();
+      }).catch(function (err) { toast(err.message || '操作失败', 'err'); });
+    };
+    window.__adminApplyFeedbackFilter = function () {
+      feedbackState.type = $('fbTypeFilter') ? $('fbTypeFilter').value : feedbackState.type;
+      feedbackState.status = $('fbStatusFilter') ? $('fbStatusFilter').value : feedbackState.status;
+      feedbackState.q = $('fbSearch') ? $('fbSearch').value.trim() : feedbackState.q;
+      feedbackState.page = 1;
+      router();
+    };
+    window.__adminFeedbackPage = function (p) { feedbackState.page = p; router(); };
+    window.__adminEditFeedbackNote = function (rid, note) {
+      openModal('<h3>反馈备注</h3>' +
+        '<div class="field"><label>内部备注（仅你可见）</label><textarea id="fb-note" rows="3">' + esc(note) + '</textarea></div>' +
+        '<div class="modal-actions"><button class="btn ghost" onclick="window.__adminCloseModal()">取消</button><button class="btn" onclick="window.__adminSaveFeedbackNote(' + qstr(rid) + ')">保存</button></div>');
+    };
+    window.__adminSaveFeedbackNote = function (rid) {
+      var note = $('fb-note') ? $('fb-note').value.trim() : '';
+      api('PATCH', '/api/admin/feedback/' + encodeURIComponent(rid), { note: note }).then(function () {
+        closeModal(); toast('备注已保存', 'ok'); router();
+      }).catch(function (err) { toast(err.message || '保存失败', 'err'); });
+    };
+    window.__adminExportFeedback = function () {
+      var q = '/api/admin/feedback?export=csv'
+        + '&type=' + encodeURIComponent(feedbackState.type === '全部' ? '' : feedbackState.type)
+        + '&status=' + encodeURIComponent(feedbackState.status === '全部' ? '' : feedbackState.status)
+        + '&q=' + encodeURIComponent(feedbackState.q);
+      if (MOCK) {
+        try {
+          var rows = mockDB.feedback;
+          var csv = '\ufeff时间,类型,内容,邮箱,版本,页面,设备ID,状态,备注\n';
+          rows.forEach(function (f) {
+            csv += [new Date(f.time).toLocaleString('zh-CN'), f.type, (f.content || ''), f.email, (f.version || ''), (f.page || ''), (f.deviceId || ''), f.status, (f.note || '')].map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(',') + '\n';
+          });
+          downloadCSV(csv, 'feedback-' + todayStr() + '.csv');
+        } catch (e) { toast('导出失败', 'err'); }
+        return;
+      }
+      var token = getToken();
+      fetch(q, { headers: { 'Authorization': 'Bearer ' + token } }).then(function (res) {
+        if (res.status === 401) { clearToken(); showLogin(); throw new Error('unauthorized'); }
+        return res.text();
+      }).then(function (text) { downloadCSV(text, 'feedback-' + todayStr() + '.csv'); }).catch(function (e) { if (e.message !== 'unauthorized') toast('导出失败', 'err'); });
+    };
+
     function downloadCSV(text, name) {
       var blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
       var a = document.createElement('a');
