@@ -478,7 +478,7 @@
       <div class="skill-pack-head">
         <p class="kicker">ALL-IN-ONE</p>
         <h2>3 张精品卡，一次拿走</h2>
-        <p>把这 3 个精品 Skill 打包成一份 PDF，发到你邮箱。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。</p>
+        <p>把这 3 个精品 Skill 打包成一个 ZIP 精品包，发到你邮箱。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。</p>
       </div>
       <div class="skill-pack-form-wrap">
         <form class="skill-pack-form" id="packForm" novalidate>
@@ -499,7 +499,7 @@
         <div class="skill-pack-success" id="packSuccess" hidden>
           <div class="skill-pack-success-icon">✓</div>
           <h3>已发送到你的邮箱</h3>
-          <p>已发送！去邮箱查收「AI 管理现场 · Skill 全集包」。没收到？先看看垃圾箱，或等 5 分钟再来一次。</p>
+          <p>已发送！去邮箱查收「AI 管理现场 · Skill 精品合集」。没收到？先看看垃圾箱，或等 5 分钟再来一次。</p>
         </div>
       </div>
     </section>
@@ -523,15 +523,25 @@
   (function () {
     'use strict';
 
-    // ===== 3 个精品 Skill 数据（配置表 /api/skills 上线后由其接管，内置数组仅作离线兜底） =====
+    // ===== 3 个精品 Skill 数据（配置表 /api/skills 上线后由其接管，内置数组仅作离线兜底；顺序与 /api/skills 排序一致：审计第一） =====
     var SKILLS = [
+      {
+        id: 'skill-12', name: '管理者 AI 效率审计',
+        value: '记录一周工作，按四类拆开算出可释放时间，找到 AI 最该插手的 TOP 3。',
+        cat: '决策', tools: ['DeepSeek', 'Kimi', 'GPT'],
+        diff: '★★★', time: '记录一周 · 周末审计 30 分钟', format: 'ZIP 精品包 · SKILL.md + 方法卡 + 使用说明',
+        file: '/skills/files/skill-12-manager-ai-audit-week.zip',
+        dlName: '管理者AI效率审计（精品包）.zip', dlText: '免费下载 · 效率审计精品包',
+        hook: { href: '/products/selfcheck.html', text: '想深挖自己的场景、把一周变成整套打法？免费自检，10 分钟找到最该改的一件 →' },
+        preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }
+      },
       {
         id: 'skill-01', name: 'AI 会议纪要·四栏法',
         value: '把 1 小时录音变成一页「决定 / 待验证 / 负责人 / 原话」四栏决议——分对了类，责任才落得下来。',
         cat: '会议', tools: ['NotebookLM', 'Kimi'],
-        diff: '★★☆', time: '首次配置 20 分钟 · 每场会 15 分钟', format: 'PDF 方法卡 · 方法 + 骨架 + 完整示例',
-        file: '/skills/files/skill-01-ai-meeting-notes-4columns.md',
-        dlName: 'AI会议纪要·四栏法（精品卡）.md', dlText: '免费下载 · 四栏法精品卡',
+        diff: '★★☆', time: '首次配置 20 分钟 · 每场会 15 分钟', format: 'ZIP 精品包 · SKILL.md + 方法卡 + 使用说明',
+        file: '/skills/files/skill-01-ai-meeting-notes-4columns.zip',
+        dlName: 'AI会议纪要·四栏法（精品包）.zip', dlText: '免费下载 · 四栏法精品包',
         hook: { href: '/products/selfcheck.html', text: '想要可复制的空白模板 + 会后复查清单 + 更多行业案例？¥29 进阶版 →' },
         preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }
       },
@@ -539,21 +549,11 @@
         id: 'skill-04', name: 'AI 写周报法（3 小时 → 20 分钟）',
         value: '周报从 3 小时压到 20 分钟——素材随手记、AI 出初稿、人只改判断。',
         cat: '汇报周报', tools: ['DeepSeek', 'Kimi'],
-        diff: '★★☆', time: '首次搭建 30 分钟 · 每周 20 分钟成稿', format: 'PDF 方法卡 · 含 3 套提示词变体 + 常见坑',
-        file: '/skills/files/skill-04-ai-weekly-report.md',
-        dlName: 'AI写周报法（精品卡）.md', dlText: '免费下载 · 周报法精品卡',
+        diff: '★★☆', time: '首次搭建 30 分钟 · 每周 20 分钟成稿', format: 'ZIP 精品包 · SKILL.md + 方法卡 + 使用说明',
+        file: '/skills/files/skill-04-ai-weekly-report.zip',
+        dlName: 'AI写周报法（精品包）.zip', dlText: '免费下载 · 周报法精品包',
         hook: { href: '/products/selfcheck.html', text: '想系统化省时间（周报、汇报一起改）？免费自检，看看最该先动哪一件 →' },
         preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }
-      },
-      {
-        id: 'skill-12', name: '管理者 AI 效率审计',
-        value: '记录一周工作，按四类拆开算出可释放时间，找到 AI 最该插手的 TOP 3。',
-        cat: '决策', tools: ['DeepSeek', 'Kimi', 'GPT'],
-        diff: '★★★', time: '记录一周 · 周末审计 30 分钟', format: 'PDF 方法卡 · 完整审计框架',
-        file: '/skills/files/skill-12-manager-ai-audit-week.md',
-        dlName: '管理者AI效率审计（精品卡）.md', dlText: '免费下载 · 效率审计精品卡',
-        hook: { href: '/products/selfcheck.html', text: '想深挖自己的场景、把一周变成整套打法？免费自检，10 分钟找到最该改的一件 →' },
-        preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }
       }
     ];
 

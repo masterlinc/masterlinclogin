@@ -131,13 +131,13 @@ let passed = 0, failed = 0;
 
 function getAuthHeader() {
   const { issueToken } = require('../lib/admin-auth.js');
-  return 'Bearer ' + issueToken().token;
+  return 'Bearer ' + issueToken({ userId: 'admin-admin', role: 'admin' }).token;
 }
 
 async function loginToken() {
   const login = require('../api/admin/login.js');
   const res = makeRes();
-  await login(makeReq({ method: 'POST', body: { password: process.env.ADMIN_PASSWORD } }), res);
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: process.env.ADMIN_PASSWORD } }), res);
   assert.strictEqual(res.statusCode, 200, 'login 应成功');
   return res.body.token;
 }
@@ -175,10 +175,12 @@ const SCENARIOS = [
 // ==================== 1. admin-auth ====================
 async function runAuth() {
   const auth = require('../lib/admin-auth.js');
-  const { token, expiresAt } = auth.issueToken();
+  const adminUser = { userId: 'admin-admin', role: 'admin' };
+  const { token, expiresAt } = auth.issueToken(adminUser);
   assert.ok(token.split('.').length === 2, 'token 应为 payload.signature');
   const p = auth.verifyToken(token);
-  assert.strictEqual(p.sub, 'masterlinc');
+  assert.strictEqual(p.sub, 'admin-admin');
+  assert.strictEqual(p.role, 'admin', 'token 应含 role');
   assert.ok(p.exp > Date.now());
 
   // 篡改 token → 无效
@@ -187,18 +189,18 @@ async function runAuth() {
 
   // 过期 token（手工构造）
   const crypto = require('crypto');
-  const payloadB64 = Buffer.from(JSON.stringify({ sub: 'masterlinc', iat: 1, exp: 1 })).toString('base64url');
+  const payloadB64 = Buffer.from(JSON.stringify({ sub: 'admin-admin', role: 'admin', iat: 1, exp: 1 })).toString('base64url');
   const sig = crypto.createHmac('sha256', process.env.ADMIN_SECRET).update(payloadB64).digest('base64url');
   assert.strictEqual(auth.verifyToken(payloadB64 + '.' + sig), null, '过期 token 应无效');
 
   // requireAdmin：未配置 env → 403（先签发 token 再删 env，验证 403 优先于验签）
   const validToken = getAuthHeader();
-  const save = { p: process.env.ADMIN_PASSWORD, s: process.env.ADMIN_SECRET };
-  delete process.env.ADMIN_PASSWORD; delete process.env.ADMIN_SECRET;
+  const save = { p: process.env.ADMIN_PASSWORD, s: process.env.ADMIN_SECRET, t: process.env.FEISHU_APP_TOKEN };
+  delete process.env.ADMIN_PASSWORD; delete process.env.ADMIN_SECRET; delete process.env.FEISHU_APP_TOKEN;
   let res = makeRes();
   let ok = auth.requireAdmin(makeReq({ headers: { authorization: validToken } }), res);
   assert.strictEqual(ok, false); assert.strictEqual(res.statusCode, 403, '未配置 env 应 403');
-  process.env.ADMIN_PASSWORD = save.p; process.env.ADMIN_SECRET = save.s;
+  process.env.ADMIN_PASSWORD = save.p; process.env.ADMIN_SECRET = save.s; process.env.FEISHU_APP_TOKEN = save.t;
 
   // requireAdmin：无 token → 401
   res = makeRes();
@@ -222,35 +224,45 @@ async function runLogin() {
   const auth = require('../lib/admin-auth.js');
 
   // 未配置 env → 403
-  const save = { p: process.env.ADMIN_PASSWORD, s: process.env.ADMIN_SECRET };
-  delete process.env.ADMIN_PASSWORD; delete process.env.ADMIN_SECRET;
+  const save = { p: process.env.ADMIN_PASSWORD, s: process.env.ADMIN_SECRET, t: process.env.FEISHU_APP_TOKEN };
+  delete process.env.ADMIN_PASSWORD; delete process.env.ADMIN_SECRET; delete process.env.FEISHU_APP_TOKEN;
   let res = makeRes();
-  await login(makeReq({ method: 'POST', body: { password: 'x' } }), res);
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: 'x' } }), res);
   assert.strictEqual(res.statusCode, 403, '未配置 env 登录应 403');
-  process.env.ADMIN_PASSWORD = save.p; process.env.ADMIN_SECRET = save.s;
+  process.env.ADMIN_PASSWORD = save.p; process.env.ADMIN_SECRET = save.s; process.env.FEISHU_APP_TOKEN = save.t;
 
-  // 错误口令 → 401
+  // 错误口令 → 401（users 表为空时走兼容迁移路径，口令不匹配 → 401）
   auth.resetLoginRate();
   res = makeRes();
-  await login(makeReq({ method: 'POST', body: { password: 'wrong-password' } }), res);
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: 'wrong-password' } }), res);
   assert.strictEqual(res.statusCode, 401);
 
-  // 正确口令 → 200 + token
+  // 正确口令 → 200 + token（首次登录兼容迁移自动建 admin 账号）
   res = makeRes();
-  await login(makeReq({ method: 'POST', body: { password: process.env.ADMIN_PASSWORD } }), res);
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: process.env.ADMIN_PASSWORD } }), res);
   assert.strictEqual(res.statusCode, 200);
   assert.ok(res.body.token);
+  assert.strictEqual(res.body.role, 'admin', '登录响应应含 role');
   assert.ok(auth.verifyToken(res.body.token), '返回 token 应可验证');
+  assert.strictEqual(auth.verifyToken(res.body.token).role, 'admin', 'token 应含 role=admin');
+
+  // 迁移后走 users 表：清空 ADMIN_PASSWORD 仍可登录（不再依赖旧口令）
+  const pSave = process.env.ADMIN_PASSWORD;
+  delete process.env.ADMIN_PASSWORD;
+  res = makeRes();
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: pSave } }), res);
+  assert.strictEqual(res.statusCode, 200, '迁移后应走 users 表，不依赖 ADMIN_PASSWORD');
+  process.env.ADMIN_PASSWORD = pSave;
 
   // 限速：连续 5 次失败 → 第 6 次 429
   auth.resetLoginRate();
   for (let i = 0; i < 5; i++) {
     res = makeRes();
-    await login(makeReq({ method: 'POST', body: { password: 'nope' } }), res);
+    await login(makeReq({ method: 'POST', body: { username: 'admin', password: 'nope' } }), res);
     assert.strictEqual(res.statusCode, 401, '第 ' + (i + 1) + ' 次失败应 401');
   }
   res = makeRes();
-  await login(makeReq({ method: 'POST', body: { password: process.env.ADMIN_PASSWORD } }), res);
+  await login(makeReq({ method: 'POST', body: { username: 'admin', password: process.env.ADMIN_PASSWORD } }), res);
   assert.strictEqual(res.statusCode, 429, '锁定后应 429');
   auth.resetLoginRate();
 }

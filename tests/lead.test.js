@@ -157,11 +157,11 @@ async function run() {
   assert.strictEqual(payload.to[0].mail_address, 'visitor@example.com', '用例1: 收件人应等于访客邮箱');
   assert.ok(payload.subject.includes('已到'), '用例1: 主题应包含「已到」');
   assert.strictEqual(payload.attachments.length, 3, '用例1: 应有 3 个附件');
-  const pdf = payload.attachments.find((a) => a.filename.endsWith('.pdf'));
-  assert.ok(pdf, '用例1: 应含 PDF 附件');
-  assert.ok(pdf.body.length > 10000, '用例1: PDF base64url 应完整（>10KB 字符）');
-  assert.ok(!pdf.body.includes('+') && !pdf.body.includes('/'), '用例1: PDF body 应为 base64url（无 +/）');
-  assert.ok(!pdf.body.includes('='), '用例1: PDF body 应无尾部 =');
+  const md0 = payload.attachments[0];
+  assert.ok(md0.filename.endsWith('.md'), '用例1: 起步包附件应为 md');
+  assert.ok(md0.body.length > 100, '用例1: md base64url 应完整');
+  assert.ok(!md0.body.includes('+') && !md0.body.includes('/'), '用例1: 附件 body 应为 base64url（无 +/）');
+  assert.ok(!md0.body.includes('='), '用例1: 附件 body 应无尾部 =');
   assert.ok(payload.dedupe_key && payload.dedupe_key.startsWith('selfcheck-'), '用例1: 应带去重键');
   assert.ok(payload.body_plain_text.includes('凌：'), '用例1: 正文应含署名风格开头');
   assert.ok(payload.body_plain_text.includes('masterlinc.com'), '用例1: 正文应含网站');
@@ -268,7 +268,33 @@ async function run() {
   assert.strictEqual(feishuMailCalls.length, 1, '用例8: 邮件应照常发送');
   console.log('✅ 用例8 通过：表格写回失败不影响发信，保留旧值下次重试');
 
-  console.log('\n🎉 全部 8 个用例通过');
+  // 用例 9：Skill 全集包（source 含 skill-pack）→ 发 1 个合集 ZIP 附件，正文为 3 精品文案
+  reset();
+  setBaseEnv();
+  process.env.FEISHU_MAIL_REFRESH_TOKEN = 'mock-refresh-1';
+  const handler9 = loadHandler();
+  const res9 = makeRes();
+  await handler9(makeReq({ email: 'pack@example.com', source: 'skill-pack|xiaohongshu' }), res9);
+  assert.strictEqual(res9.statusCode, 200, '用例9: 应返回 200');
+  assert.strictEqual(res9.body.ok, true, '用例9: ok 应为 true');
+  assert.strictEqual(res9.body.emailSent, true, '用例9: emailSent 应为 true');
+  assert.strictEqual(feishuMailCalls.length, 1, '用例9: 应调用 1 次飞书邮件');
+  const payload9 = JSON.parse(feishuMailCalls[0].opts.body);
+  assert.ok(payload9.subject.includes('3 张 Skill 精品卡'), '用例9: 主题应含「3 张 Skill 精品卡」');
+  assert.ok(payload9.dedupe_key.startsWith('skill-pack-'), '用例9: 应带 skill-pack 去重键');
+  assert.strictEqual(payload9.attachments.length, 1, '用例9: 全集包应恰好 1 个附件');
+  const zip9 = payload9.attachments[0];
+  assert.ok(zip9.filename.endsWith('.zip'), '用例9: 附件应为 ZIP 合集');
+  assert.ok(zip9.filename.includes('精品合集'), '用例9: ZIP 文件名应含「精品合集」');
+  assert.ok(zip9.body.length > 10000, '用例9: ZIP base64url 应完整（>10KB 字符）');
+  assert.ok(!zip9.body.includes('+') && !zip9.body.includes('/'), '用例9: ZIP body 应为 base64url（无 +/）');
+  assert.ok(!zip9.body.includes('='), '用例9: ZIP body 应无尾部 =');
+  assert.ok(payload9.body_plain_text.includes('3 张精品方法卡'), '用例9: 正文应含「3 张精品方法卡」');
+  assert.ok(payload9.body_plain_text.includes('先存着，总有一张能帮上忙'), '用例9: 正文应含 masterlinc 原话钩子');
+  assert.ok(payload9.body_plain_text.indexOf('12') === -1, '用例9: 正文不应再提 12 张');
+  console.log('✅ 用例9 通过：Skill 全集包发 1 个合集 ZIP，正文 3 精品文案无 12 张残留');
+
+  console.log('\n🎉 全部 9 个用例通过');
 }
 
 run().catch((err) => {

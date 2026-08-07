@@ -188,10 +188,14 @@
     <div class="login-box">
       <div class="brand">运营驾驶舱<small>MASTER LINC · 一人专用</small></div>
       <h2>登录后台</h2>
-      <p class="sub">输入管理口令继续</p>
+      <p class="sub">输入账号密码继续</p>
       <form id="loginForm" novalidate>
         <div class="field">
-          <label for="loginPassword">管理口令</label>
+          <label for="loginUsername">用户名</label>
+          <input type="text" id="loginUsername" autocomplete="username" placeholder="admin" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">密码</label>
           <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••••••" required />
         </div>
         <button class="btn" type="submit" id="loginBtn">进入驾驶舱 →</button>
@@ -288,7 +292,7 @@
       }
       days[days.length - 1].pv = 128; days[days.length - 1].uv = 87; // 今日
       return {
-        login: { password: 'proma2026' },
+        login: { username: 'admin', password: 'proma2026' },
         skills: [
           { id: 'skill-01', name: 'AI 会议纪要·四栏法', cat: '会议', status: 'on', sort: 1, file: '/skills/files/skill-01-ai-meeting-notes-4columns.md', dlName: 'AI会议纪要·四栏法（精品卡）.md', dlText: '免费下载 · 四栏法精品卡', value: '把 1 小时录音变成一页「决定 / 待验证 / 负责人 / 原话」四栏决议。', tools: ['NotebookLM', 'Kimi'], diff: '★★☆', time: '首次配置 20 分钟 · 每场会 15 分钟', format: 'PDF 方法卡 · 方法 + 骨架 + 完整示例', hook: { href: '/products/selfcheck.html', text: '想要完整模板 + 复查清单？¥29 进阶版 →' }, preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }, download: 34 },
           { id: 'skill-04', name: 'AI 写周报法（3 小时 → 20 分钟）', cat: '汇报周报', status: 'on', sort: 2, file: '/skills/files/skill-04-ai-weekly-report.md', dlName: 'AI写周报法（精品卡）.md', dlText: '免费下载 · 周报法精品卡', value: '周报从 3 小时压到 20 分钟——素材随手记、AI 出初稿、人只改判断。', tools: ['DeepSeek', 'Kimi'], diff: '★★☆', time: '首次搭建 30 分钟 · 每周 20 分钟成稿', format: 'PDF 方法卡 · 含 3 套提示词变体 + 常见坑', hook: { href: '/products/selfcheck.html', text: '想系统化省时间？免费自检 →' }, preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }, download: 21 },
@@ -366,10 +370,10 @@
       var qs = path.split('?')[1] || '';
       qs.split('&').forEach(function (kv) { if (!kv) return; var p = kv.split('='); q[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || ''); });
       if (u === '/api/admin/login') {
-        if (method === 'POST' && body && body.password === mockDB.login.password) {
-          return { ok: true, token: 'mock-token-' + Date.now(), expiresAt: Date.now() + 7 * 86400000, expiresIn: 7 * 24 * 60 * 60 };
+        if (method === 'POST' && body && body.username === mockDB.login.username && body.password === mockDB.login.password) {
+          return { ok: true, token: 'mock-token-' + Date.now(), expiresAt: Date.now() + 7 * 86400000, expiresIn: 7 * 24 * 60 * 60, role: 'admin', userId: 'admin-' + mockDB.login.username, username: mockDB.login.username };
         }
-        var err = new Error('口令不正确');
+        var err = new Error('用户名或密码错误');
         err.status = 401; throw err;
       }
       if (u === '/api/admin/skills') {
@@ -503,19 +507,21 @@
     // 登录
     $('loginForm').addEventListener('submit', function (ev) {
       ev.preventDefault();
+      var usr = $('loginUsername').value;
       var pwd = $('loginPassword').value;
       var btn = $('loginBtn');
       btn.disabled = true; btn.textContent = '验证中…';
       $('loginError').textContent = '';
-      api('POST', '/api/admin/login', { password: pwd }).then(function (data) {
+      api('POST', '/api/admin/login', { username: usr, password: pwd }).then(function (data) {
         if (data && data.token) {
           setToken(data.token);
           $('loginPassword').value = '';
+          $('loginUsername').value = '';
           location.hash = '#/dashboard';
           router();
         } else { throw new Error('登录响应异常'); }
       }).catch(function (err) {
-        var msg = err && err.status === 401 ? '口令错误，请重试。' : (err && err.message ? err.message : '登录失败，请检查网络。');
+        var msg = err && err.status === 401 ? '用户名或密码错误，请重试。' : (err && err.message ? err.message : '登录失败，请检查网络。');
         $('loginError').textContent = msg;
       }).finally(function () {
         btn.disabled = false; btn.textContent = '进入驾驶舱 →';

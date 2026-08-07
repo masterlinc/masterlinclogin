@@ -83,21 +83,10 @@ const DELIVERABLES = [
   { file: '起步包-7天验证表.md', type: 'text/markdown', name: '起步包-7天验证表.md' },
 ];
 
-// v1.19.0 Skill 专区：全集包（/skills/ 提交 source 含 skill-pack 前缀时发送）
-// 附件 = skills/files/ 下的 12 张 Skill 方法卡（静态 md，Vercel 随仓库打包）
+// v1.21.0 Skill 专区：全集包（/skills/ 提交 source 含 skill-pack 前缀时发送）
+// 附件 = 3 个精品 Skill 合集 ZIP（skill-collection-premium.zip，内含 3 个 Skill 各自完整精品包），Vercel 随仓库打包
 const SKILL_PACK_FILES = [
-  { file: 'skill-01-ai-meeting-notes-4columns.md', name: 'AI会议纪要·四栏法（入门卡）.md' },
-  { file: 'skill-02-pre-meeting-3-questions.md', name: '会前三问清单.md' },
-  { file: 'skill-03-7day-verification.md', name: '7天验证表.md' },
-  { file: 'skill-04-ai-weekly-report.md', name: 'AI写周报法（3小时→20分钟）.md' },
-  { file: 'skill-05-ai-report-one-page.md', name: 'AI汇报一页纸法.md' },
-  { file: 'skill-06-ai-message-routing.md', name: 'AI消息流分流法.md' },
-  { file: 'skill-07-process-audit-5steps.md', name: '流程审计五步法（入门卡）.md' },
-  { file: 'skill-08-ai-decision-memo.md', name: 'AI决策备忘法.md' },
-  { file: 'skill-09-cross-dept-followup.md', name: '跨部门催进度话术卡.md' },
-  { file: 'skill-10-sensitive-data-checklist.md', name: 'AI敏感资料安全清单.md' },
-  { file: 'skill-11-notebooklm-meeting-config.md', name: 'NotebookLM会议纪要配置卡.md' },
-  { file: 'skill-12-manager-ai-audit-week.md', name: '管理者AI审计卡（一周版）.md' },
+  { file: 'skill-collection-premium.zip', name: 'AI管理现场-Skill精品合集.zip' },
 ];
 
 // 解析 deliverables 目录绝对路径（兼容 Vercel 打包后的 cwd 与 __dirname 两种布局）
@@ -239,18 +228,23 @@ async function sendMaterialsEmail(to) {
   }
 }
 
-// 组装 Skill 全集包邮件正文（凌客风格 · 12 张卡 + 1 个自检钩子）
+// 组装 Skill 全集包邮件正文（凌客风格 · 3 张精品合集 ZIP + 1 个自检钩子）
 function buildSkillPackEmailText() {
   return [
     '凌：',
     '',
-    '你在 masterlinc.com 领的「AI 管理现场 Skill 全集包」，给你发过来了，12 张都在附件里。',
+    '你在 masterlinc.com 领的「AI 管理现场 · Skill 精品合集」，给你发过来了——3 张精品方法卡打包在一个 ZIP 里，一次收藏。',
     '',
-    '里面有会议纪要四栏法、会前三问、7 天验证表、AI 写周报法、汇报一页纸、消息流分流、流程审计五步、决策备忘、催进度话术、安全清单、NotebookLM 配置卡、一周审计卡——不全是教你「用工具」，更多是教你「把哪件活交给工具」。',
+    '里面有：',
+    '· 管理者 AI 效率审计——记录一周，算出你可释放的时间，找到 AI 最该插手的 TOP 3',
+    '· AI 会议纪要·四栏法——1 小时录音变成一页四栏决议，责任才落得下来',
+    '· AI 写周报法——周报从 3 小时压到 20 分钟',
     '',
-    '我的建议：别一口气全看，先挑一个最疼的场景试 7 天。比如你每周被周报拖 3 小时，就只练「AI 写周报法」，拿 7 天验证表记数字。试完你觉得有用，再回来拿下一张。',
+    '每个 Skill 都是完整精品包：能直接装进 AI 助手的技能文件 + 精品方法卡 + 使用说明。适合想一口气收藏、再慢慢挑着用的人——先存着，总有一张能帮上忙。',
     '',
-    '卡只是起点。拿不准该先改哪件，可以做一次免费自检（10 分钟，测出你最该先动的那件事）：',
+    '我的建议：别一口气全看，先挑一个最疼的场景试 7 天。比如你每周被周报拖 3 小时，就只练「AI 写周报法」，拿 7 天验证表记数字。',
+    '',
+    '拿不准该先改哪件？可以做一次免费自检（10 分钟，测出你最该先动的那件事）：',
     '',
     'masterlinc.com/products/selfcheck.html',
     '',
@@ -280,7 +274,7 @@ async function sendSkillPackEmail(to) {
   const attachments = loadSkillPackDeliverables();
 
   const payload = {
-    subject: '你要的 12 张 Skill 卡，打包在这封邮件里',
+    subject: '你要的 3 张 Skill 精品卡，打包在这封邮件里',
     to: [{ mail_address: to }],
     body_plain_text: buildSkillPackEmailText(),
     attachments,
