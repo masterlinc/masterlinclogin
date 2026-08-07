@@ -392,7 +392,16 @@
             status: /^(off|offline|下线|0|false)$/i.test(String(s.status)) ? 'off' : 'on',
             sort: parseInt(s.sort, 10) || 0
           };
-          if (found) { norm.download = found.download || 0; mockDB.skills = mockDB.skills.map(function (x) { return x.id === id ? norm : x; }); }
+          if (found) {
+            // upsert 部分更新：只覆盖传入字段，其余保留（与后端 upsertSkill 语义一致）
+            Object.keys(norm).forEach(function (k) {
+              var v = norm[k];
+              if (s[k] !== undefined && s[k] !== null && s[k] !== '') found[k] = v;
+            });
+            found.status = /^(off|offline|下线|0|false)$/i.test(String(s.status)) ? 'off' : (s.status !== undefined ? 'on' : found.status);
+            found.sort = s.sort !== undefined && s.sort !== null && s.sort !== '' ? (parseInt(s.sort, 10) || 0) : found.sort;
+            norm = found;
+          }
           else { norm.download = 0; mockDB.skills.push(norm); }
           return { ok: true, action: found ? 'update' : 'create', skill: norm };
         }
@@ -714,7 +723,7 @@
       }).catch(function () { toast('加载失败', 'err'); });
     };
     window.__adminToggleSkill = function (id, toOn) {
-      api('PATCH', '/api/admin/skills/' + encodeURIComponent(id), { status: toOn ? 'on' : 'off' }).then(function () {
+      api('POST', '/api/admin/skills', { skillId: id, status: toOn ? 'on' : 'off' }).then(function () {
         toast(toOn ? '已上架' : '已下架', 'ok');
         router();
       }).catch(function (err) { toast(err.message || '操作失败', 'err'); });

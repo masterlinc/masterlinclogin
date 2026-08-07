@@ -7,7 +7,7 @@
 //   2) POST /api/admin/login：未配置 env 403 / 错误口令 401 / 正确 200 / 限速 429
 //   3) POST /api/track：正常写事件、事件白名单拒绝、extra 邮箱过滤、批量、限流 429
 //   4) GET /api/skills：自动建表 + seed 12 卡、只返回上线、排序、下架后消失
-//   5) GET/POST /api/admin/skills + PATCH /:id：鉴权、新增/更新/上下线/404
+//   5) GET/POST /api/admin/skills：鉴权、新增/更新（upsert 部分更新）/上下线/404
 //   6) GET /api/admin/leads：读取、脱敏、source/日期/邮箱筛选、CSV 导出原文
 //   7) GET /api/admin/downloads：uid+skillId 去重聚合
 //   8) GET /api/admin/traffic：page_view PV/UV/热门页面/按天趋势
@@ -365,7 +365,6 @@ async function runPublicSkills() {
 // ==================== 5. admin skills ====================
 async function runAdminSkills() {
   const adminSkills = require('../api/admin/skills.js');
-  const patchSkill = require('../api/admin/skills/[id].js');
   const token = await loginToken();
   const h = { authorization: 'Bearer ' + token };
 
@@ -397,28 +396,18 @@ async function runAdminSkills() {
   assert.strictEqual(res.body.action, 'updated');
   assert.strictEqual(res.body.skill.name, '测试卡改');
 
-  // PUT（前端上下线路径）：body 直接 { skillId, status }
+  // POST 上下线（前端 toggle 路径）：body 直接 { skillId, status }，不覆盖其他字段
   res = makeRes();
-  await adminSkills(makeReq({ method: 'PUT', headers: h, body: { skillId: 'skill-99', status: 'on' } }), res);
-  assert.strictEqual(res.statusCode, 200, 'PUT 应支持');
-  assert.strictEqual(res.body.skill.status, 'on');
+  await adminSkills(makeReq({ method: 'POST', headers: h, body: { skillId: 'skill-99', status: 'off' } }), res);
+  assert.strictEqual(res.statusCode, 200);
+  assert.strictEqual(res.body.skill.status, 'off');
+  assert.strictEqual(res.body.skill.name, '测试卡改', '上下线不应清空其他字段');
 
   // POST { skill: {...} } 包裹写法
   res = makeRes();
   await adminSkills(makeReq({ method: 'POST', headers: h, body: { skill: { skillId: 'skill-98', name: '包裹卡', status: 'on', sort: 98 } } }), res);
   assert.strictEqual(res.statusCode, 200);
   assert.strictEqual(res.body.skill.name, '包裹卡');
-
-  // PATCH 下架
-  res = makeRes();
-  await patchSkill(makeReq({ method: 'PATCH', headers: h, query: { id: 'skill-99' }, body: { status: 'off' } }), res);
-  assert.strictEqual(res.statusCode, 200);
-  assert.strictEqual(res.body.skill.status, 'off');
-
-  // PATCH 不存在 → 404
-  res = makeRes();
-  await patchSkill(makeReq({ method: 'PATCH', headers: h, query: { id: 'skill-999' }, body: { status: 'off' } }), res);
-  assert.strictEqual(res.statusCode, 404);
 
   // 下架后公开读消失
   const skills = require('../api/skills.js');
@@ -565,37 +554,37 @@ async function runEvents() {
   assert.strictEqual(res.body.page, 2);
 }
 
-// ==================== 10. 前端兼容别名路径 ====================
+// ==================== 10. 前端主路径（与已上线端点契约一致） ====================
 async function runAliases() {
   const token = await loginToken();
   const h = { authorization: 'Bearer ' + token };
 
-  // /api/admin/logs（前端路径）→ events 同实现
-  const logs = require('../api/admin/logs.js');
+  // /api/admin/events（行为日志，前端路径）
+  const events = require('../api/admin/events.js');
   let res = makeRes();
-  await logs(makeReq({ method: 'GET', headers: h, query: { page: '1', ev: 'page_view' } }), res);
+  await events(makeReq({ method: 'GET', headers: h, query: { page: '1', pageSize: '20', ev: 'page_view' } }), res);
   assert.strictEqual(res.statusCode, 200);
-  assert.ok(Array.isArray(res.body.events), 'logs 应返回 events 数组');
-  assert.ok(res.body.per > 0, 'logs 应返回 per');
+  assert.ok(Array.isArray(res.body.items), 'events 应返回 items 数组');
+  assert.ok(res.body.pageSize > 0, 'events 应返回 pageSize');
   assert.ok(res.body.items.every((i) => i.ev === 'page_view'), 'ev 筛选生效');
 
-  // /api/admin/stats/visits → traffic 同实现
-  const visits = require('../api/admin/stats/visits.js');
+  // /api/admin/traffic（访问数据，前端路径）
+  const traffic = require('../api/admin/traffic.js');
   res = makeRes();
-  await visits(makeReq({ method: 'GET', headers: h, query: { days: '7' } }), res);
+  await traffic(makeReq({ method: 'GET', headers: h, query: { days: '7' } }), res);
   assert.strictEqual(res.statusCode, 200);
-  assert.ok(res.body.today && res.body.days, 'visits 含 today/days');
+  assert.ok(res.body.daily && Array.isArray(res.body.daily), 'traffic 含 daily');
 
-  // /api/admin/stats/downloads → downloads 同实现
-  const statsDl = require('../api/admin/stats/downloads.js');
+  // /api/admin/downloads（下载统计，前端路径）
+  const downloads = require('../api/admin/downloads.js');
   res = makeRes();
-  await statsDl(makeReq({ method: 'GET', headers: h, query: { days: '30' } }), res);
+  await downloads(makeReq({ method: 'GET', headers: h, query: { days: '30' } }), res);
   assert.strictEqual(res.statusCode, 200);
-  assert.ok(res.body.totalUnique != null, 'stats/downloads 含 totalUnique');
+  assert.ok(res.body.total != null, 'downloads 含 total');
 
-  // /api/admin/leads 应返回 leads 数组（前端读取字段）
+  // /api/admin/leads 应返回 items 数组（前端读取字段）
   const leads = require('../api/admin/leads.js');
   res = makeRes();
   await leads(makeReq({ method: 'GET', headers: h }), res);
-  assert.ok(Array.isArray(res.body.leads), 'leads 应返回 leads 数组');
+  assert.ok(Array.isArray(res.body.items), 'leads 应返回 items 数组');
 }
