@@ -351,6 +351,15 @@
     .ln-ops { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .ln-ops .btn-sm { min-height: 36px; padding: 6px 10px; font-size: 13px; }
     .ln-empty { text-align: center; padding: 26px 14px; color: var(--dim); font-size: 13px; line-height: 1.8; border: 1px dashed var(--line); border-radius: 12px; }
+    /* v1.25.0：学习笔记汇总区（统计行 / 截断 / 原文件跳转） */
+    .ln-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 0 0 12px; }
+    .ln-stats-item { border: 1px solid var(--line); border-radius: 12px; padding: 10px 4px; text-align: center; background: var(--card2); min-width: 0; }
+    .ln-stats-num { font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .ln-stats-label { font-size: 11px; color: var(--dim); margin-top: 2px; line-height: 1.3; }
+    .ln-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .ln-src { margin-top: 8px; }
+    .ln-src-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 650; color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; text-decoration: none; transition: border-color 150ms ease; }
+    .ln-src-link:hover { border-color: var(--text); }
 
     .about-line { font-size: 14px; color: var(--sub); line-height: 1.8; }
     .toast { position: fixed; left: 50%; bottom: 84px; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 14px; font-weight: 650; padding: 10px 18px; border-radius: 999px; z-index: 200; opacity: 0; transition: opacity 200ms ease; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
@@ -1730,7 +1739,8 @@
     h += '<h2 class="page-title">你积累了什么</h2>';
     h += '<p class="page-sub">每一条产出，要么是<strong>可复用资产</strong>，要么是<strong>真实市场证据</strong>。分开管理，互相可见。</p>';
     h += '<div class="btn-row" style="margin-top:0;"><button class="btn" data-action="open-record" data-session="0">＋ 新增记录</button>';
-    h += '<button class="btn-ghost" data-action="goto-learn">✦ 学习笔记 (' + db.learnNotes.length + ')</button></div>';
+    // v1.25.0：修复 UX 混淆——直接打开学习笔记记录框（自由记录），而不是跳去学习页
+    h += '<button class="btn-ghost" data-action="learn-note">✦ 记学习笔记 (' + db.learnNotes.length + ')</button></div>';
     h += '<div style="height:14px;"></div>';
     h += '<div class="seg">';
     h += '<button data-action="rec-tab" data-tab="asset" class="' + (recFilter.tab === 'asset' ? 'active' : '') + '">资产库 (' + db.assets.length + ')</button>';
@@ -1835,6 +1845,7 @@
   /* ================= 学习页（v1.18.0：双导师知识库 + 提升记录） ================= */
   var learnFilter = { level: 1, theme: 'all', mentor: 'all', type: 'all' };
   var recordConvertNote = null; // 学习笔记 → 资产/证据 时关联的笔记（recSave 里检测并标记）
+  var learnNoteModalKId = ''; // v1.25.0：当前学习笔记弹层关联的知识卡 id（learnNoteSave 时写入笔记）
 
   function learnTypeName(t) { var x = LEARN_TYPES.filter(function (i) { return i.key === t; })[0]; return x ? x.name : t; }
   function learnThemeName(t) { var x = LEARN_THEMES.filter(function (i) { return i.key === t; })[0]; return x ? x.name : t; }
@@ -1847,6 +1858,9 @@
   }
   function learnConvertedCount() {
     return db.learnNotes.filter(function (n) { return n.applyStatus === 'done' && n.convertedId; }).length;
+  }
+  function learnPlannedCount() { // v1.25.0：待应用笔记数（统计行用）
+    return db.learnNotes.filter(function (n) { return !n.applyStatus || n.applyStatus === 'planned'; }).length;
   }
   function learnNoteById(id) {
     return db.learnNotes.filter(function (n) { return n.id === id; })[0] || null;
@@ -1974,11 +1988,17 @@
       list.forEach(function (k) { h += kCardHTML(k, levelLocked); });
     }
 
-    // 我的提升记录
-    h += '<div style="margin-top:8px;"><div style="font-size:15px;font-weight:700;margin:0 2px 10px;">我的提升记录</div>';
+    // 学习笔记汇总区（v1.25.0：统计行 + 按时间倒序全部笔记 + 原文件跳转）
+    h += '<div style="margin-top:8px;"><div style="font-size:15px;font-weight:700;margin:0 2px 10px;">学习笔记汇总</div>';
+    h += '<div class="ln-stats">';
+    h += '<div class="ln-stats-item"><div class="ln-stats-num">' + db.learnNotes.length + '</div><div class="ln-stats-label">累计笔记</div></div>';
+    h += '<div class="ln-stats-item"><div class="ln-stats-num">' + learnWeekCount() + '</div><div class="ln-stats-label">本周新增</div></div>';
+    h += '<div class="ln-stats-item"><div class="ln-stats-num">' + learnConvertedCount() + '</div><div class="ln-stats-label">已转资产/证据</div></div>';
+    h += '<div class="ln-stats-item"><div class="ln-stats-num">' + learnPlannedCount() + '</div><div class="ln-stats-label">待应用</div></div>';
+    h += '</div>';
     var notes = db.learnNotes.slice().sort(function (x, y) { return (y.createdAt || '').localeCompare(x.createdAt || ''); });
     if (!notes.length) {
-      h += '<div class="ln-empty">还没有提升记录。读完一张知识卡，点「记一条提升」，把收获和下一步行动写下来。<br>学习笔记不算成果，但它是资产的原料——每条都可以转成资产或证据。</div>';
+      h += '<div class="ln-empty">还没有提升记录。<br>三步走：① 在下方知识库挑一张卡 → ② 点「记一条提升」 → ③ 写下收获与下一步行动。<br>学习笔记不算成果，但它是资产的原料——每条都可以转成资产或证据。<br><button class="btn btn-sm" data-action="learn-note" style="margin-top:12px;">✦ 直接记一条（自由记录）</button></div>';
     } else {
       h += '<div class="rec-list">';
       notes.forEach(function (n) { h += learnNoteItemHTML(n); });
@@ -1995,15 +2015,23 @@
     var st = n.applyStatus || 'planned';
     var stMap = { planned: ['待应用', 'planned'], done: ['已转' + (n.convertedKind === 'evidence' ? '证据' : '资产'), 'done'], dropped: ['已放弃', 'dropped'] };
     var stCfg = stMap[st] || stMap.planned;
+    // v1.25.0：关联原文件——优先用保存的 sourceLink；老数据只有 knowledgeId 时从知识库反查补 link/title
+    var link = n.sourceLink || '';
+    var title = n.sourceTitle || '';
+    if (!link && n.knowledgeId) {
+      var kk = knowledgeById(n.knowledgeId);
+      if (kk) { link = kk.link || ''; if (!title) title = kk.title; }
+    }
     var h = '<div class="ln-item"><div class="ln-head"><span class="ln-status ' + stCfg[1] + '">' + stCfg[0] + '</span><div style="flex:1;min-width:0;">';
-    h += '<div class="ln-title">' + esc(n.sourceTitle || '自由记录') + '</div>';
+    h += '<div class="ln-title">' + esc(title || '自由记录') + '</div>';
     h += '<div class="ln-meta">' + prettyDate((n.date || n.createdAt || '').slice(0, 10)) +
       (n.mentor ? ' · ' + learnMentorName(n.mentor) : '') +
       (n.theme ? ' · ' + learnThemeName(n.theme) : '') +
       (n.mainlineId && db.mainline ? ' · 🎯 关联母线' : '') +
       '</div></div></div>';
-    h += '<div class="ln-body"><b>收获：</b>' + esc(n.harvest || '') + '</div>';
-    h += '<div class="ln-body"><b>应用：</b>' + esc(n.apply || '') + '</div>';
+    h += '<div class="ln-body ln-clamp"><b>收获：</b>' + esc(n.harvest || '') + '</div>';
+    h += '<div class="ln-body ln-clamp"><b>应用：</b>' + esc(n.apply || '') + '</div>';
+    if (link) h += '<div class="ln-src"><a class="ln-src-link" href="' + esc(link) + '" target="_blank" rel="noopener noreferrer">查看原文件 ↗</a></div>';
     h += '<div class="ln-ops">';
     if (st !== 'done') {
       h += '<button class="btn btn-sm" data-action="learn-convert-asset" data-id="' + n.id + '">转资产</button>';
@@ -2016,6 +2044,7 @@
   }
 
   function openLearnNoteModal(knowledgeId) {
+    learnNoteModalKId = knowledgeId || ''; // v1.25.0：记住来源知识卡，保存时写入关联与原文件链接
     var k = knowledgeId ? knowledgeById(knowledgeId) : null;
     var html = '';
     html += '<div class="field"><label class="field-label">日期</label><input value="' + prettyDate(todayStr) + '" disabled></div>';
@@ -2043,9 +2072,11 @@
     var mentor = $id('lnMentor') ? $id('lnMentor').value : '';
     var theme = $id('lnTheme') ? $id('lnTheme').value : 't1';
     var mainlineId = $id('lnMainline') ? $id('lnMainline').value : '';
+    // v1.25.0：从知识卡进入时写入 knowledgeId + sourceLink（原文件外部链接），便于卡片跳转原文件
+    var kk = learnNoteModalKId ? knowledgeById(learnNoteModalKId) : null;
     var note = {
-      id: uid(), knowledgeId: '', date: todayStr, sourceTitle: source,
-      sourceLink: '', mentor: mentor, theme: theme,
+      id: uid(), knowledgeId: kk ? kk.id : '', date: todayStr, sourceTitle: source,
+      sourceLink: kk ? (kk.link || '') : '', mentor: mentor, theme: theme,
       harvest: harvest, apply: apply, applyStatus: 'planned',
       mainlineId: mainlineId || null, createdAt: nowISO(),
       convertedAt: null, convertedKind: null, convertedId: null
