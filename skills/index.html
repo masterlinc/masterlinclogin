@@ -119,70 +119,23 @@
     }
     .skill-card.hidden-card { display: none; }
 
-    /* 预览区：默认收起，点击展开（纯 CSS 骨架，无图片） */
-    .skill-preview {
-      position: relative;
-      min-height: 0;
-      aspect-ratio: 16 / 9;
-      background: var(--surface-2);
-      border: none;
-      border-bottom: 1px solid var(--line);
-      padding: 0;
-      cursor: pointer;
+    /* 方法要点行：静态展示（无点击交互），像简介一样一眼看到内容 */
+    .skill-points {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      font: inherit;
-      transition: background 150ms ease;
-    }
-    .skill-preview:hover { background: #1d1d1c; }
-    .skill-preview[hidden] { display: none; }
-    .skill-preview-hint {
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      color: #555552;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-    .skill-preview-tip {
-      position: absolute;
-      right: 12px;
-      bottom: 10px;
-      color: #555552;
-      font-size: 11px;
-    }
-    .skill-preview:hover .skill-preview-tip { color: #a8a8a5; }
-    .skill-sk {
-      display: grid;
+      flex-wrap: wrap;
       gap: 6px;
-      width: 100%;
-      max-width: 280px;
-      padding: 20px 18px;
+      margin-top: 12px;
     }
-    .skill-sk[hidden] { display: none; }
-    .skill-sk.grid { grid-template-columns: repeat(2, 1fr); }
-    .skill-sk.cols { grid-template-columns: repeat(4, 1fr); }
-    .skill-sk.rows,
-    .skill-sk.flow { grid-template-columns: 1fr; }
-    .skill-sk-cell {
+    .skill-points span {
+      display: inline-block;
+      padding: 4px 9px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #0b0b0b;
-      color: #777774;
+      border-radius: 999px;
+      background: #101010; /* var(--surface) */
+      color: var(--muted);
       font-size: 11px;
-      line-height: 1.35;
-      padding: 8px 7px;
-      text-align: center;
-      min-height: 34px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      line-height: 1.45;
     }
-    .skill-sk-cell.hl { border-color: var(--line-strong); color: var(--muted); }
-    .skill-sk.flow .skill-sk-cell { text-align: left; justify-content: flex-start; padding-left: 12px; }
 
     .skill-body { padding: 22px 22px 0; }
 
@@ -533,6 +486,7 @@
         file: '/skills/files/skill-12-manager-ai-audit-week.zip',
         dlName: '管理者AI效率审计（精品包）.zip', dlText: '免费下载 · 效率审计精品包',
         hook: { href: '/products/selfcheck.html', text: '想深挖自己的场景、把一周变成整套打法？免费自检，10 分钟找到最该改的一件 →' },
+        points: ['四类拆解', '找出可释放时间', 'TOP3 自动化'],
         preview: { title: '四类时间', style: 'cols', labels: ['❶ 核心管理', '❷ 可委派', '❸ 纯重复', '⚠️ 时间黑洞'] }
       },
       {
@@ -543,6 +497,7 @@
         file: '/skills/files/skill-01-ai-meeting-notes-4columns.zip',
         dlName: 'AI会议纪要·四栏法（精品包）.zip', dlText: '免费下载 · 四栏法精品包',
         hook: { href: '/products/selfcheck.html', text: '想要可复制的空白模板 + 会后复查清单 + 更多行业案例？¥29 进阶版 →' },
+        points: ['决定', '待验证', '负责人', '原话'],
         preview: { title: '四栏骨架', style: 'grid', labels: ['已确认决定', '待验证事项', '负责人 · 截止', '原话证据'] }
       },
       {
@@ -553,6 +508,7 @@
         file: '/skills/files/skill-04-ai-weekly-report.zip',
         dlName: 'AI写周报法（精品包）.zip', dlText: '免费下载 · 周报法精品包',
         hook: { href: '/products/selfcheck.html', text: '想系统化省时间（周报、汇报一起改）？免费自检，看看最该先动哪一件 →' },
+        points: ['素材随手记', 'AI 出初稿', '人只改判断'],
         preview: { title: '三步流程', style: 'flow', labels: ['① 随手记 · 每天 2 分钟', '② AI 初稿 · 周日 15 分钟', '③ 人只改判断 · 5 分钟'] }
       }
     ];
@@ -608,38 +564,7 @@
         card.className = 'skill-card';
         card.id = s.id;
 
-        // 预览区（默认收起，点击展开骨架）
-        var prev = document.createElement('button');
-        prev.type = 'button';
-        prev.className = 'skill-preview';
-        prev.setAttribute('aria-expanded', 'false');
-        prev.setAttribute('aria-label', '展开 ' + s.name + ' 方法骨架预览');
-        var sk = document.createElement('div');
-        sk.className = 'skill-sk ' + s.preview.style;
-        sk.hidden = true;
-        s.preview.labels.forEach(function (l) {
-          var c = document.createElement('div');
-          c.className = 'skill-sk-cell';
-          c.textContent = l;
-          sk.appendChild(c);
-        });
-        var hint = document.createElement('span');
-        hint.className = 'skill-preview-hint';
-        hint.textContent = s.preview.title;
-        var tip = document.createElement('span');
-        tip.className = 'skill-preview-tip';
-        tip.textContent = '展开预览 ▾';
-        prev.appendChild(hint);
-        prev.appendChild(sk);
-        prev.appendChild(tip);
-        prev.addEventListener('click', function () {
-          var open = !sk.hidden;
-          sk.hidden = open;
-          tip.textContent = open ? '展开预览 ▾' : '收起预览 ▴';
-          prev.setAttribute('aria-expanded', open ? 'false' : 'true');
-        });
-
-        // 正文
+        // 正文（无预览交互；要点以静态行展示，一眼可见）
         var body = document.createElement('div');
         body.className = 'skill-body';
         body.innerHTML =
@@ -648,6 +573,19 @@
           '<p class="skill-value">' + s.value + '</p>' +
           '<p class="skill-meta">' + s.diff + ' · ' + s.time + ' · ' + s.format + '</p>' +
           '<div class="skill-tools">' + s.tools.map(function (t) { return '<span class="skill-tool">' + t + '</span>'; }).join('') + '</div>';
+
+        // 方法要点：静态 chip 行（无点击事件）
+        var pts = s.points && s.points.length ? s.points : [];
+        if (pts.length) {
+          var ptsRow = document.createElement('div');
+          ptsRow.className = 'skill-points';
+          pts.forEach(function (p) {
+            var sp = document.createElement('span');
+            sp.textContent = '▸ ' + p;
+            ptsRow.appendChild(sp);
+          });
+          body.insertBefore(ptsRow, body.querySelector('.skill-meta'));
+        }
 
         // 操作区：下载 + 钩子
         var actions = document.createElement('div');
@@ -665,7 +603,6 @@
 
         actions.appendChild(dl);
         actions.appendChild(hook);
-        card.appendChild(prev);
         card.appendChild(body);
         card.appendChild(actions);
         frag.appendChild(card);
@@ -681,7 +618,7 @@
         var el = document.getElementById(s.id);
         if (!el) return;
         var catOk = state.cat === '全部' || s.cat === state.cat;
-        var qOk = !q || (s.name + ' ' + s.cat + ' ' + s.tools.join(' ') + ' ' + s.value + ' ' + s.format).toLowerCase().indexOf(q) !== -1;
+        var qOk = !q || (s.name + ' ' + s.cat + ' ' + s.tools.join(' ') + ' ' + s.value + ' ' + s.format + ' ' + (s.points || []).join(' ')).toLowerCase().indexOf(q) !== -1;
         var show = catOk && qOk;
         el.classList.toggle('hidden-card', !show);
         if (show) visible++;
@@ -802,6 +739,35 @@
     // ===== 数据源：/api/skills 优先，失败降级到内置 3 个精品 =====
     // 服务端返回结构约定：{ skills: [{ skillId, 名称/name, 描述/value, 分类/cat, 文件URL/file, 下载文件名/dlName, 状态/status, 排序/sort, ... }] }
     // 这里做字段归一化，兼容中英文键名；只渲染在线（online/on）且有文件 URL 的卡片。
+    // 提取方法要点（方案 B：静态要点行，替代旧骨架预览）
+    // 优先级：配置表 points/要点 → preview.points/labels → 内置精品 points 兜底；
+    // 过滤旧骨架占位（① ② ③ ④ / 纯数字 / 空串），保证不渲染无意义内容。
+    var BUILTIN_POINTS = {};
+    SKILLS.forEach(function (s) { BUILTIN_POINTS[s.id] = s.points || []; });
+    function isPlaceholderLabel(v) {
+      var t = String(v).trim();
+      if (!t) return true;
+      if (/^[①②③④⑤⑥⑦⑧⑨⑩]+$/.test(t)) return true;
+      if (/^[\d·.、\s]+$/.test(t)) return true;
+      return false;
+    }
+    function extractPoints(raw, id) {
+      var out = [];
+      function push(v) {
+        if (v === undefined || v === null || v === '') return;
+        var arr = Array.isArray(v) ? v : String(v).split(/[,，、;；]/);
+        arr.forEach(function (x) {
+          var t = String(x).trim();
+          if (!t || isPlaceholderLabel(t)) return;
+          if (out.length < 4) out.push(t);
+        });
+      }
+      push(raw.points); push(raw['要点']); push(raw['方法要点']);
+      if (raw.preview && typeof raw.preview === 'object') { push(raw.preview.points); push(raw.preview.labels); }
+      if (!out.length && BUILTIN_POINTS[id]) out = BUILTIN_POINTS[id].slice(0, 4);
+      return out;
+    }
+
     function normalizeRemoteSkill(raw) {
       if (!raw) return null;
       var pick = function (keys, def) {
@@ -833,7 +799,7 @@
           href: String(pick(['hookHref', '钩子链接'], '/products/selfcheck.html')),
           text: String(pick(['hookText', '钩子文案'], '免费自检，看看最该先动哪一件 →'))
         },
-        preview: { title: '方法骨架', style: 'grid', labels: ['①', '②', '③', '④'] }
+        points: extractPoints(raw, id)
       };
     }
 
