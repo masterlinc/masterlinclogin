@@ -6,7 +6,7 @@
 //   1) lib/admin-auth：HMAC token 签发/校验/篡改/过期；requireAdmin 403/401/200
 //   2) POST /api/admin/login：未配置 env 403 / 错误口令 401 / 正确 200 / 限速 429
 //   3) POST /api/track：正常写事件、事件白名单拒绝、extra 邮箱过滤、批量、限流 429
-//   4) GET /api/skills：自动建表 + seed 12 卡、只返回上线、排序、下架后消失
+//   4) GET /api/skills：自动建表 + seed 3 精品卡、只返回上线、排序、下架后消失
 //   5) GET/POST /api/admin/skills：鉴权、新增/更新（upsert 部分更新）/上下线/404
 //   6) GET /api/admin/leads：读取、脱敏、source/日期/邮箱筛选、CSV 导出原文
 //   7) GET /api/admin/downloads：uid+skillId 去重聚合
@@ -349,7 +349,7 @@ async function runPublicSkills() {
   await skills(makeReq({ method: 'GET' }), res);
   assert.strictEqual(res.statusCode, 200);
   assert.strictEqual(res.body.ok, true);
-  assert.strictEqual(res.body.skills.length, 12, 'seed 应为 12 卡');
+  assert.strictEqual(res.body.skills.length, 3, 'seed 应为 3 个精品卡');
   assert.ok(res.body.skills.every((s) => s.status === 'on'), '公开读只应返回上线卡');
   assert.strictEqual(res.body.skills[0].id, 'skill-01', '应按排序');
   assert.deepStrictEqual(res.body.skills[0].tools, ['NotebookLM', 'Kimi'], 'tools 应还原为数组');
@@ -359,7 +359,7 @@ async function runPublicSkills() {
   // 再次调用：不重复 seed（仍 12 条）
   res = makeRes();
   await skills(makeReq({ method: 'GET' }), res);
-  assert.strictEqual(res.body.skills.length, 12);
+  assert.strictEqual(res.body.skills.length, 3);
 }
 
 // ==================== 5. admin skills ====================
@@ -377,7 +377,7 @@ async function runAdminSkills() {
   res = makeRes();
   await adminSkills(makeReq({ method: 'GET', headers: h }), res);
   assert.strictEqual(res.statusCode, 200);
-  assert.strictEqual(res.body.skills.length, 12);
+  assert.strictEqual(res.body.skills.length, 3);
   assert.ok(res.body.skills[0].recordId, '管理端应含 recordId');
 
   // POST 新增
