@@ -4,5 +4,19 @@
       "path": "/api/keepalive",
       "schedule": "0 3 * * *"
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/feedback",
+      "destination": "/api/lead"
+    },
+    {
+      "source": "/api/admin/feedback",
+      "destination": "/api/admin/skills?__fb=1"
+    },
+    {
+      "source": "/api/admin/feedback/:path*",
+      "destination": "/api/admin/skills?__fb=1&fbpath=:path*"
+    }
   ]
 }

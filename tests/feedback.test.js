@@ -115,6 +115,8 @@ function makeRes() {
 }
 function makeReq(over) {
   const r = Object.assign({
+    // 默认管理反馈路径：合并后 api/admin/skills.js 按 req.url 路径分流（PATCH 测试会显式覆盖）
+    url: '/api/admin/feedback',
     method: 'GET', headers: {}, query: {}, socket: { remoteAddress: '1.2.3.4' },
   }, over);
   return r;
@@ -135,7 +137,7 @@ function getAuthHeader() {
 
 function postFeedback(payload, ip) {
   return new Promise((resolve) => {
-    const fb = require('../api/feedback.js');
+    const fb = require('../api/lead.js');
     const res = makeRes();
     const req = makeReq({ method: 'POST', body: payload, socket: { remoteAddress: ip || '1.2.3.4' } });
     fb(req, res).then(() => resolve(res));
@@ -143,7 +145,7 @@ function postFeedback(payload, ip) {
 }
 
 function resetMock() {
-  require('../api/feedback.js').resetRate();
+  require('../api/lead.js').resetRate();
   // 固定 user_feedback 表（feedback/admin 模块首次调用时自动查找/缓存此表，避免表 id 漂移）；只清记录不清表
   const t = ensureTable('user_feedback', [], 'tbl-fb');
   t.records.length = 0;
@@ -153,7 +155,7 @@ function resetMock() {
 // 1. 正常提交
 // ============================================================================
 (async function main() {
-  const fb = require('../api/feedback.js');
+  const fb = require('../api/lead.js');
 
   section('1. POST /api/feedback 正常提交（自动建表 + 写飞书）');
   {
@@ -226,7 +228,7 @@ function resetMock() {
     let fakeNow = realNow();
     Date.now = function () { return fakeNow; };
     try {
-      require('../api/feedback.js').resetRate();
+      require('../api/lead.js').resetRate();
       const ip2 = '8.8.8.8';
       let codes = [];
       for (let i = 0; i < 6; i++) {
@@ -244,7 +246,7 @@ function resetMock() {
   // ============================================================================
   // 5. admin 接口
   // ============================================================================
-  const adminFeedback = require('../api/admin/feedback.js');
+  const adminFeedback = require('../api/admin/skills.js');
 
   section('5. GET /api/admin/feedback：鉴权 + 列表 + 脱敏 + 筛选');
   {
