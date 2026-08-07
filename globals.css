@@ -51,8 +51,9 @@ img { display: block; width: 100%; }
 }
 
 .nav {
-  position: relative;
-  z-index: 20;
+  position: sticky;
+  top: 0;
+  z-index: 60;
   display: flex;
   min-height: 76px;
   align-items: center;
@@ -98,6 +99,16 @@ img { display: block; width: 100%; }
 .nav-links a[aria-current="page"]:hover {
   color: var(--white);
   text-decoration-color: var(--white);
+}
+
+/* 触屏点击反馈 + 键盘无障碍（P2-1） */
+.nav-links a:active,
+.nav-links button:active { opacity: 0.7; }
+.nav-links a:focus-visible,
+.nav-links button:focus-visible,
+.wordmark:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
 }
 
 .nav-cta {
@@ -925,6 +936,20 @@ img { display: block; width: 100%; }
 @media (max-width: 900px) {
   .nav-links > a:not(.nav-cta):not(.lang-switch):not(.nav-key) { display: none; }
 
+  /* P0-1 触控目标 ≥44px：移动端所有导航项拉高点击区 */
+  .nav-links > a,
+  .nav-links > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+  }
+  .wordmark { min-height: 44px; }
+  .nav-key { padding-inline: 6px; min-width: 44px; }
+  .nav-cta { padding-inline: 8px; }
+  /* P1-1 中文站移动端隐藏 EN，把稀缺空间让给内容入口；英文站「中文」切换不受影响 */
+  .nav-links > .lang-switch--zh { display: none !important; }
+
   .resources { grid-template-columns: 1fr; max-width: 720px; }
   .resource { display: grid; grid-template-columns: 0.9fr 1.1fr; }
   .resource figure { height: 100%; aspect-ratio: auto; }
@@ -945,7 +970,7 @@ img { display: block; width: 100%; }
 
   .nav { min-height: 66px; padding-inline: 18px; }
   .wordmark { font-size: 13px; letter-spacing: 0.16em; }
-  .nav-links { gap: 12px; }
+  .nav-links { gap: 10px; }
   .nav-key { font-size: 12px; }
   .nav-cta { font-size: 12px; }
 
@@ -1010,10 +1035,16 @@ img { display: block; width: 100%; }
 
 @media (max-width: 400px) {
   .nav { padding-inline: 14px; }
-  .nav-links { gap: 12px; }
+  .nav-links { gap: 10px; }
   .wordmark { font-size: 12px; letter-spacing: 0.12em; }
   .wordmark-logo { width: 32px; height: 32px; }
   .nav-key { font-size: 12px; }
+}
+
+@media (max-width: 340px) {
+  .nav-links { gap: 6px; }
+  .nav-key { padding-inline: 4px; }
+  .nav-cta { padding-inline: 6px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
