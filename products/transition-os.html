@@ -582,6 +582,7 @@
       <section class="view" id="view-review"></section>
       <section class="view" id="view-learn"></section>
       <section class="view" id="view-settings"></section>
+      <section class="view" id="view-publish"></section>
     </main>
   </div>
 
@@ -594,6 +595,7 @@
       <button class="tab" data-route="review"><span class="tab-ico">▦</span><span class="tab-label">复盘</span></button>
       <button class="tab" data-route="learn"><span class="tab-ico">✦</span><span class="tab-label">学习</span></button>
       <button class="tab" data-route="settings"><span class="tab-ico">⚙</span><span class="tab-label">设置</span></button>
+      <button class="tab" data-route="publish"><span class="tab-ico">📮</span><span class="tab-label">发布</span></button>
     </div>
     <div class="safe-bottom"></div>
   </nav>
@@ -606,10 +608,14 @@
 
   /* ================= 数据层（localStorage 单一 JSON 根） ================= */
   var LS_KEY = 'transition-os:v1';
-  var todayStr = (function () {
+  // v1.27.0：todayStr 由「模块加载时固定」改为「每次渲染/交互前刷新」。同一天内 nowDateStr() 值稳定，
+  // 不影响同日签到/周统计/数据 key；跨天后 render()/handleAction() 会自动取新日期，母线剩余天数、
+  // 时间线、看板进度随之更新（不再需要关闭重开页面）。
+  function nowDateStr() {
     var d = new Date();
     return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  })();
+  }
+  var todayStr = nowDateStr();
 
   function pad(n) { return String(n).padStart(2, '0'); }
   function uid() {
@@ -2425,6 +2431,185 @@
     v.innerHTML = h;
   }
 
+
+  /* ================= 发布工作台 ================= */
+  var PUBLISH_API = '/api/publish';
+  var PUB_KEY = '';
+  try { PUB_KEY = localStorage.getItem('pub_admin_key') || ''; } catch (e) {}
+
+  function publishApi(path, opts) {
+    opts = opts || {};
+    opts.headers = opts.headers || {};
+    if (PUB_KEY) opts.headers['x-publish-key'] = PUB_KEY;
+    return fetch(PUBLISH_API + path, opts).then(function (r) { return r.json(); }).catch(function () { return { ok: false, message: '网络错误' }; });
+  }
+
+  function escMultiline(t) {
+    return esc(t || '').replace(/\n/g, '<br>');
+  }
+
+  function renderPublish() {
+    var v = $id('view-publish');
+    var h = '';
+    h += '<p class="kicker">发布 · Publish</p>';
+    h += '<h2 class="page-title">内容发布工作台</h2>';
+    h += '<p class="page-sub">在 Obsidian 写完 → 粘贴到这里 → 一键排版 / 一键图文并茂 / 一键分发到公众号·小红书·即刻。排版与图文生成、发送由本机 Proma 自动执行；公众号为草稿，小红书/即刻自动发送。</p>';
+
+    h += '<div class="card"><div class="card-title">平台通道状态</div><div id="pub-config-status"><p class="card-sub">加载中…</p></div></div>';
+
+    h += '<div class="card"><div class="card-title">① 内容</div>';
+    h += '<div class="field"><label class="field-label" for="pubTitle">标题</label><input id="pubTitle" maxlength="100" placeholder="例：AI 提效不是看省了多少时间" autocomplete="off"></div>';
+    h += '<div class="field"><label class="field-label" for="pubContent">正文 / 母稿（Markdown）</label>';
+    h += '<textarea id="pubContent" rows="8" placeholder="粘贴 Obsidian 母稿或正文；发布时会自动格式化为三平台版本"></textarea></div>';
+    h += '<div class="field"><label class="field-label">选项</label>';
+    h += '<label class="check-line"><input type="checkbox" id="pubOptRich" checked> 一键图文并茂（生成封面图 + 图表渲染）</label>';
+    h += '<label class="check-line"><input type="checkbox" id="pubOptMp" checked> 公众号（草稿）</label>';
+    h += '<label class="check-line"><input type="checkbox" id="pubOptXhs" checked> 小红书</label>';
+    h += '<label class="check-line"><input type="checkbox" id="pubOptJike" checked> 即刻</label></div>';
+    h += '<div class="btn-row">';
+    h += '<button class="btn" data-action="publish-format">🎨 一键排版预览</button>';
+    h += '<button class="btn btn-primary" data-action="publish-create">📮 一键分发</button>';
+    h += '</div></div>';
+
+    h += '<div class="card" id="pub-preview-card" style="display:none;"><div class="card-title">三平台预览（完整排版由 Proma 执行）</div><div id="pub-preview"></div></div>';
+
+    h += '<div class="card"><div class="card-title">发布任务</div><div id="pub-tasks"><p class="card-sub">加载中…</p></div></div>';
+
+    h += '<div class="card"><div class="card-title">账号配置</div>';
+    h += '<p class="card-sub">配置公众号 / 小红书 / 即刻账号。敏感值（AppSecret）加密存储；「管理密钥」= 发布系统管理员密钥，保存配置时需填写（只保存在本机浏览器）。</p>';
+    h += '<div id="pub-config-form"><p class="card-sub">加载中…</p></div></div>';
+
+    v.innerHTML = h;
+    publishLoadConfig();
+    publishLoadTasks();
+  }
+
+  function pubStatusBadge(cfg) {
+    function chip(ok, label) {
+      return '<span style="display:inline-block;padding:3px 10px;border-radius:12px;font-size:12.5px;margin-right:6px;background:' + (ok ? 'var(--green-soft,#e8f0e9)' : 'var(--line-soft,#eee)') + ';color:' + (ok ? '#17351d' : '#888') + ';">' + label + '</span>';
+    }
+    var mp = cfg.wechat_mp || {};
+    var xhs = cfg.xiaohongshu || {};
+    var jk = cfg.jike || {};
+    return chip(!!mp.appSecretSet, '公众号 ' + (mp.appSecretSet ? '已配置' : '未配置')) +
+      chip(mp.ipWhitelistStatus === 'ok', 'IP 白名单 ' + (mp.ipWhitelistStatus === 'ok' ? 'OK' : '待确认')) +
+      chip(xhs.loginStatus === 'ok', '小红书 ' + (xhs.loginStatus === 'ok' ? '已登录' : '待登录')) +
+      chip(jk.loginStatus === 'ok', '即刻 ' + (jk.loginStatus === 'ok' ? '已登录' : '待登录'));
+  }
+
+  function publishLoadConfig() {
+    publishApi('?op=config').then(function (r) {
+      var st = document.getElementById('pub-config-status');
+      var fm = document.getElementById('pub-config-form');
+      if (!st || !fm) return;
+      if (!r.ok || !r.data) { st.innerHTML = '<p class="card-sub">配置加载失败：' + esc(r.message || '未知') + '</p>'; return; }
+      var cfg = r.data;
+      st.innerHTML = pubStatusBadge(cfg) + '<p class="card-sub" style="margin-top:8px;">公众号 AppID：' + esc(cfg.wechat_mp.appId || '未设置') + ' · IP：' + esc(cfg.wechat_mp.ipWhitelist || '-') + ' · 小红书昵称：' + esc(cfg.xiaohongshu.nickname || '未设置') + '</p>';
+
+      var h = '';
+      h += '<div class="field"><label class="field-label" for="cfgMpAppId">公众号 AppID</label><input id="cfgMpAppId" value="' + esc(cfg.wechat_mp.appId || '') + '" placeholder="wx..." autocomplete="off"></div>';
+      h += '<div class="field"><label class="field-label" for="cfgMpSecret">公众号 AppSecret（' + (cfg.wechat_mp.appSecretSet ? '已设置，留空不改' : '未设置') + '）</label><input id="cfgMpSecret" type="password" placeholder="app secret" autocomplete="off"></div>';
+      h += '<div class="field"><label class="field-label" for="cfgMpIp">公众号 IP 白名单（本机公网 IP）</label><input id="cfgMpIp" value="' + esc(cfg.wechat_mp.ipWhitelist || '') + '" placeholder="如 1.2.3.4" autocomplete="off"></div>';
+      h += '<div class="field"><label class="field-label" for="cfgXhsNick">小红书昵称（防搜）</label><input id="cfgXhsNick" value="' + esc(cfg.xiaohongshu.nickname || '') + '" placeholder="例：AI管理博士" autocomplete="off"></div>';
+      h += '<div class="field"><label class="field-label" for="cfgPubKey">管理密钥（保存配置时必填）</label><input id="cfgPubKey" type="password" value="' + esc(PUB_KEY) + '" placeholder="publish admin key" autocomplete="off"></div>';
+      h += '<div class="btn-row"><button class="btn" data-action="publish-save-config">💾 保存配置</button>';
+      h += '<button class="btn btn-ghost" data-action="publish-refresh-config">🔄 刷新状态</button></div>';
+      h += '<p class="privacy-note">保存后：小红书/即刻登录态由本机 Proma 建立；AppSecret 加密存储，页面不显示明文。</p>';
+      fm.innerHTML = h;
+    });
+  }
+
+  function publishSaveConfig() {
+    PUB_KEY = (document.getElementById('cfgPubKey') || {}).value || '';
+    try { localStorage.setItem('pub_admin_key', PUB_KEY); } catch (e) {}
+    var cfg = {};
+    if (document.getElementById('cfgMpAppId')) {
+      cfg.wechat_mp = {
+        appId: document.getElementById('cfgMpAppId').value,
+        appSecret: document.getElementById('cfgMpSecret').value,
+        ipWhitelist: document.getElementById('cfgMpIp').value,
+        ipWhitelistStatus: document.getElementById('cfgMpIp').value ? 'ok' : 'unknown'
+      };
+    }
+    if (document.getElementById('cfgXhsNick')) {
+      cfg.xiaohongshu = { nickname: document.getElementById('cfgXhsNick').value, loginStatus: 'unknown' };
+    }
+    var tasks = [];
+    if (cfg.wechat_mp) tasks.push(publishApi('?op=config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'wechat_mp', value: cfg.wechat_mp }) }));
+    if (cfg.xiaohongshu) tasks.push(publishApi('?op=config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'xiaohongshu', value: cfg.xiaohongshu }) }));
+    Promise.all(tasks).then(function (rs) {
+      var ok = rs.every(function (r) { return r && r.ok; });
+      toast(ok ? '配置已保存' : '保存失败，请检查管理密钥');
+      publishLoadConfig();
+    });
+  }
+
+  function publishFormat() {
+    var title = (document.getElementById('pubTitle') || {}).value || '';
+    var content = (document.getElementById('pubContent') || {}).value || '';
+    var card = document.getElementById('pub-preview-card');
+    var box = document.getElementById('pub-preview');
+    if (!card || !box) return;
+    if (!title && !content) { toast('先填写标题或正文'); return; }
+    var plain = content.replace(/[#*>`\[\]|]/g, ' ').replace(/\s+/g, ' ').trim();
+    var h = '';
+    h += '<p style="font-weight:600;margin:6px 0 4px;">📕 小红书版（标题 ≤20 字 / 正文 ≤800 字）</p>';
+    h += '<div style="background:var(--bg-soft,#faf8f4);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.7;margin-bottom:10px;">' + escMultiline('标题：《' + (title.slice(0, 20) || '待定') + '》\n' + plain.slice(0, 500) + (plain.length > 500 ? '…' : '')) + '</div>';
+    h += '<p style="font-weight:600;margin:6px 0 4px;">⚡ 即刻版（≤200 字）</p>';
+    h += '<div style="background:var(--bg-soft,#faf8f4);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.7;margin-bottom:10px;">' + escMultiline(plain.slice(0, 200) + (plain.length > 200 ? '…' : '')) + '</div>';
+    h += '<p style="font-weight:600;margin:6px 0 4px;">📌 公众号版（HTML 排版 + 封面 + 图表，由 Proma 生成）</p>';
+    h += '<div style="background:var(--bg-soft,#faf8f4);border-radius:8px;padding:10px 12px;font-size:13.5px;line-height:1.7;">点击「📮 一键分发」，Proma 将完成完整排版与图文并茂（封面图 / Mermaid 图表 / 表格适配）后自动分发。</div>';
+    card.style.display = '';
+    box.innerHTML = h;
+  }
+
+  function publishCreate() {
+    var title = (document.getElementById('pubTitle') || {}).value || '';
+    var content = (document.getElementById('pubContent') || {}).value || '';
+    if (!title) { toast('请填写标题'); return; }
+    var options = {
+      rich: !!(document.getElementById('pubOptRich') || {}).checked,
+      mp: !!(document.getElementById('pubOptMp') || {}).checked,
+      xhs: !!(document.getElementById('pubOptXhs') || {}).checked,
+      jike: !!(document.getElementById('pubOptJike') || {}).checked
+    };
+    toast('正在创建发布任务…');
+    publishApi('', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ title: title, content: content, options: options, userId: db.user.nickname || 'masterlinc' }) }).then(function (r) {
+      if (r && r.ok) {
+        toast('发布任务已创建：' + (r.taskId || ''));
+        document.getElementById('pubTitle').value = '';
+        document.getElementById('pubContent').value = '';
+        publishLoadTasks();
+      } else {
+        toast('创建失败：' + ((r && r.message) || '未知'));
+      }
+    });
+  }
+
+  function publishLoadTasks() {
+    var box = document.getElementById('pub-tasks');
+    if (!box) return;
+    publishApi('?op=list&limit=10').then(function (r) {
+      if (!r.ok) { box.innerHTML = '<p class="card-sub">任务加载失败</p>'; return; }
+      var tasks = r.tasks || [];
+      if (!tasks.length) { box.innerHTML = '<p class="card-sub">暂无发布任务。填写内容后点「📮 一键分发」。</p>'; return; }
+      var h = '<div style="font-size:13.5px;">';
+      tasks.forEach(function (t) {
+        var st = t.status === 'done' ? '✅ 完成' : t.status === 'failed' ? '❌ 失败' : t.status === 'processing' ? '⏳ 执行中' : '🕐 待执行';
+        var stColor = t.status === 'done' ? '#17351d' : t.status === 'failed' ? '#5b1d18' : '#8a8173';
+        h += '<div style="display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line-soft,#eee);">';
+        h += '<span style="width:64px;flex:none;color:' + stColor + ';">' + st + '</span>';
+        h += '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(t.title || '') + '</span>';
+        if (t.result && t.result.mp) h += '<span style="flex:none;color:#8a8173;">公众号✓</span>';
+        if (t.result && t.result.xhs) h += '<span style="flex:none;color:#8a8173;">小红书✓</span>';
+        if (t.result && t.result.jike) h += '<span style="flex:none;color:#8a8173;">即刻✓</span>';
+        h += '</div>';
+      });
+      h += '</div>';
+      box.innerHTML = h;
+    });
+  }
+
   function exportBackup() {
     db.meta.lastExportAt = nowISO();
     persist();
@@ -2888,12 +3073,13 @@
   }
 
   /* ================= 路由与渲染 ================= */
-  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'learn', 'settings'];
+  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'learn', 'settings', 'publish'];
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, '');
     return ROUTES.indexOf(h) >= 0 ? h : 'today';
   }
   function render() {
+    todayStr = nowDateStr(); // v1.27.0：每次渲染前刷新，跨天后自动用新日期
     var route = currentRoute();
     document.querySelectorAll('.view').forEach(function (v) { v.classList.remove('active'); });
     var view = $id('view-' + route);
@@ -2916,6 +3102,7 @@
     else if (route === 'review') renderReview();
     else if (route === 'learn') renderLearn();
     else if (route === 'settings') renderSettings();
+    else if (route === 'publish') renderPublish();
     window.scrollTo({ top: 0 });
   }
 
@@ -2927,6 +3114,7 @@
     'reset-data',
     'learn-note', 'learn-note-save', 'learn-convert-asset', 'learn-convert-evidence', 'learn-del', 'learn-drop'];
   function handleAction(act, el) {
+    todayStr = nowDateStr(); // v1.27.0：交互前刷新，保证签到/记录/周统计等用当天日期
     if (browseMode && BROWSE_BLOCKED.indexOf(act) >= 0) {
       toast('先完成昵称和邮箱，才能开始记录');
       mountOnboarding(true);
@@ -2999,6 +3187,10 @@
       case 'goto-settings': location.hash = '#/settings'; break;
       case 'goto-mainline': location.hash = '#/mainline'; break;
       case 'goto-learn': location.hash = '#/learn'; break;
+      case 'publish-format': publishFormat(); break;
+      case 'publish-create': publishCreate(); break;
+      case 'publish-save-config': publishSaveConfig(); break;
+      case 'publish-refresh-config': publishLoadConfig(); break;
       case 'learn-path': learnFilter.level = parseInt(el.getAttribute('data-lv'), 10) || 1; render(); break;
       case 'learn-theme': learnFilter.theme = el.getAttribute('data-t'); render(); break;
       case 'learn-mentor': learnFilter.mentor = el.getAttribute('data-m'); render(); break;
@@ -3127,6 +3319,20 @@
   });
 
   window.addEventListener('hashchange', render);
+
+  // v1.27.0：跨天自动刷新。页面停留跨天后，每分钟检查一次日期；变了就更新 todayStr 并重渲染当前视图，
+  // 保留滚动位置，且仅在页面可见时执行（后台标签页不打扰）。modal 是 body 下的独立元素，不受 render() 影响。
+  var dayTimer = setInterval(function () {
+    if (document.visibilityState !== 'visible') return;
+    var s = nowDateStr();
+    if (s !== todayStr) {
+      todayStr = s;
+      var y = window.scrollY;
+      render();
+      window.scrollTo({ top: y });
+    }
+  }, 60000);
+
   render();
   mountOnboarding(); // v1.17.0：启动时判定首次引导（新用户完整 3 屏 / 老用户轻量补填）
 })();
