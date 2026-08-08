@@ -347,23 +347,22 @@
 
           <div class="paybox no-print">
             <span class="paybox-tag">完整工具包 · ¥29</span>
-            <h3>进阶版 ¥29：从入门到完整落地</h3>
-            <p class="pay-sub">免费入门包给方向，完整工具包给可直接用的全套交付物——三问帮你「想清楚」，四栏帮你「落得下」；不只是拿走方法，是加入一个圈子：购买进阶版即加入「AI 管理现场·实战群」，工具包给你方法，群给你环境。</p>
+            <h3>完整工具包 ¥29：从入门到完整落地</h3>
+            <p class="pay-sub">免费入门包给方向，完整工具包给结果——<strong>① 你的自检结果解读</strong>（一页本周行动清单）<strong>② 会议四栏完整方法</strong>（含 AI 提示词，直接能用）<strong>③ 实战群</strong>（每月答疑 + 每周更新 + 群友互助）。三问帮你「想清楚」，四栏帮你「落得下」；买的不只是方法，是圈子。</p>
             <ul>
-              <li><strong>方法手册 PDF</strong>：AI 会议纪要四栏机制 + 流程审计五步 + 3 个真实现场案例（含复盘）</li>
-              <li><strong>会议闭环四栏模板</strong>：飞书 / Obsidian 复制即用，防止「讨论变决定」（免费区只给三问，这里给完整闭环）</li>
-              <li><strong>会后复查清单</strong>：5 分钟核对，确保每件事都有负责人和截止时间</li>
-              <li><strong>「AI 管理现场·实战群」（企业微信群）</strong>：每月 1 次集中答疑 + 每周 1 条实战更新 + 群友互助</li>
+              <li><strong>① 一次自检结果解读</strong>：把刚才自检的结论变成一页本周行动清单——最该改哪件、怎么改、7 天怎么验证（个性化，AI 给不了）</li>
+              <li><strong>② 会议四栏完整方法（含 AI 提示词，直接能用）</strong>：四栏机制 + 流程审计五步 + 3 个真实现场案例（含复盘）+ 可复制 AI 提示词 + 四栏模板（复制即用）+ 会后复查清单</li>
+              <li><strong>③ 「AI 管理现场·实战群」（企业微信群）</strong>：每月 1 次集中答疑 + 每周 1 条实战更新 + 群友互助——有人一起跑</li>
             </ul>
             <div class="pay-row">
-              <span class="pay-price">¥29 <small>一次买断 · 微信付款 · 24 小时内人工核对发货</small></span>
+              <span class="pay-price">¥29 <small>当前首发价 · 满 50 人涨至 ¥39 · 微信付款 · 24 小时内人工核对发货</small></span>
             </div>
             <p class="pay-qr-guide">微信扫一扫 → 先扫「收款码」付款，再扫「公众号码」关注（悬停或点击图片可放大）</p>
             <div class="pay-qr-row">
               <div class="pay-qr-item pay-main"><img src="/pay-qr.png" alt="微信收款二维码" /><span>微信扫码付款 ¥29<br/>付款后留言「完整工具包」</span></div>
               <div class="pay-qr-item pay-sub"><img src="/gongzhonghao-qr-card.png" alt="公众号二维码" /><span>或关注公众号<br/>菜单「完整工具包」</span></div>
             </div>
-            <p class="pay-note">付款后把截图发给公众号/微信，24 小时内人工核对发货（发货时同步邀请进群）。免费入门包解决「知道方向」，完整工具包解决「拿到方法」——如果你要的是可直接用的全套交付物，这里才是完整的那一份。</p>
+            <p class="pay-note">付款后把截图发给公众号/微信，24 小时内人工核对发货（发货时同步邀请进群）。🛡️ <strong>7 天内按方法跑一次真实会议，觉得不值全额退</strong>——买的是验证，不是盲盒。首发价 ¥29，满 50 人涨至 ¥39，越早买越便宜。</p>
           </div>
 
           <!-- Skill 专区（公众号阅读原文落地可见入口） -->
@@ -395,7 +394,21 @@
   (function () {
     var state = { sel1: '', sel2: '', sel3: '', task1: '' };
 
+    // 埋点安全封装：SDK（lib/track.js）为 defer，DOMContentLoaded 前可能未就绪；失败静默不阻塞主流程
+    function trackEv(name, extra) {
+      try {
+        if (window.track) { window.track(name, extra); }
+        else {
+          window.addEventListener('DOMContentLoaded', function () { if (window.track) window.track(name, extra); });
+        }
+      } catch (e) { /* 埋点绝不阻塞 */ }
+    }
+    window.__trackEv = trackEv; // 供支付二维码等独立 IIFE 复用
+
     function qs(sel) { return document.querySelector(sel); }
+
+    // 进入自检第一步（页面加载即开始；restart 属同会话重置，不重复计 start）
+    trackEv('selfcheck_start', { step: '1' });
 
     function bindOpts(containerId, key, nextBtn) {
       var container = qs(containerId);
@@ -570,6 +583,12 @@
       renderResult(r);
       qs('#step3').style.display = 'none';
       qs('#result').classList.add('visible');
+      // 自检结果生成（漏斗中段：resultType A-E、任务长度、三项选择；匿名化）
+      trackEv('selfcheck_result', {
+        resultType: r.type,
+        taskLen: String(r.task || '').length,
+        sel: [state.sel1, state.sel2, state.sel3]
+      });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
@@ -660,6 +679,8 @@
             qs('#leadSuccessEmail').textContent = email;
             leadForm.hidden = true;
             qs('#leadSuccess').hidden = false;
+            // 线索提交成功（匿名化：不记邮箱原文，只记 hasEmail + 来源渠道）
+            trackEv('lead_submit', { hasEmail: true, source: detectSource() });
           } else {
             throw new Error(data && data.message ? data.message : '提交失败');
           }
@@ -696,6 +717,9 @@
       img.addEventListener('click', function (e) {
         e.preventDefault();
         openLb(img.currentSrc || img.src, img.alt);
+        // ¥29 付费区点击（paybox 二维码：付款码/公众号码；匿名化，不阻塞）
+        var which = (img.closest && img.closest('.pay-main')) ? 'pay' : ((img.closest && img.closest('.pay-sub')) ? 'wechat' : 'qr');
+        if (window.__trackEv) window.__trackEv('pay_click', { where: 'qr', which: which });
       });
     });
     lb.addEventListener('click', closeLb);
