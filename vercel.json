@@ -11,6 +11,10 @@
       "destination": "/api/lead"
     },
     {
+      "source": "/api/publish",
+      "destination": "/api/lead"
+    },
+    {
       "source": "/api/admin/feedback",
       "destination": "/api/admin/skills?__fb=1"
     },
