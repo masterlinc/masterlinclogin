@@ -376,6 +376,29 @@
   })();
   </script>
 
+  <!-- 首页产品卡点击（product_click，漏斗入口归因；失败静默不影响页面） -->
+  <script>
+  (function () {
+    document.addEventListener('click', function (e) {
+      var card = e.target && e.target.closest ? e.target.closest('.product-card') : null;
+      if (!card) return;
+      var link = e.target.closest('a[href], button');
+      if (!link) return;
+      var h3 = card.querySelector('h3');
+      var title = (h3 && h3.textContent || '').trim().slice(0, 60);
+      try {
+        if (window.track) {
+          window.track('product_click', {
+            where: 'home-card',
+            title: title,
+            to: (link.getAttribute('href') || '').slice(0, 120)
+          });
+        }
+      } catch (err) { /* 埋点不阻塞 */ }
+    });
+  })();
+  </script>
+
   <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
   <script src="/lib/track.js" defer onerror="this.remove()"></script>
   <!-- 用户反馈弹层（全站入口，v1.24.0；失败静默不影响页面） -->
