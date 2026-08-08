@@ -1146,3 +1146,222 @@ button.button { font-family: inherit; letter-spacing: inherit; }
   .hook-panel-text { align-items: center; }
   .hook-nav-panel { right: max(18px, calc((100vw - 340px) / 2)); }
 }
+
+/* ===== 产品下拉导航（v1.28.0 · 凌设视觉规范） ===== */
+.nav-drop {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;          /* 触控 ≥44 与 nav-links 对齐 */
+}
+/* 透明桥接：盖住 toggle 与面板之间的间隙，hover 不闪烁 */
+.nav-drop::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: -8px;
+  right: -8px;
+  height: 12px;
+}
+.nav-drop-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+.nav-drop-toggle:hover { color: var(--white); }
+.nav-drop-toggle .caret {
+  font-size: 10px;
+  transition: transform 150ms ease;
+}
+.nav-drop.open .nav-drop-toggle .caret { transform: rotate(180deg); }
+.nav-drop-toggle[aria-current="page"] {
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--white);
+}
+.nav-drop-toggle:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+.nav-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  width: min(660px, calc(100vw - 40px));
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 150ms ease, transform 150ms ease, visibility 150ms;
+  z-index: 70;
+}
+.nav-drop:hover .nav-dropdown,
+.nav-drop.open .nav-dropdown,
+.nav-drop:focus-within .nav-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.drop-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+.drop-col { min-width: 0; }
+.drop-group-label {
+  margin: 4px 10px 2px;
+  padding: 6px 0 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.drop-group { padding-bottom: 6px; }
+.drop-group + .drop-group { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 2px; }
+.drop-item {
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  transition: background 150ms ease;
+}
+.drop-item:hover { background: var(--surface-2); }
+.drop-ico {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 18px;
+}
+.drop-name { display: block; font-size: 14px; font-weight: 700; color: var(--white); }
+.drop-desc { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+.drop-arrow { color: var(--muted); font-size: 14px; transition: transform 150ms ease; }
+.drop-item:hover .drop-arrow { transform: translateX(3px); }
+/* 当前产品页：下拉内该项延续 aria-current 下划线语言 */
+.drop-item[aria-current="page"] .drop-name {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 2px;
+  text-decoration-color: var(--white);
+}
+.drop-all {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 6px;
+  padding: 12px 10px 8px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white);
+}
+.drop-all:hover { color: var(--muted); }
+
+/* 移动端 ≤900px：点击展开全宽浮层（禁 hover 打开，防 touch sticky） */
+@media (max-width: 900px) {
+  .nav-drop { min-height: 44px; }
+  .nav-drop::before { display: none; }
+  .nav-drop-toggle { font-size: 13px; }
+  .nav-dropdown {
+    position: fixed;
+    top: 76px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    transform: translateY(-6px);
+    max-height: calc(100dvh - 76px - 12px);
+    overflow-y: auto;
+    border-radius: 0 0 16px 16px;
+    border-inline: none;
+    border-top: none;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+  }
+  .nav-drop:hover .nav-dropdown,
+  .nav-drop:focus-within .nav-dropdown {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-6px);
+  }
+  .nav-drop.open .nav-dropdown {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .drop-cols { display: block; }
+  .drop-group + .drop-group { border-top: 1px solid var(--line); }
+  .drop-item { min-height: 44px; padding: 9px 10px; }
+  .drop-ico { width: 32px; height: 32px; border-radius: 8px; font-size: 15px; }
+  .drop-arrow { font-size: 15px; }
+  .drop-all { padding: 14px 12px 12px; min-height: 44px; }
+}
+@media (max-width: 640px) {
+  .nav-dropdown { top: 66px; max-height: calc(100dvh - 66px - 12px); }
+}
+
+/* ===== 产品介绍页模板（v1.28.0 · 凌设视觉规范） ===== */
+.pp-head { max-width: 760px; margin: 0 auto 64px; text-align: left; }
+.pp-kicker { margin: 0 0 20px; color: var(--muted); font-size: 12px; font-weight: 600; letter-spacing: 0.42em; text-transform: uppercase; }
+.pp-title { margin: 0; font-size: clamp(40px, 5.5vw, 64px); font-weight: 650; letter-spacing: -0.05em; line-height: 1.1; }
+.pp-sub { max-width: 640px; margin: 22px 0 0; color: var(--muted); font-size: 17px; line-height: 1.75; }
+.pp-meta { margin: 26px 0 0; display: flex; flex-wrap: wrap; gap: 8px 18px; color: var(--muted); font-size: 13px; }
+.pp-meta strong { color: var(--white); font-weight: 700; }
+
+.pp-value-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 0 0 28px; }
+.pp-value-card { border: 1px solid var(--line); border-radius: 16px; background: var(--surface); padding: 30px 28px; }
+.pp-value-card h2 { margin: 0 0 10px; font-size: 18px; font-weight: 700; }
+.pp-value-card p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+
+.pp-deliver { border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, #101010 0%, #0b0b0b 100%); padding: 30px 28px; margin: 0 0 28px; }
+.pp-deliver h2 { margin: 0 0 6px; font-size: 18px; font-weight: 700; }
+.pp-deliver-sub { margin: 0 0 18px; color: var(--muted); font-size: 14px; }
+.pp-deliver ul { list-style: none; margin: 0; padding: 0; }
+.pp-deliver li { position: relative; padding: 8px 0 8px 26px; color: #d9d9d6; font-size: 15px; line-height: 1.65; }
+.pp-deliver li::before { content: "✓"; position: absolute; left: 0; color: var(--white); font-weight: 700; }
+.pp-deliver li strong { color: var(--white); }
+
+.pp-price-box { margin: 0 0 28px; border: 1px solid #3a3a38; border-radius: 16px; background: linear-gradient(180deg, #101010 0%, #0b0b0b 100%); padding: 30px 28px; }
+.pp-price { font-size: 34px; font-weight: 800; line-height: 1; }
+.pp-price small { display: block; margin-top: 8px; font-size: 13px; font-weight: 400; color: var(--muted); }
+.pp-price-note { margin: 14px 0 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+.pp-cta { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin: 0 0 28px; }
+.pp-cta .button-light { min-width: 240px; }
+.pp-cta-note { margin: 0; color: var(--muted); font-size: 13px; }
+
+.pp-faq { max-width: 700px; margin: 0 0 28px; }
+.pp-faq h2 { font-size: 18px; font-weight: 700; margin: 0 0 14px; }
+.pp-faq details { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-bottom: 10px; }
+.pp-faq summary { padding: 16px 18px; font-size: 15px; font-weight: 700; cursor: pointer; list-style: none; }
+.pp-faq summary::after { content: "+"; float: right; color: var(--muted); }
+.pp-faq details[open] summary::after { content: "–"; }
+.pp-faq details p { margin: 0; padding: 0 18px 16px; color: var(--muted); font-size: 14px; line-height: 1.75; }
+.pp-faq summary:focus-visible { outline: 2px solid var(--white); outline-offset: -2px; }
+
+@media (max-width: 640px) {
+  .pp-head { margin-bottom: 44px; }
+  .pp-value-grid { grid-template-columns: 1fr; gap: 14px; }
+  .pp-deliver, .pp-price-box { padding: 22px 20px; }
+}

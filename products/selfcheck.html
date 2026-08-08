@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#050505" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="canonical" href="https://www.masterlinc.com/products/selfcheck.html" />
-  <link rel="stylesheet" href="/globals.css?v=20260807-2" />
+  <link rel="stylesheet" href="/globals.css?v=20260808-1" />
 
   <meta property="og:title" content="管理者 AI 自检 · MASTER LINC" />
   <meta property="og:description" content="10 分钟找出你第一件最该 AI 改的工作。" />
@@ -165,10 +165,60 @@
     <a class="wordmark" href="/#top" aria-label="MASTER LINC 首页"><img class="wordmark-logo" src="/logo-masterlinc.png" alt="MASTER LINC" width="38" height="38" /></a>
     <div class="nav-links">
       <a href="/#start">从这里开始</a>
-      <a class="nav-key" href="/products/" aria-current="page">产品与工具</a>
+      <div class="nav-drop" data-nav-drop>
+        <button type="button" class="nav-drop-toggle" aria-haspopup="menu" aria-expanded="false" aria-controls="productsMenu" aria-current="page">产品 <span class="caret" aria-hidden="true">▾</span></button>
+        <div class="nav-dropdown" id="productsMenu" role="menu">
+          <div class="drop-cols">
+            <div class="drop-col">
+              <div class="drop-group">
+                <p class="drop-group-label">免费工具</p>
+                <a class="drop-item" href="/products/selfcheck.html" aria-current="page">
+                  <span class="drop-ico" aria-hidden="true">🧭</span>
+                  <span><span class="drop-name">管理者 AI 自检</span><span class="drop-desc">10 分钟口述三件事，找出最该交给 AI 的那一件。免费</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="drop-item" href="/products/selfcheck.html">
+                  <span class="drop-ico" aria-hidden="true">📦</span>
+                  <span><span class="drop-name">免费领《起步包》</span><span class="drop-desc">自检结论带回家：行动卡 + 会前三问 + 7 天验证表。0 元</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="drop-item" href="/skills/">
+                  <span class="drop-ico" aria-hidden="true">🎴</span>
+                  <span><span class="drop-name">Skill 专区</span><span class="drop-desc">22 年管理现场沉淀的方法卡，全部免费</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+            <div class="drop-col">
+              <div class="drop-group">
+                <p class="drop-group-label">解决方案</p>
+                <a class="drop-item" href="/products/toolkit-29.html">
+                  <span class="drop-ico" aria-hidden="true">🧰</span>
+                  <span><span class="drop-name">完整工具包 + 实战群</span><span class="drop-desc">¥29 三问想清楚，四栏落得下，进实战群一起跑</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+                <a class="drop-item" href="/products/transition-os.html">
+                  <span class="drop-ico" aria-hidden="true">🌱</span>
+                  <span><span class="drop-name">AI 管理·转型驾驶舱</span><span class="drop-desc">不辞职也能转型，每天 15 分钟，资产自己长出来</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
+              <div class="drop-group">
+                <p class="drop-group-label">服务</p>
+                <a class="drop-item" href="/products/coaching.html">
+                  <span class="drop-ico" aria-hidden="true">🤝</span>
+                  <span><span class="drop-name">一对一诊断 / 转型陪跑</span><span class="drop-desc">自检告诉你方向，陪跑看着你改。先免费聊 5 分钟</span></span>
+                  <span class="drop-arrow" aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <a class="drop-all" href="/products/">查看全部产品 <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
       <a href="/#letters">现场笔记</a>
-      <a class="nav-key" href="/skills/">Skill 专区</a>
-      <a class="nav-key" href="/products/selfcheck.html">自检</a>
+      <a href="/skills/">Skill 专区</a>
+      <a href="/products/selfcheck.html">自检</a>
       <a href="/#about">关于</a>
       <button type="button" class="nav-cta" data-hook-cta aria-expanded="false" aria-controls="navConsultPanel">免费咨询</button>
       <a class="lang-switch lang-switch--zh" href="/en/products/selfcheck.html" lang="en">EN</a>
@@ -660,6 +710,8 @@
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLb(); });
   })();
   </script>
+  <!-- 产品下拉导航（v1.28.0） -->
+  <script src="/lib/nav-drop.js" defer></script>
   <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
   <script src="/lib/track.js" defer onerror="this.remove()"></script>
   <!-- 用户反馈弹层（全站入口，v1.24.0；失败静默不影响页面） -->
