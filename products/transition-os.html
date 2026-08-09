@@ -563,7 +563,7 @@
       <div class="brand">
         <a class="brand-mark" href="/#top" aria-label="返回 masterlinc.com 主页" title="返回主页">◤</a>
         <div>
-          <div class="brand-name">AI 管理·转型驾驶舱<span class="plan-badge" id="planBadge">免费版</span></div>
+          <div class="brand-name">AI 管理·转型驾驶舱<span class="plan-badge" id="planBadge">免费体验</span></div>
           <div class="brand-sub">Transition Cockpit</div>
         </div>
       </div>
@@ -1898,7 +1898,7 @@
     h += '<div class="k-title">' + esc(k.title) + '</div>';
     h += '<div class="k-author">' + esc(k.author) + ' · ' + minutes + ' · ' + learnThemeName(k.theme) + '</div>';
     if (locked) {
-      h += '<div class="k-lock-box"><span><b>🔒 Pro 权益</b> · 完整知识库与 L2/L3 路径升级后解锁</span>';
+      h += '<div class="k-lock-box"><span><b>🔒 Pro 权益</b> · 完整知识库与 L2/L3 路径订阅开放后解锁</span>';
       h += '<button class="btn-ghost btn btn-sm" data-action="goto-settings">看看 Pro</button></div>';
     } else {
       h += '<div class="k-summary">' + esc(k.summary) + '</div>';
@@ -1932,7 +1932,7 @@
 
     // 学习路径切换
     var pathDefs = [
-      { lv: 1, name: 'L1 认知入门', desc: '免费全开放' },
+      { lv: 1, name: 'L1 认知入门', desc: '免费体验' },
       { lv: 2, name: 'L2 方法实践', desc: pro ? '已解锁' : 'Pro 解锁' },
       { lv: 3, name: 'L3 体系化', desc: pro ? '已解锁' : 'Pro 解锁' }
     ];
@@ -1951,7 +1951,7 @@
       (curLevel === 2 ? ' · 转成资产/证据 ' + learnConvertedCount() + ' / 3 条后挑战 L3' : '') +
       '</div>';
     if (levelLocked) {
-      h += '<div class="learn-tip"><b>🔒 L' + curLevel + ' 为 Pro 权益</b>：完整知识库与进阶学习路径升级后解锁。L1 免费完整可用，先把认知入门学完。</div>';
+      h += '<div class="learn-tip"><b>🔒 L' + curLevel + ' 为 Pro 权益</b>：完整知识库与进阶学习路径订阅开放后解锁。L1 免费体验，先把认知入门学完。</div>';
     }
 
     // 筛选：主题 / 导师 / 类型
@@ -2374,7 +2374,7 @@
     h += '<p class="privacy-note">📄 个保法声明：本邮箱仅用于「防丢失、后续恢复/升级账号」，不用于营销。填写即视为同意；你可随时清空本输入框删除邮箱，或在下方重置全部数据彻底删除。' +
       (db.user.privacy && db.user.privacy.agreedAt ? '<br>✅ 已同意隐私声明：' + db.user.privacy.agreedAt.slice(0, 10) : '') + '</p></div>';
     // v1.18.0：设备码对用户隐藏——数据标识由系统自动生成并用于云端恢复，无需用户记忆/复制/输入
-    h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费版') + '</span></div></div>';
+    h += '<div class="field"><label class="field-label">当前版本</label><div><span class="plan-chip' + (isPro() ? ' pro' : '') + '"><span class="dot"></span>' + (isPro() ? '已解锁 Pro' : '免费体验') + '</span></div></div>';
     h += '<div style="margin-top:14px;border-top:1px solid var(--line-soft);padding-top:12px;"><div style="font-size:13px;font-weight:650;margin-bottom:6px;">🔒 你的数据属于你</div>';
     h += '<p class="privacy-note">所有记录默认只保存在本设备浏览器中；开启自动备份后，会以匿名方式（仅一组随机数据标识，用于区分设备）安全保存到云端，仅用于防丢失，不做任何其他用途。昵称与邮箱会随匿名备份上传（防丢失用途）。</p>';
     h += '<p class="privacy-note" style="margin-top:6px;">你可以随时：导出数据报告（查看 / 带走全部产出）、导出 JSON 备份（完整备份用于恢复）、从云端恢复、重置全部数据（彻底清除本设备数据）。</p>';
@@ -2383,7 +2383,7 @@
     h += '</div>';
     h += '</div>';
 
-    // 阶段一：升级 Pro（闸门纪律：验证期不公开报价；免费版完整可用，Pro 敬请期待）
+    // 阶段一：升级 Pro（闸门纪律：验证期不公开报价；免费体验完整可用，Pro 订阅待开放）
     h += '<div class="card' + (isPro() ? ' pro-card' : '') + '"><div class="card-title">' + (isPro() ? '⭐ 已解锁 Pro' : 'Pro 版本') + '</div>';
     if (isPro()) {
       h += '<p class="pro-ok">✓ 已解锁 Pro</p>';
@@ -2392,8 +2392,8 @@
       if (db.user.planNote) h += '<p class="privacy-note">解锁备注：' + esc(db.user.planNote) + '</p>';
     } else {
       // 免费用户：不展示价格 / 收款码 / 付款流程 / 解锁码（闸门未过前不公开报价）
-      h += '<p class="card-sub" style="margin-bottom:8px;">核心循环（红黄绿日 / 今日动作 / 记录 / 母线 / 复盘）永远免费。</p>';
-      h += '<p class="pro-coming">🛠 Pro 版本建设中 · 敬请期待</p>';
+      h += '<p class="card-sub" style="margin-bottom:8px;">核心循环（看板 / 今日 / 记录 / 母线 / 复盘 / 学习）免费体验，无需付费。</p>';
+      h += '<p class="pro-coming">🔒 Pro 订阅待开放 · 北极星闸门通过后开放</p>';
     }
     h += '</div>';
 
@@ -3092,7 +3092,7 @@
     $id('topDate').textContent = prettyDate(todayStr) + ' · ' + (db.mainline ? '母线 ' + Math.max(0, diffDays(todayStr, addDays(db.mainline.startDate, MAINLINE_DAYS))) + ' 天' : '未设母线');
     var badge = $id('planBadge');
     if (badge) {
-      badge.textContent = isPro() ? 'Pro' : '免费版';
+      badge.textContent = isPro() ? 'Pro' : '免费体验';
       badge.classList.toggle('pro', isPro());
     }
     if (route === 'dashboard') renderDashboard();
