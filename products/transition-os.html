@@ -595,7 +595,6 @@
       <button class="tab" data-route="review"><span class="tab-ico">▦</span><span class="tab-label">复盘</span></button>
       <button class="tab" data-route="learn"><span class="tab-ico">✦</span><span class="tab-label">学习</span></button>
       <button class="tab" data-route="settings"><span class="tab-ico">⚙</span><span class="tab-label">设置</span></button>
-      <button class="tab" data-route="publish"><span class="tab-ico">📮</span><span class="tab-label">发布</span></button>
     </div>
     <div class="safe-bottom"></div>
   </nav>
@@ -646,10 +645,25 @@
       meta: { lastExportAt: null, backupDismissDate: null, profileTipDismissDate: null, shownWelcomeIds: [], createdAt: nowISO() }
     };
   }
+  // v1.31.0：自测残留兜底清理（P0 信任修复）。masterlinc 自测曾以「线上验证」昵称、
+  // prod-check@example.com 邮箱、含「含逗号/换行母线」等测试母线名留下 localStorage 数据，
+  // 若被复用/演示会暴露给访客。检测到明确测试特征 → 重置为干净空库（清空后为未设母线空状态）。
+  function isTestResidue(d) {
+    if (!d || !d.user) return false;
+    var nick = (d.user.nickname || '').trim();
+    var email = (d.user.email || '').trim();
+    if (nick === '线上验证') return true;
+    if (email.indexOf('prod-check') >= 0) return true;
+    if (d.mainline && d.mainline.name) {
+      var mn = d.mainline.name;
+      if (mn.indexOf('线上验证') >= 0 || mn.indexOf('含逗号') >= 0 || mn.indexOf('换行母线') >= 0) return true;
+    }
+    return false;
+  }
   function load() {
     try {
       var raw = localStorage.getItem(LS_KEY);
-      if (raw) { var d = JSON.parse(raw); if (d && d.user) return normalize(d); }
+      if (raw) { var d = JSON.parse(raw); if (d && d.user) { d = normalize(d); if (isTestResidue(d)) { d = emptyDB(); save(d); } return d; } }
     } catch (e) {}
     var d = emptyDB();
     save(d);
@@ -3073,7 +3087,8 @@
   }
 
   /* ================= 路由与渲染 ================= */
-  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'learn', 'settings', 'publish'];
+  var ROUTES = ['dashboard', 'today', 'records', 'mainline', 'review', 'learn', 'settings'];
+  // v1.31.0：发布工作台（内部工具）从驾驶舱 Tab 栏移除，对访客隐藏入口；renderPublish 代码保留（内部使用）。
   function currentRoute() {
     var h = location.hash.replace(/^#\/?/, '');
     return ROUTES.indexOf(h) >= 0 ? h : 'today';
@@ -3102,7 +3117,6 @@
     else if (route === 'review') renderReview();
     else if (route === 'learn') renderLearn();
     else if (route === 'settings') renderSettings();
-    else if (route === 'publish') renderPublish();
     window.scrollTo({ top: 0 });
   }
 
@@ -3335,6 +3349,20 @@
 
   render();
   mountOnboarding(); // v1.17.0：启动时判定首次引导（新用户完整 3 屏 / 老用户轻量补填）
+
+  // v1.31.0：驾驶舱进入埋点（测量补强 M2，系统层可测）。track SDK 为 defer 加载，
+  // DOMContentLoaded 时必已就绪；只首屏触发一次，Tab 切换不重复埋（最小化）。
+  function fireTransitionEnter() {
+    try {
+      if (!window.track) return;
+      window.track('transition_enter', { where: 'page', source: (document.referrer || '').slice(0, 200) || 'direct' });
+    } catch (e) { /* 埋点失败静默，不影响功能 */ }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fireTransitionEnter);
+  } else {
+    fireTransitionEnter();
+  }
 })();
 </script>
   <!-- 匿名埋点 SDK（page_view / skill_download / lead_submit / skill_pack_submit → /api/track；失败静默不影响页面） -->
