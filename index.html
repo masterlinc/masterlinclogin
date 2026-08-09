@@ -123,7 +123,7 @@
         变成可检查、可复用的 AI 工作流。
       </p>
       <div class="hero-actions">
-        <a class="button button-light" href="/products/selfcheck.html">开始 3 分钟自检 <span aria-hidden="true">↘</span></a>
+        <a class="button button-light" href="/products/selfcheck.html" data-hero-cta="1">开始 3 分钟自检 <span aria-hidden="true">↘</span></a>
         <a class="text-link" href="#letters">先读一篇现场笔记 <span aria-hidden="true">→</span></a>
       </div>
       <p class="hero-promise">不注册 · 不留邮箱 · 马上得到你的 AI 减负处方</p>
@@ -260,6 +260,20 @@
         }
       } catch (err) { /* 埋点不阻塞 */ }
     });
+    // v1.31.0 测量补强：Hero 主 CTA 独立点击事件（home_cta_click）
+    var heroCta = document.querySelector('[data-hero-cta]');
+    if (heroCta) {
+      heroCta.addEventListener('click', function () {
+        try {
+          if (window.track) {
+            window.track('home_cta_click', {
+              where: 'hero',
+              target: '/products/selfcheck.html'
+            });
+          }
+        } catch (err) { /* 埋点不阻塞 */ }
+      });
+    }
   })();
   </script>
 
