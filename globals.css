@@ -262,6 +262,43 @@ img { display: block; width: 100%; }
   letter-spacing: 0.07em;
 }
 
+/* P0-1：Hero 主 CTA 承诺行（不注册 · 不留邮箱 · 马上得到处方） */
+.hero-promise {
+  margin: 16px 0 0;
+  color: #a3a3a0;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+}
+
+/* P0-1：驾驶舱降级为内容区末尾的一句话 + 链接 */
+.transition-teaser {
+  padding: 88px 0;
+  text-align: center;
+  border-top: 1px solid var(--line);
+}
+
+.transition-teaser h2 {
+  margin: 18px 0 0;
+  font-size: clamp(28px, 4vw, 44px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.transition-teaser p:not(.kicker) {
+  max-width: 620px;
+  margin: 14px auto 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.transition-teaser .text-link {
+  display: inline-flex;
+  margin-top: 22px;
+  font-size: 15px;
+}
+
 .intro {
   padding: 104px 0 66px;
   text-align: center;
