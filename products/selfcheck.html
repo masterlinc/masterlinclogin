@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>管理者 AI 自检 · 10 分钟找出第一件最该 AI 改的工作 · MASTER LINC</title>
-  <meta name="description" content="不交资料、不学提示词。花 10 分钟口述你一周最耗时的三件事，AI 帮你判断哪一件最值得用 AI 改造，并给出五步流程图。" />
+  <title>AI 减负自检 · 3 分钟找出第一件最该 AI 改的事 · MASTER LINC</title>
+  <meta name="description" content="不注册 · 不留邮箱。花 3 分钟选出你每周最耗时的 1 件事，AI 给你一句话判断 + 一个明天能做的动作，并给出五步落地路径。" />
   <meta name="robots" content="index, follow" />
   <meta name="theme-color" content="#050505" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="canonical" href="https://www.masterlinc.com/products/selfcheck.html" />
   <link rel="stylesheet" href="/globals.css?v=20260808-1" />
 
-  <meta property="og:title" content="管理者 AI 自检 · MASTER LINC" />
-  <meta property="og:description" content="10 分钟找出你第一件最该 AI 改的工作。" />
+  <meta property="og:title" content="AI 减负自检 · 3 分钟 · MASTER LINC" />
+  <meta property="og:description" content="3 分钟，找出你第一件最该 AI 改的工作。不注册 · 不留邮箱。" />
   <meta property="og:url" content="https://www.masterlinc.com/products/selfcheck.html" />
   <meta property="og:site_name" content="MASTER LINC" />
   <meta property="og:locale" content="zh_CN" />
@@ -144,6 +144,43 @@
     .lead-success p strong { color: #f4f3ef; }
     @media print { .leadbox { display: none !important; } }
 
+    /* ===== 3 分钟快检 · 进度提示 ===== */
+    .step-progress { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+    .step-progress .sp-step { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: #f4f3ef; background: rgba(244,243,239,.08); border: 1px solid #2a2a28; padding: 4px 10px; border-radius: 999px; }
+    .step-progress .sp-time { font-size: 12px; color: #a8a8a5; }
+
+    /* ===== 结果页第一屏 · 四件套 ===== */
+    .result-kicker { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: #a8a8a5; margin-bottom: 8px; }
+    .hero-verdict { padding-bottom: 22px; }
+    .hero-title { font-size: 26px; line-height: 1.4; font-weight: 800; margin-bottom: 10px; }
+    .hero-reason { font-size: 15px; line-height: 1.7; color: #d9d9d6; }
+    .type-card { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; background: #101010; border: 1px solid #2a2a28; border-radius: 14px; padding: 16px 18px; margin: 4px 0 14px; }
+    .type-badge { display: inline-block; background: #f4f3ef; color: #050505; font-size: 13px; font-weight: 800; letter-spacing: 0.02em; padding: 6px 14px; border-radius: 999px; white-space: nowrap; }
+    .type-desc { font-size: 14px; color: #a8a8a5; line-height: 1.6; margin: 0; flex: 1; min-width: 0; }
+    .time-card { background: linear-gradient(135deg, #14140f 0%, #0b0b0b 100%); border: 1px solid #3a3a38; border-radius: 14px; padding: 18px 20px; margin: 0 0 14px; }
+    .time-main { font-size: 16px; color: #d9d9d6; margin: 0 0 6px; }
+    .time-main strong { font-size: 24px; color: #f4f3ef; font-weight: 800; }
+    .time-sub { font-size: 16px; color: #d9d9d6; margin: 0; }
+    .time-sub strong { font-size: 24px; color: #f4f3ef; font-weight: 800; }
+    .action-card { display: flex; gap: 14px; align-items: flex-start; background: #101010; border-left: 3px solid #f4f3ef; border-radius: 12px; padding: 18px 20px; margin: 0 0 8px; }
+    .action-tag { flex-shrink: 0; display: inline-block; background: transparent; border: 1px solid #f4f3ef; color: #f4f3ef; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; padding: 4px 10px; border-radius: 999px; margin-top: 2px; white-space: nowrap; }
+    .action-text { font-size: 15px; line-height: 1.7; margin: 0; }
+    .action-text strong { color: #f4f3ef; }
+
+    .flow-head { margin: 30px 0 4px; padding-top: 22px; border-top: 1px solid #1a1a1a; }
+    .flow-head h3 { font-size: 17px; font-weight: 750; margin-bottom: 6px; }
+    .flow-head .result-kicker { margin-bottom: 6px; }
+
+    .hook-tag { display: inline-block; background: #f4f3ef; color: #050505; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 5px 12px; border-radius: 999px; margin-bottom: 14px; }
+
+    .lead-wechat-panel { margin: 0 0 6px; }
+    .lead-or { font-size: 12px; color: #666; text-align: center; margin: 12px 0 4px; letter-spacing: 0.1em; }
+    @media (max-width: 480px) {
+      .hero-title { font-size: 22px; }
+      .time-main strong, .time-sub strong { font-size: 20px; }
+      .type-card { flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+
     .progress { height: 3px; background: #1a1a1a; border-radius: 99px; margin: 0 0 26px; overflow: hidden; }
     .progress-fill { height: 100%; width: 33%; background: #f4f3ef; border-radius: 99px; transition: width 300ms ease; }
 
@@ -174,12 +211,12 @@
                 <p class="drop-group-label">免费工具</p>
                 <a class="drop-item" href="/products/selfcheck.html" aria-current="page">
                   <span class="drop-ico" aria-hidden="true">🧭</span>
-                  <span><span class="drop-name">管理者 AI 自检</span><span class="drop-desc">10 分钟，找出最该 AI 改的一项</span></span>
+                  <span><span class="drop-name">AI 减负自检</span><span class="drop-desc">3 分钟，找出最该 AI 改的一项</span></span>
                   <span class="drop-arrow" aria-hidden="true">→</span>
                 </a>
                 <a class="drop-item" href="/products/selfcheck.html">
                   <span class="drop-ico" aria-hidden="true">📦</span>
-                  <span><span class="drop-name">免费领《起步包》</span><span class="drop-desc">行动卡 + 会前三问 + 7 天验证表</span></span>
+                  <span><span class="drop-name">免费领《AI 减负处方》</span><span class="drop-desc">1 页行动卡 + 会前三问 + 7 天省时打卡</span></span>
                   <span class="drop-arrow" aria-hidden="true">→</span>
                 </a>
                 <a class="drop-item" href="/skills/">
@@ -212,14 +249,14 @@
       <a href="/skills/">Skill 专区</a>
       <a href="/products/selfcheck.html">自检</a>
       <a href="/#about">关于</a>
-      <button type="button" class="nav-cta" data-hook-cta aria-expanded="false" aria-controls="navConsultPanel">免费咨询</button>
+      <button type="button" class="nav-cta" data-hook-cta aria-expanded="false" aria-controls="navConsultPanel">先聊 5 分钟</button>
       <a class="lang-switch lang-switch--zh" href="/en/products/selfcheck.html" lang="en">EN</a>
     </div>
     <div class="hook-panel hook-nav-panel" id="navConsultPanel" hidden>
       <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
       <div class="hook-panel-text">
-        <strong>扫码加企业微信，免费咨询</strong>
-        <span>添加时备注「自检」，我尽快回复。免费先聊，不推销。</span>
+        <strong>先聊 5 分钟 · 每周仅 3 席</strong>
+        <span>先做 3 分钟自检，带着结果来聊：30 分钟能解决的事，不花 60 分钟。添加时备注「自检」，我尽快回复。</span>
         <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
       </div>
     </div>
@@ -228,27 +265,26 @@
   <main id="main">
     <div class="check-shell">
       <div class="check-head">
-        <p class="check-kicker">管理者 AI 自检 · 10 分钟</p>
-        <h1 class="check-title">不用交资料，不学提示词。<br />找出你第一件最该 AI 改的工作。</h1>
-        <p class="check-sub">口述你一周最耗时的 <strong>3 件事</strong>，系统按「输入 → 判断 → 输出 → 审核 → 返工」五步帮你定位：哪一件最值得用 AI 改造，改造第一步怎么走。</p>
+        <p class="check-kicker">AI 减负自检 · 3 分钟</p>
+        <h1 class="check-title">不用交资料，不学提示词。<br />3 分钟，找出你第一件最该 AI 改的事。</h1>
+        <p class="check-sub">选出你每周最耗时的 <strong>1 件事</strong>，AI 给你一句话判断 + 一个明天能做的动作，并给出五步落地路径。<br /><strong>不注册 · 不留邮箱</strong> · 做完就得到你的处方。</p>
       </div>
 
       <div class="progress no-print"><div class="progress-fill" id="progressFill"></div></div>
 
       <!-- 步骤 1 -->
       <section class="step-card" id="step1">
+        <p class="step-progress"><span class="sp-step">第 1 步 / 共 3 步</span><span class="sp-time">约 3 分钟</span></p>
         <div class="step-num">1</div>
-        <div class="step-q">最近一周，哪 3 件事最消耗你的时间？</div>
-        <div class="step-hint">只写你亲自反复做的事，不用管别人做的。例如：回微信消息、跟项目进度、写周报、跨部门对齐、做会议纪要、审方案……</div>
+        <div class="step-q">最近一周，最耗你时间的 1 件事是什么？</div>
+        <div class="step-hint">只选你亲自反复做、最烦的那一件。</div>
         <div class="opt-grid">
           <button class="opt" data-sel="消息与协调">回复消息、群里捞信息</button>
           <button class="opt" data-sel="会议与纪要">开会、整理会议纪要</button>
           <button class="opt" data-sel="汇报与周报">写周报 / 汇报材料</button>
           <button class="opt" data-sel="跟进度">跟任务进度、反复催</button>
           <button class="opt" data-sel="审方案">审方案、改文档</button>
-          <button class="opt" data-sel="其他">其他（在下面补充）</button>
         </div>
-        <textarea class="check-input" id="task1" placeholder="第 1 件：一句话描述，越具体越好（谁发起、多久一次、最烦在哪）"></textarea>
         <div class="btn-row no-print">
           <button class="btn" id="to2" disabled>下一步 →</button>
         </div>
@@ -256,14 +292,15 @@
 
       <!-- 步骤 2 -->
       <section class="step-card" id="step2" style="display:none;">
+        <p class="step-progress"><span class="sp-step">第 2 步 / 共 3 步</span><span class="sp-time">约 3 分钟</span></p>
         <div class="step-num">2</div>
         <div class="step-q">这件事，最让你头疼的是哪一部分？</div>
         <div class="step-hint">选最接近的。它会决定 AI 能不能帮上忙、该不该外包。</div>
         <div class="opt-grid">
-          <button class="opt" data-sel="重复搬运">重复搬运：复制、整理、填表、转格式</button>
-          <button class="opt" data-sel="规则判断">规则判断：按既定标准筛选、分类、汇总</button>
-          <button class="opt" data-sel="经验判断">经验判断：需要靠经验拿主意、定方向</button>
-          <button class="opt" data-sel="沟通协调">沟通协调：要人配合、跨部门推、催</button>
+          <button class="opt" data-sel="重复搬运">重复搬运：复制、整理、填表</button>
+          <button class="opt" data-sel="规则判断">规则判断：按标准筛选、分类</button>
+          <button class="opt" data-sel="经验判断">经验判断：靠经验拿主意、定方向</button>
+          <button class="opt" data-sel="沟通协调">沟通协调：要人配合、跨部门推</button>
           <button class="opt" data-sel="不确认">不好说 / 我没想过</button>
         </div>
         <div class="btn-row no-print">
@@ -274,14 +311,15 @@
 
       <!-- 步骤 3 -->
       <section class="step-card" id="step3" style="display:none;">
+        <p class="step-progress"><span class="sp-step">第 3 步 / 共 3 步</span><span class="sp-time">约 3 分钟</span></p>
         <div class="step-num">3</div>
         <div class="step-q">如果交给 AI，你担心什么？</div>
         <div class="step-hint">没有对错。它决定风险边界怎么画。</div>
         <div class="opt-grid">
-          <button class="opt" data-sel="数据安全">数据安全：涉及人名、金额、内部决策</button>
+          <button class="opt" data-sel="数据安全">数据安全：人名、金额、内部决策</button>
           <button class="opt" data-sel="质量不可靠">质量不可靠：怕 AI 出错、漏关键</button>
-          <button class="opt" data-sel="责任归属">责任归属：出了错谁负责、谁审核</button>
-          <button class="opt" data-sel="不会用">不会用：不知道从哪开始、嫌麻烦</button>
+          <button class="opt" data-sel="责任归属">责任归属：出了错谁负责</button>
+          <button class="opt" data-sel="不会用">不会用：不知道从哪开始</button>
           <button class="opt" data-sel="不太担心">其实不太担心</button>
         </div>
         <div class="btn-row no-print">
@@ -293,37 +331,49 @@
       <!-- 结果 -->
       <div class="result-wrap" id="result">
         <div class="result-box">
-          <span class="result-badge">自检结果</span>
-          <h2 class="result-title" id="resultTitle">你最该先改的，可能是：</h2>
-          <p class="result-sel" id="resultSel"></p>
-
-          <div class="verdict" id="verdictBox">
-            <div class="verdict-label">判断</div>
-            <div class="verdict-text" id="verdictText"></div>
+          <!-- 第一屏 · 四件套（固定顺序） -->
+          <div class="hero-verdict" id="heroVerdict">
+            <p class="result-kicker">你的 AI 减负自检结果</p>
+            <h2 class="hero-title" id="heroTitle"></h2>
+            <p class="hero-reason" id="heroReason"></p>
           </div>
 
+          <div class="type-card" id="typeCard">
+            <span class="type-badge" id="typeBadge"></span>
+            <p class="type-desc" id="typeDesc"></p>
+          </div>
+
+          <div class="time-card" id="timeCard">
+            <p class="time-main">你每周在这件事上花 <strong id="timeHours"></strong></p>
+            <p class="time-sub">一年 ≈ <strong id="timeDays"></strong></p>
+          </div>
+
+          <div class="action-card" id="actionCard">
+            <span class="action-tag">明天就做</span>
+            <p class="action-text" id="actionText"></p>
+          </div>
+
+          <!-- 第二屏 · 五步落地路径 -->
+          <div class="flow-head no-print">
+            <p class="result-kicker">下一步 · 你的 AI 减负路径</p>
+            <h3>5 步把这件事跑起来</h3>
+          </div>
           <div class="flow" id="flowBox"></div>
 
-          <div class="hook no-print">
-            <h3>自检只是第一步</h3>
-            <p>工具给的是方向，真正的价值是把这件「最该 AI 改的事」跑起来：输入从哪来、谁审核、哪一步最容易返工、7 天后怎么验证。</p>
-            <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">免费 AI 管理咨询：画出一项高频工作的现状流程 →</button>
-            <div class="hook-panel" id="diagPanel" hidden>
-              <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
-              <div class="hook-panel-text">
-                <strong>扫码加企业微信，免费 AI 管理咨询</strong>
-                <span>一起画出一项高频工作的现状流程，找出重复、等待、返工和责任模糊的位置，再决定最小试跑动作。添加时备注「自检」，我来安排时间。</span>
-                <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- 免费入门包 · 线索捕获 -->
+          <!-- 免费起步包 · AI 减负处方（改名 + 微信/邮箱双通道） -->
           <div class="leadbox no-print" id="leadbox">
             <span class="leadbox-tag">免费领取</span>
-            <h3>把这份自检结果带走：免费领《自检结果入门包》</h3>
-            <p class="lead-intro">留下邮箱，免费领取《自检结果入门包》：<strong>① 你的自检结果行动卡</strong>（基于刚才的自检输出，个性化、可打印）+ <strong>② 会前三问清单</strong>（引导思考，不含完整模板）+ <strong>③ 7 天验证表</strong>（跟踪第一步落地）。不发广告，随时退订。</p>
-            <p class="lead-boundary">免费入门包解决「知道方向」；完整方法手册与会议四栏模板在下方 ¥29 完整工具包里。</p>
+            <h3>把这份处方带走：《AI 减负处方》</h3>
+            <p class="lead-intro">不是资料包，是你明天就能用的东西：<strong>① 明天开会就能用的 3 个问题</strong> + <strong>② 7 天省时打卡表</strong>。选一个通道，马上带走。</p>
+            <div class="hook-panel lead-wechat-panel">
+              <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+              <div class="hook-panel-text">
+                <strong>扫码微信直接领</strong>
+                <span>加微信备注「处方」，自动回复 2 个文件，即扫即得，不用等邮件。</span>
+              </div>
+            </div>
+            <p class="lead-or">或留邮箱，马上发</p>
+            <p class="lead-boundary">免费处方解决「明天能用」；完整模板 + 实战群在下方 AI 减负工具包里。</p>
             <form id="leadForm" novalidate>
               <label class="lead-label" for="leadEmail">邮箱 <span class="req">*</span></label>
               <input class="check-input lead-input" type="email" id="leadEmail" name="email" placeholder="you@example.com" autocomplete="email" required />
@@ -335,22 +385,22 @@
               </label>
               <div class="lead-error" id="leadError" role="alert" hidden></div>
               <div class="btn-row">
-                <button class="btn" type="submit" id="leadSubmit">免费领入门包 →</button>
+                <button class="btn" type="submit" id="leadSubmit">免费领《AI 减负处方》 →</button>
               </div>
             </form>
             <div class="lead-success" id="leadSuccess" hidden>
               <div class="lead-success-icon">✓</div>
-              <h3>入门包马上发到你的邮箱</h3>
-              <p>我们会在 <strong>24 小时内</strong>把《自检结果入门包》（行动卡 + 会前三问 + 7 天验证表）发到 <strong id="leadSuccessEmail"></strong>。若没收到，回复任意邮件即可联系我们。</p>
+              <h3>处方马上发到你的邮箱</h3>
+              <p>我们会在 <strong>24 小时内</strong>把《AI 减负处方》（3 个问题 + 7 天省时打卡表）发到 <strong id="leadSuccessEmail"></strong>。若没收到，回复任意邮件即可联系我们。</p>
             </div>
           </div>
 
           <div class="paybox no-print">
-            <span class="paybox-tag">完整工具包 · ¥29</span>
-            <h3>完整工具包 ¥29：从入门到完整落地</h3>
-            <p class="pay-sub">免费入门包给方向，完整工具包给结果——<strong>① 你的自检结果解读</strong>（一页本周行动清单）<strong>② 会议四栏完整方法</strong>（含 AI 提示词，直接能用）<strong>③ 实战群</strong>（每月答疑 + 每周更新 + 群友互助）。三问帮你「想清楚」，四栏帮你「落得下」；买的不只是方法，是圈子。</p>
+            <span class="paybox-tag">AI 减负工具包 · ¥29</span>
+            <h3>AI 减负工具包 ¥29：把处方变成整套可复制的方法</h3>
+            <p class="pay-sub">免费处方给方向，完整工具包给结果——<strong>① 你的减负处方解读</strong>（一页本周行动清单）<strong>② 会议四栏完整方法</strong>（含 AI 提示词，直接能用）<strong>③ 实战群</strong>（每月答疑 + 每周更新 + 群友互助）。三问帮你「想清楚」，四栏帮你「落得下」；买的不只是方法，是圈子。</p>
             <ul>
-              <li><strong>① 一次自检结果解读</strong>：把刚才自检的结论变成一页本周行动清单——最该改哪件、怎么改、7 天怎么验证（个性化，AI 给不了）</li>
+              <li><strong>① 你的减负处方解读</strong>：把刚才的结论变成一页本周行动清单——最该改哪件、怎么改、7 天怎么验证（个性化，AI 给不了）</li>
               <li><strong>② 会议四栏完整方法（含 AI 提示词，直接能用）</strong>：四栏机制 + 流程审计五步 + 3 个真实现场案例（含复盘）+ 可复制 AI 提示词 + 四栏模板（复制即用）+ 会后复查清单</li>
               <li><strong>③ 「AI 管理现场·实战群」（企业微信群）</strong>：每月 1 次集中答疑 + 每周 1 条实战更新 + 群友互助——有人一起跑</li>
             </ul>
@@ -365,12 +415,20 @@
             <p class="pay-note">付款后把截图发给公众号/微信，24 小时内人工核对发货（发货时同步邀请进群）。🛡️ <strong>7 天内按方法跑一次真实会议，觉得不值全额退</strong>——买的是验证，不是盲盒。首发价 ¥29，满 50 人涨至 ¥39，越早买越便宜。</p>
           </div>
 
-          <!-- Skill 专区（公众号阅读原文落地可见入口） -->
+          <!-- 先聊 5 分钟 · 每周 3 席（结果页唯一咨询入口） -->
           <div class="hook no-print">
-            <span class="result-badge">免费 · 方法卡</span>
-            <h3>下一步：免费领 3 张 AI 管理方法卡</h3>
-            <p>22 年管理现场 × AI 工具，沉淀成能直接带走的方法卡：AI 会议纪要四栏法、AI 写周报法、管理者效率审计。全部免费，拿走就用。</p>
-            <a class="hook-cta" href="/skills/">免费拿走 3 张 AI 管理方法卡 →</a>
+            <span class="hook-tag">先聊 5 分钟 · 每周仅 3 席</span>
+            <h3>想落地？先聊 5 分钟，再决定</h3>
+            <p>你可能想问：这 3 个问题怎么用？AI 起草的纪要谁审核？我这种情况 7 天能不能见效？——带着你的自检结果来，30 分钟能解决的事，不花 60 分钟。</p>
+            <button type="button" class="hook-cta" id="diagCta" aria-expanded="false" aria-controls="diagPanel">先聊 5 分钟 · 每周仅 3 席 →</button>
+            <div class="hook-panel" id="diagPanel" hidden>
+              <img class="hook-qr-img" src="/qr-work-wechat.jpg" alt="企业微信二维码" width="140" height="140" />
+              <div class="hook-panel-text">
+                <strong>先聊 5 分钟 · 每周仅 3 席</strong>
+                <span>建议先做 3 分钟快检，带着结果来聊：30 分钟能解决的事，不花 60 分钟。添加时备注「自检」，我尽快回复。</span>
+                <span class="hook-fallback">或复制邮箱：<a href="mailto:lincyang@foxmail.com">lincyang@foxmail.com</a></span>
+              </div>
+            </div>
           </div>
         </div>
         <div class="btn-row no-print">
@@ -392,7 +450,7 @@
 
   <script>
   (function () {
-    var state = { sel1: '', sel2: '', sel3: '', task1: '' };
+    var state = { sel1: '', sel2: '', sel3: '' };
 
     // 埋点安全封装：SDK（lib/track.js）为 defer，DOMContentLoaded 前可能未就绪；失败静默不阻塞主流程
     function trackEv(name, extra) {
@@ -426,7 +484,7 @@
     bindOpts('#step2', 'sel2', '#to3');
     bindOpts('#step3', 'sel3', '#submit');
 
-    // 预约诊断：点击展开企业微信二维码（替代 mailto，移动端可靠）
+    // 先聊 5 分钟：点击展开二维码（结果页唯一咨询入口；consult_click 埋点）
     (function () {
       var cta = qs('#diagCta');
       var panel = qs('#diagPanel');
@@ -435,17 +493,13 @@
         var willShow = panel.hidden;
         panel.hidden = !willShow;
         cta.setAttribute('aria-expanded', willShow ? 'true' : 'false');
+        if (willShow) trackEv('consult_click', { where: 'result' });
       });
     })();
 
     function updateProgress(pct) {
       qs('#progressFill').style.width = pct + '%';
     }
-
-    qs('#task1').addEventListener('input', function () {
-      state.task1 = this.value.trim();
-      if (state.task1.length > 0 && state.sel1) qs('#to2').disabled = false;
-    });
 
     // 导航免费咨询：展开企业微信二维码（复用 hook-cta.js 逻辑）
     (function () {
@@ -484,16 +538,23 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
-    // 判断引擎
-    function classify() {
-      var s1 = state.sel1, s2 = state.sel2, s3 = state.sel3, t1 = state.task1;
+    // 场景字典：一句话结论 + 减负类型 + 每周耗时估算 + 明天动作
+    var SCENES = {
+      '会议与纪要': { hTitle: '【会议纪要】', reason: '它重复、有模板、且 80% 可由 AI 起草，你只需审核。', typeName: '会议型', typeDesc: '你的时间，主要被会议与纪要吃掉。', hours: 6, action: '本周三开会前，把会前三问发给 AI 试一次。' },
+      '消息与协调': { hTitle: '【消息回复与群信息】', reason: '它们高频、格式固定、且 60% 以上可由 AI 先起草初稿。', typeName: '协调型', typeDesc: '你的时间，被大量消息与来回确认吃掉。', hours: 8, action: '今天下班前，把群里最常问的 5 个问题交给 AI，生成一版标准回复。' },
+      '汇报与周报': { hTitle: '【周报与汇报材料】', reason: '它有固定结构、按模板走、且 70% 可由 AI 先起草。', typeName: '汇报型', typeDesc: '你的时间，被复盘与汇报材料吃掉。', hours: 5, action: '本周写周报时，把上周数据丢给 AI，让它先起草一版，你来改。' },
+      '跟进度': { hTitle: '【任务进度跟进】', reason: '它重复、靠催、且进度同步 80% 可由 AI 起草。', typeName: '推进型', typeDesc: '你的时间，被追进度与反复确认吃掉。', hours: 7, action: '本周跟进度前，用 AI 起草一版同步消息，把责任人、卡点写清楚再发。' },
+      '审方案': { hTitle: '【方案审阅】', reason: '它有固定清单、重复性高、且初筛 50% 可由 AI 完成。', typeName: '决策型', typeDesc: '你的时间，被审阅与决策吃掉。', hours: 4, action: '本周审方案前，让 AI 先列出 3 个选项的利弊，你只做拍板。' }
+    };
 
-      var type, title, verdict, flows, selText;
+    // 判断引擎（resultType A-E 按「最头疼在哪」；四件套按「最耗时场景」）
+    function classify() {
+      var s1 = state.sel1, s2 = state.sel2, s3 = state.sel3;
+
+      var type, flows;
 
       if (s2 === '重复搬运') {
         type = 'A';
-        title = '这件「重复搬运」的工作，最适合先交给 AI';
-        verdict = '它属于高重复、低判断、可验证的流程，是 AI 效率最高、风险最低的场景。先跑通一个，再决定要不要放大。';
         flows = [
           { h: '输入', p: '明确这项工作的原始材料从哪来：谁发起、什么格式、多久一次。' },
           { h: '步骤', p: '拆成可重复的固定步骤：整理、去重、填表、转格式……一步一个动作。' },
@@ -501,11 +562,8 @@
           { h: '审核', p: '定一个负责人和核对点：AI 产出后，由谁、花几分钟抽查。' },
           { h: '7 天后', p: '记录前后耗时和出错次数。目标：这一步从 N 分钟降到 3 分钟，且不出大错。' }
         ];
-        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
       } else if (s2 === '规则判断') {
         type = 'B';
-        title = '这件「规则判断」的工作，AI 可以帮你做初筛，人做终审';
-        verdict = '它有明确标准，可以交给 AI 按规则生成草稿，但「决定和担责」必须留给人。边界：先让 AI 给出候选，你做最后拍板。';
         flows = [
           { h: '输入', p: '把判断依据（标准、阈值、历史案例）整理成 AI 能读的上下文。' },
           { h: '步骤', p: '让 AI 按规则逐条筛：符合 / 不符合 / 存疑，三类分开。' },
@@ -513,11 +571,8 @@
           { h: '审核', p: '你只审「存疑」和「高影响」的条目，其余批量放行。' },
           { h: '7 天后', p: '统计 AI 初筛的准确率。若 >90%，可扩大范围；若常错，补规则。' }
         ];
-        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
       } else if (s2 === '经验判断') {
         type = 'C';
-        title = '这件「经验判断」的工作，AI 当参谋，你做决定';
-        verdict = '它依赖你的经验和判断力，不该直接交给 AI 做决定。正确用法：让 AI 把信息整理好、列出利弊和盲点，决策权留在你手里。';
         flows = [
           { h: '输入', p: '把背景、约束、相关数据和历史决策整理给 AI 当素材。' },
           { h: '步骤', p: '让 AI 列出选项、利弊、风险和你可能忽略的盲点，不要让它直接给结论。' },
@@ -525,11 +580,8 @@
           { h: '审核', p: '所有判断由你拍板。AI 只负责把信息摆整齐、把问题问全。' },
           { h: '7 天后', p: '复盘你最近一个决策：AI 简报有没有帮你看见盲点？哪部分它帮不上？' }
         ];
-        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
       } else if (s2 === '沟通协调') {
         type = 'D';
-        title = '这件「沟通协调」的工作，AI 能帮你准备，不能替你出面';
-        verdict = '它的问题通常不是「信息不够」，而是「责任和进度没人说得清」。AI 可以帮你整理进展、起草沟通、追踪节点，但推动人情的部分必须你自己上。';
         flows = [
           { h: '输入', p: '把相关方、当前进度、卡点和截止时间整理成一张「推进卡」。' },
           { h: '步骤', p: '让 AI 起草进展同步、会议纪要、待办清单，减少你来回写消息的时间。' },
@@ -537,11 +589,8 @@
           { h: '审核', p: '你确认信息准确后亲自发出；涉及人情和责任的判断不外包。' },
           { h: '7 天后', p: '看哪一步最常卡：是信息没同步，还是没人有权拍板？' }
         ];
-        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
       } else {
         type = 'E';
-        title = '先从「最小的一件重复事」开始验证，比想清楚更重要';
-        verdict = '还没想清楚是正常的。建议先挑一件最重复、最不涉及机密的小事，花 30 分钟让 AI 跑一遍，用真实结果代替想象。';
         flows = [
           { h: '输入', p: '挑一件「今天就能做」的小事：整理一份清单、转一段格式、生成一版草稿。' },
           { h: '步骤', p: '给它最小上下文，让它输出一版结果，不要追求一次到位。' },
@@ -549,24 +598,27 @@
           { h: '审核', p: '你亲自核对关键部分。第一次的目标是「体验」，不是「替换」。' },
           { h: '7 天后', p: '如果你对一次结果满意，再把它固化成固定工作流。' }
         ];
-        selText = '你选了：' + s1 + ' · 最头疼：' + s2 + ' · 担心：' + s3;
       }
 
-      // 风险边界补充
-      if (s3 === '数据安全') {
-        verdict += ' 注意：涉及人名、金额、内部决策时，先脱敏或只用最小样本，资料留在你控制的环境里。';
-      }
-      if (s3 === '责任归属') {
-        verdict += ' 注意：AI 只做辅助，责任和审核必须由你或团队指定的人承担。';
-      }
+      // 风险边界（并入一句话结论的补充句，保持信息不丢）
+      var risk = '';
+      if (s3 === '数据安全') risk = ' 注意：涉及人名、金额、内部决策时，先脱敏、只用最小样本。';
+      if (s3 === '责任归属') risk = ' 注意：AI 只做辅助，责任和审核留给你或指定的人。';
 
-      return { title: title, verdict: verdict, flows: flows, selText: selText, task: t1, type: type };
+      var scene = SCENES[s1] || SCENES['会议与纪要'];
+      return { type: type, flows: flows, scene: scene, risk: risk };
     }
 
     function renderResult(r) {
-      qs('#resultTitle').textContent = r.title;
-      qs('#resultSel').textContent = r.selText + (r.task ? ' · 「' + r.task + '」' : '');
-      qs('#verdictText').textContent = r.verdict;
+      var scene = r.scene;
+      var days = Math.round(scene.hours * 52 / 24);
+      qs('#heroTitle').textContent = '你，最该 AI 改的是' + scene.hTitle;
+      qs('#heroReason').textContent = scene.reason + r.risk;
+      qs('#typeBadge').textContent = '你的减负类型：『' + scene.typeName + '』';
+      qs('#typeDesc').textContent = scene.typeDesc;
+      qs('#timeHours').textContent = scene.hours + ' 小时';
+      qs('#timeDays').textContent = days + ' 个完整工作日';
+      qs('#actionText').innerHTML = '<strong>' + scene.action + '</strong>';
 
       var flowBox = qs('#flowBox');
       flowBox.innerHTML = '';
@@ -583,19 +635,18 @@
       renderResult(r);
       qs('#step3').style.display = 'none';
       qs('#result').classList.add('visible');
-      // 自检结果生成（漏斗中段：resultType A-E、任务长度、三项选择；匿名化）
+      // 自检结果生成（漏斗中段：resultType A-E、减负类型、三项选择；匿名化）
       trackEv('selfcheck_result', {
         resultType: r.type,
-        taskLen: String(r.task || '').length,
+        type: r.scene.typeName,
         sel: [state.sel1, state.sel2, state.sel3]
       });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
     qs('#restart').addEventListener('click', function () {
-      state = { sel1: '', sel2: '', sel3: '', task1: '' };
+      state = { sel1: '', sel2: '', sel3: '' };
       document.querySelectorAll('.opt').forEach(function (b) { b.classList.remove('selected'); });
-      qs('#task1').value = '';
       qs('#to2').disabled = true; qs('#to3').disabled = true; qs('#submit').disabled = true;
       qs('#result').classList.remove('visible');
       qs('#step1').style.display = 'block';
