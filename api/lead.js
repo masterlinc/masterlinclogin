@@ -978,7 +978,8 @@ async function handleFeishuNotify(req, res) {
     res.status(200).json({ ok: true, ...r });
   } catch (err) {
     console.error('[lead] feishu-notify ' + (err && err.message ? err.message : err));
-    res.status(502).json({ ok: false, message: '发送失败: ' + (err.message || '') });
+    // 返回 200 + ok:false 携带真实错误信息（Vercel 对 5xx 会吞 body，不便于排查）
+    res.status(200).json({ ok: false, error: (err && err.message) ? err.message : String(err) });
   }
 }
 
