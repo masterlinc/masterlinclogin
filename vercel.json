@@ -15,6 +15,14 @@
       "destination": "/api/lead"
     },
     {
+      "source": "/api/feishu-event",
+      "destination": "/api/lead"
+    },
+    {
+      "source": "/api/feishu-notify",
+      "destination": "/api/lead"
+    },
+    {
       "source": "/api/admin/feedback",
       "destination": "/api/admin/skills?__fb=1"
     },

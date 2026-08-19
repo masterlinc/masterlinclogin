@@ -35,6 +35,9 @@ const FEISHU_BASE = 'https://open.feishu.cn/open-apis';
 // 飞书 refresh_token 保活存储（多维表格方案）：负责 OAuth 刷新 + 新 refresh_token 写回表格
 const { getTenantAccessToken, obtainUserMailToken } = require('../lib/feishu-token.js');
 
+// 飞书机器人公共能力（内容工厂：事件接收 + 发消息）
+const { sendFeishuText, isAllowedOpenId, verifyEventToken } = require('../lib/feishu-bot.js');
+
 // ---------- 飞书：user_access_token（OAuth 用户身份，用于发信） ----------
 /**
  * 获取发信用的 user_access_token（保活版）。
@@ -868,6 +871,117 @@ async function handlePublish(req, res) {
   }
 }
 
+// ---------- 飞书内容工厂（v1.28.0 合并自 api/feishu-event.js / api/feishu-notify.js） ----------
+// 为修复 Vercel 免费版函数数超限，飞书机器人端点合并进本函数，由 vercel.json rewrites 分流：
+//   /api/feishu-event   → 事件订阅（URL 验证 + im.message.receive_v1 → 创建发布任务 + 回执）
+//   /api/feishu-notify  → 内容工厂完成通知（Proma 分发后调用，x-publish-key 鉴权）
+
+function parseFeishuBody(req) {
+  if (typeof req.body === 'object' && req.body !== null) return req.body;
+  try { return JSON.parse(req.body || '{}'); } catch (e) { return null; }
+}
+
+async function handleFeishuEvent(req, res) {
+  // URL 验证（飞书 POST {"challenge":"xxx"} → 原样返回）
+  const challengeBody = parseFeishuBody(req);
+  if (challengeBody && challengeBody.challenge) {
+    res.status(200).json({ challenge: challengeBody.challenge });
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.status(405).json({ ok: false, message: 'Method Not Allowed' });
+    return;
+  }
+
+  const event = parseFeishuBody(req);
+  if (!event) {
+    res.status(400).json({ ok: false, message: 'invalid json' });
+    return;
+  }
+  if (!verifyEventToken(event)) {
+    res.status(403).json({ ok: false, message: 'invalid event token' });
+    return;
+  }
+
+  const eventType = (event.header && event.header.event_type) || event.type || '';
+  try {
+    if (eventType !== 'im.message.receive_v1') {
+      res.status(200).json({ ok: true, skipped: 'unhandled:' + eventType });
+      return;
+    }
+
+    const ev = event.event || {};
+    const sender = ev.sender || {};
+    const msg = ev.message || {};
+    const senderOpenId = (sender.sender_id && sender.sender_id.open_id) || '';
+    const chatId = msg.chat_id || '';
+    const msgType = msg.message_type || '';
+
+    if (!isAllowedOpenId(senderOpenId)) {
+      res.status(200).json({ ok: true, skipped: 'not-allowed' });
+      return;
+    }
+    if (msgType !== 'text') {
+      res.status(200).json({ ok: true, skipped: 'not-text:' + msgType });
+      return;
+    }
+
+    let text = '';
+    try { text = String((JSON.parse(msg.content || '{}').text) || '').trim(); } catch (e) { /* ignore */ }
+    if (!text) {
+      res.status(200).json({ ok: true, skipped: 'empty-text' });
+      return;
+    }
+
+    const title = text.slice(0, 200);
+    const { taskId } = await createTask({
+      title,
+      content: '',
+      userId: 'feishu:' + (senderOpenId.slice(0, 16) || 'unknown'),
+      options: { source: 'feishu', replyChatId: chatId, replyOpenId: senderOpenId, chatType: msg.chat_type || 'p2p' },
+    });
+
+    await sendFeishuText(chatId, `收到 ✅ 内容工厂开始加工：\n「${title}」\n⏳ 预计 10-20 分钟，完成后我会通知你审核发布。`);
+    res.status(200).json({ ok: true, taskId });
+  } catch (err) {
+    console.error('[lead] feishu-event ' + (err && err.message ? err.message : err));
+    const chatId = ((event.event || {}).message || {}).chat_id || '';
+    if (chatId) {
+      try {
+        await sendFeishuText(chatId, '⚠️ 内容工厂处理失败：' + (err.message || '未知错误') + '\n请稍后重试。');
+      } catch (e) { /* ignore */ }
+    }
+    res.status(200).json({ ok: false, message: 'handled-with-error' });
+  }
+}
+
+async function handleFeishuNotify(req, res) {
+  if (req.method !== 'POST') {
+    res.status(405).json({ ok: false, message: 'Method Not Allowed' });
+    return;
+  }
+  const expected = process.env.PUBLISH_KEY;
+  const got = req.headers['x-publish-key'];
+  if (!expected || got !== expected) {
+    res.status(403).json({ ok: false, message: 'x-publish-key 无效' });
+    return;
+  }
+  const body = parseFeishuBody(req);
+  if (!body || !body.chatId) {
+    res.status(400).json({ ok: false, message: '缺少 chatId' });
+    return;
+  }
+  const defaultText = '✅ 内容工厂完成：三平台草稿已就绪，请审核后发布。';
+  try {
+    const r = await sendFeishuText(body.chatId, String(body.text || defaultText), body.receiveIdType || 'chat_id');
+    res.status(200).json({ ok: true, ...r });
+  } catch (err) {
+    console.error('[lead] feishu-notify ' + (err && err.message ? err.message : err));
+    res.status(502).json({ ok: false, message: '发送失败: ' + (err.message || '') });
+  }
+}
+
 // ---------- handler ----------
 
 module.exports = async function handler(req, res) {
@@ -886,6 +1000,17 @@ module.exports = async function handler(req, res) {
   const isPublishPath = (req.url || '').indexOf('/api/publish') !== -1;
   if (isPublishPath) {
     return handlePublish(req, res);
+  }
+
+  // v1.28.0 分流：/api/feishu-event（vercel.json rewrites 路由到本函数）→ 飞书事件订阅
+  const isFeishuEventPath = (req.url || '').indexOf('/api/feishu-event') !== -1;
+  if (isFeishuEventPath) {
+    return handleFeishuEvent(req, res);
+  }
+  // v1.28.0 分流：/api/feishu-notify（vercel.json rewrites 路由到本函数）→ 内容工厂完成通知
+  const isFeishuNotifyPath = (req.url || '').indexOf('/api/feishu-notify') !== -1;
+  if (isFeishuNotifyPath) {
+    return handleFeishuNotify(req, res);
   }
 
   if (req.method !== 'POST') {
@@ -986,3 +1111,8 @@ module.exports.resetRate = function resetRate() { rateMap.clear(); };
 // 发布任务队列（合并自 api/publish.js）导出，供本地单测
 module.exports.handlePublish = handlePublish;
 module.exports._publish = { createTask, listTasks, listPending, markDone, getConfigPublic, setConfig, obfuscate, deobfuscate };
+
+// 飞书内容工厂（合并自 api/feishu-event.js / api/feishu-notify.js）导出，供本地单测
+module.exports.handleFeishuEvent = handleFeishuEvent;
+module.exports.handleFeishuNotify = handleFeishuNotify;
+module.exports.parseFeishuBody = parseFeishuBody;
