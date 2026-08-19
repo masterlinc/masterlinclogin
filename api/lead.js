@@ -911,47 +911,20 @@ async function handleFeishuEvent(req, res) {
       return;
     }
 
+    // 2026-08-19 用户指令：停用飞书机器人。收到消息只回执已停用，不建任务、不处理。
     const ev = event.event || {};
-    const sender = ev.sender || {};
     const msg = ev.message || {};
-    const senderOpenId = (sender.sender_id && sender.sender_id.open_id) || '';
     const chatId = msg.chat_id || '';
-    const msgType = msg.message_type || '';
-
-    if (!isAllowedOpenId(senderOpenId)) {
-      res.status(200).json({ ok: true, skipped: 'not-allowed' });
-      return;
-    }
-    if (msgType !== 'text') {
-      res.status(200).json({ ok: true, skipped: 'not-text:' + msgType });
-      return;
-    }
-
-    let text = '';
-    try { text = String((JSON.parse(msg.content || '{}').text) || '').trim(); } catch (e) { /* ignore */ }
-    if (!text) {
-      res.status(200).json({ ok: true, skipped: 'empty-text' });
-      return;
-    }
-
-    const title = text.slice(0, 200);
-    const { taskId } = await createTask({
-      title,
-      content: '',
-      userId: 'feishu:' + (senderOpenId.slice(0, 16) || 'unknown'),
-      options: { source: 'feishu', replyChatId: chatId, replyOpenId: senderOpenId, chatType: msg.chat_type || 'p2p' },
-    });
-
-    await sendFeishuText(chatId, `收到 ✅ 内容工厂开始加工：\n「${title}」\n⏳ 预计 10-20 分钟，完成后我会通知你审核发布。`);
-    res.status(200).json({ ok: true, taskId });
-  } catch (err) {
-    console.error('[lead] feishu-event ' + (err && err.message ? err.message : err));
-    const chatId = ((event.event || {}).message || {}).chat_id || '';
-    if (chatId) {
+    const senderOpenId = ((ev.sender || {}).sender_id || {}).open_id || '';
+    if (chatId && isAllowedOpenId(senderOpenId)) {
       try {
-        await sendFeishuText(chatId, '⚠️ 内容工厂处理失败：' + (err.message || '未知错误') + '\n请稍后重试。');
+        await sendFeishuText(chatId, '⏸️ 内容工厂已停用（2026-08-19 指令）。如需恢复，请告知 masterlinc。');
       } catch (e) { /* ignore */ }
     }
+    res.status(200).json({ ok: true, skipped: 'disabled-by-user' });
+    return;
+  } catch (err) {
+    console.error('[lead] feishu-event ' + (err && err.message ? err.message : err));
     res.status(200).json({ ok: false, message: 'handled-with-error' });
   }
 }
